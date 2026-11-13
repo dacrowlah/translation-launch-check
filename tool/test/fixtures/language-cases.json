@@ -1,0 +1,199 @@
+{
+  "corpus": {
+    "de": {
+      "cta": [
+        "Jetzt kaufen",
+        "Mehr erfahren",
+        "Zum Angebot",
+        "Jetzt sichern",
+        "Gratis testen",
+        "Zur Kasse"
+      ],
+      "headline": [
+        "Bis zu 30 % auf Laufschuhe",
+        "Nur heute: Gratisversand",
+        "Neue Wanderjacken sind da",
+        "Dein Winter-Outfit wartet",
+        "Angebot endet am Sonntag",
+        "Sichere dir deinen Rabatt"
+      ],
+      "body": [
+        "Spare bis zu 30 % auf ausgew\u00e4hlte Laufschuhe und Jacken \u2013 nur bis Sonntag.",
+        "Melde dich jetzt an und erhalte exklusive Angebote direkt in dein Postfach.",
+        "Kostenloser Versand ab einem Bestellwert von 50 \u20ac in ganz Deutschland.",
+        "Hallo {{vorname}}, deine Lieblingsartikel sind jetzt reduziert.",
+        "Nur solange der Vorrat reicht. Nicht mit anderen Aktionen kombinierbar.",
+        "Entdecke unsere Bestseller f\u00fcr den Winter und finde dein neues Lieblingsst\u00fcck."
+      ],
+      "long": [
+        "Unsere neue TrailPro Kollektion wurde f\u00fcr lange Tage in den Bergen entwickelt: wasserdicht, atmungsaktiv und leicht genug f\u00fcr jede Tour. Jetzt im Black Friday Sale entdecken.",
+        "Die R\u00fccksendung ist innerhalb von 30 Tagen kostenlos. Bitte bewahre den Kassenbon auf und verwende das beiliegende R\u00fccksendeetikett.",
+        "Mit dem Code BF30 sparst du bis Sonntag, 30. November, 30 % auf alles. Gilt nicht f\u00fcr bereits reduzierte Artikel. Details unter https://example.com/de/agb?utm_campaign=bf26."
+      ],
+      "tricky": [
+        "Black Friday Sale: Jetzt shoppen",
+        "TrailPro Ultra \u2013 jetzt live",
+        "Code BF30 einl\u00f6sen",
+        "Sale startet um 9 Uhr",
+        "Cyber Monday Deals",
+        "Newsletter abonnieren"
+      ]
+    },
+    "fr": {
+      "cta": [
+        "Acheter",
+        "En savoir plus",
+        "Je d\u00e9couvre",
+        "J'en profite",
+        "Voir l'offre",
+        "Commander"
+      ],
+      "headline": [
+        "Jusqu'\u00e0 -30 % sur les baskets",
+        "Livraison offerte aujourd'hui",
+        "Nouvelles vestes de randonn\u00e9e",
+        "L'offre se termine dimanche",
+        "Votre tenue d'hiver vous attend",
+        "Profitez de votre remise"
+      ],
+      "body": [
+        "\u00c9conomisez jusqu'\u00e0 30 % sur une s\u00e9lection de chaussures et de vestes, jusqu'\u00e0 dimanche seulement.",
+        "Inscrivez-vous d\u00e8s maintenant et recevez nos offres exclusives directement dans votre bo\u00eete mail.",
+        "Livraison gratuite d\u00e8s 50 \u20ac d'achat partout en France m\u00e9tropolitaine.",
+        "Bonjour {{pr\u00e9nom}}, vos articles pr\u00e9f\u00e9r\u00e9s sont en promotion.",
+        "Dans la limite des stocks disponibles. Offre non cumulable avec d'autres promotions.",
+        "D\u00e9couvrez nos meilleures ventes de l'hiver et trouvez votre nouvelle pi\u00e8ce pr\u00e9f\u00e9r\u00e9e."
+      ],
+      "long": [
+        "Notre nouvelle collection TrailPro a \u00e9t\u00e9 con\u00e7ue pour les longues journ\u00e9es en montagne : imperm\u00e9able, respirante et assez l\u00e9g\u00e8re pour toutes vos sorties. \u00c0 d\u00e9couvrir pendant le Black Friday.",
+        "Les retours sont gratuits sous 30 jours. Conservez votre ticket de caisse et utilisez l'\u00e9tiquette de retour fournie dans le colis.",
+        "Avec le code BF30, \u00e9conomisez 30 % sur tout jusqu'au dimanche 30 novembre. Hors articles d\u00e9j\u00e0 sold\u00e9s. Conditions sur https://example.com/fr/cgv?utm_campaign=bf26."
+      ],
+      "tricky": [
+        "Black Friday : c'est parti",
+        "TrailPro Ultra \u2013 disponible",
+        "Code BF30 \u00e0 saisir",
+        "Les soldes commencent \u00e0 9 h",
+        "Offres Cyber Monday",
+        "S'abonner \u00e0 la newsletter"
+      ]
+    },
+    "en": {
+      "cta": ["Shop now", "Learn more", "Get the deal", "Claim offer", "Try it free", "Checkout"],
+      "headline": [
+        "Up to 30% off running shoes",
+        "Free shipping today only",
+        "New hiking jackets are here",
+        "Your winter outfit awaits",
+        "Offer ends Sunday",
+        "Claim your discount"
+      ],
+      "body": [
+        "Save up to 30% on selected running shoes and jackets, until Sunday only.",
+        "Sign up now and get exclusive offers delivered straight to your inbox.",
+        "Free shipping on orders over $50 anywhere in the continental US.",
+        "Hi {{first_name}}, your favorite items are now on sale.",
+        "While stocks last. Cannot be combined with other promotions.",
+        "Discover our winter best sellers and find your new favorite piece."
+      ],
+      "long": [
+        "Our new TrailPro collection was built for long days in the mountains: waterproof, breathable and light enough for any trip. Discover it now in the Black Friday Sale.",
+        "Returns are free within 30 days. Please keep your receipt and use the return label included in your package.",
+        "With code BF30 you save 30% on everything until Sunday, November 30. Excludes items already on sale. Details at https://example.com/en/terms?utm_campaign=bf26."
+      ],
+      "tricky": [
+        "Black Friday Sale: shop now",
+        "TrailPro Ultra is live",
+        "Use code BF30",
+        "Sale starts at 9am",
+        "Cyber Monday deals",
+        "Subscribe to the newsletter"
+      ]
+    },
+    "ja": {
+      "cta": [
+        "\u4eca\u3059\u3050\u8cfc\u5165",
+        "\u8a73\u3057\u304f\u898b\u308b",
+        "\u30af\u30fc\u30dd\u30f3\u3092\u4f7f\u3046"
+      ],
+      "headline": [
+        "\u6700\u592730%\u30aa\u30d5",
+        "\u30d6\u30e9\u30c3\u30af\u30d5\u30e9\u30a4\u30c7\u30fc\u30bb\u30fc\u30eb\u958b\u50ac\u4e2d",
+        "\u9001\u6599\u7121\u6599\u306f\u672c\u65e5\u9650\u308a",
+        "TrailPro Ultra \u65b0\u767b\u5834"
+      ],
+      "body": [
+        "\u65e5\u66dc\u65e5\u307e\u3067\u3001\u5bfe\u8c61\u306e\u30e9\u30f3\u30cb\u30f3\u30b0\u30b7\u30e5\u30fc\u30ba\u3068\u30b8\u30e3\u30b1\u30c3\u30c8\u304c\u6700\u592730%\u30aa\u30d5\u3002",
+        "\u4eca\u3059\u3050\u767b\u9332\u3057\u3066\u3001\u9650\u5b9a\u30aa\u30d5\u30a1\u30fc\u3092\u30e1\u30fc\u30eb\u3067\u53d7\u3051\u53d6\u308a\u307e\u3057\u3087\u3046\u3002"
+      ],
+      "long": [
+        "\u65b0\u3057\u3044TrailPro\u30b3\u30ec\u30af\u30b7\u30e7\u30f3\u306f\u3001\u5c71\u3067\u306e\u9577\u3044\u4e00\u65e5\u306e\u305f\u3081\u306b\u4f5c\u3089\u308c\u307e\u3057\u305f\u3002\u9632\u6c34\u6027\u3068\u901a\u6c17\u6027\u306b\u512a\u308c\u3001\u3069\u3093\u306a\u65c5\u306b\u3082\u5341\u5206\u306a\u8efd\u3055\u3067\u3059\u3002\u30d6\u30e9\u30c3\u30af\u30d5\u30e9\u30a4\u30c7\u30fc\u30bb\u30fc\u30eb\u3067\u4eca\u3059\u3050\u30c1\u30a7\u30c3\u30af\u3002"
+      ],
+      "tricky": ["Black Friday SALE", "TrailPro"]
+    }
+  },
+  "hard": {
+    "de": [
+      "Online-Shop",
+      "Gutschein-Code",
+      "Top-Deals der Woche",
+      "Last-Minute-Geschenke",
+      "Ski-Jacke im Sale",
+      "Sneaker-Highlights",
+      "Outdoor-Equipment",
+      "Members-only: 20 % extra",
+      "Jetzt Fan werden",
+      "Das perfekte Geschenk",
+      "G\u00fcltig bis 30.11.",
+      "Versandkostenfrei bestellen",
+      "Gr\u00f6\u00dfe w\u00e4hlen",
+      "In den Warenkorb",
+      "Zur\u00fcck zum Shop",
+      "Bewertungen lesen",
+      "Black Friday Week: Die besten Deals f\u00fcr Outdoor-Fans",
+      "Unser Bestseller-Rucksack ist zur\u00fcck \u2013 limitiert und nur online erh\u00e4ltlich.",
+      "Gr\u00fcezi {{vorname}}, Ihr Gutschein ist bis Ende Monat g\u00fcltig.",
+      "Servus! Die Skisaison startet \u2013 hol dir jetzt dein Equipment."
+    ],
+    "fr": [
+      "Bons plans de la semaine",
+      "Code promo",
+      "Cadeaux de derni\u00e8re minute",
+      "Veste de ski en soldes",
+      "S\u00e9lection sneakers",
+      "\u00c9quipement outdoor",
+      "R\u00e9serv\u00e9 aux membres : 20 % en plus",
+      "Le cadeau parfait",
+      "Valable jusqu'au 30/11",
+      "Livraison gratuite",
+      "Choisir la taille",
+      "Ajouter au panier",
+      "Retour \u00e0 la boutique",
+      "Lire les avis",
+      "Black Friday Week : les meilleurs deals pour les fans d'outdoor",
+      "Notre sac \u00e0 dos best-seller est de retour, en \u00e9dition limit\u00e9e et uniquement en ligne.",
+      "Bonjour {{pr\u00e9nom}}, votre bon d'achat est valable jusqu'\u00e0 la fin du mois.",
+      "La saison de ski commence : \u00e9quipez-vous d\u00e8s maintenant."
+    ],
+    "en": [
+      "Deals of the week",
+      "Promo code",
+      "Last-minute gifts",
+      "Ski jacket on sale",
+      "Sneaker picks",
+      "Outdoor gear",
+      "Members only: extra 20%",
+      "The perfect gift",
+      "Valid until 11/30",
+      "Free delivery",
+      "Select size",
+      "Add to cart",
+      "Back to shop",
+      "Read reviews",
+      "Black Friday Week: the best deals for outdoor fans",
+      "Our best-selling backpack is back, limited edition and online only.",
+      "Hi {{first_name}}, your voucher is valid until the end of the month.",
+      "Ski season is here: gear up now."
+    ]
+  }
+}
