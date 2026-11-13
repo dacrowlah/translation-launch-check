@@ -1,11 +1,10 @@
-import { registerTool, type ToolsService } from "@optimizely-opal/opal-tools-sdk";
+import { registerTool } from "@optimizely-opal/opal-tools-sdk";
 import { checkLocalization, type CheckDeps } from "../application/check-localization";
 import type { Logger } from "../domain/ports/logger";
 import type { Limits } from "../domain/rules";
 import type { LocalizationPackage } from "../domain/types";
 import { localizationSchema, localizationShape } from "./schemas";
 import { safeHandler } from "./safe-handler";
-import { validationGate } from "./validation-gate";
 
 const NAME = "localization_check";
 const DESCRIPTION =
@@ -21,18 +20,15 @@ const spec = (limits: Limits) => ({
   inputSchema: localizationShape(limits),
 });
 
-const handler = (deps: CheckDeps, logger: Logger) =>
-  safeHandler(NAME, logger, (pkg: LocalizationPackage) => ({
-    body: checkLocalization(pkg, deps),
-    lines: pkg.lines.length,
-    locales: pkg.locales.length,
-  }));
+const check = (deps: CheckDeps) => (pkg: LocalizationPackage) => ({
+  body: checkLocalization(pkg, deps),
+  lines: pkg.lines.length,
+  locales: pkg.locales.length,
+});
 
-export const registerLocalizationCheck = (
-  service: ToolsService,
-  deps: CheckDeps,
-  logger: Logger,
-): void => {
-  validationGate(service, NAME, localizationSchema(deps.rules.limits));
+const handler = (deps: CheckDeps, logger: Logger) =>
+  safeHandler(NAME, logger, localizationSchema(deps.rules.limits), check(deps));
+
+export const registerLocalizationCheck = (deps: CheckDeps, logger: Logger): void => {
   registerTool(NAME, spec(deps.rules.limits), handler(deps, logger));
 };

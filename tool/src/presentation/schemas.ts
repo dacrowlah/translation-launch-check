@@ -13,7 +13,7 @@ const lineShape = (limits: Limits) => ({
   id: name(),
   channel: name(),
   field: name(),
-  texts: z.record(z.string(), text(limits)),
+  texts: z.record(z.string().regex(LOCALE), text(limits)),
 });
 
 const localesField = (limits: Limits) =>
@@ -53,14 +53,33 @@ export const localizationShape = (limits: Limits) => ({
 
 export const copyFitShape = (limits: Limits) => ({ items: itemsField(limits) });
 
-/** The full check: the shape plus "texts holds the master and every target locale". */
+type Pkg = { locales: string[]; lines: { texts: Record<string, string> }[] };
+type Issue = Parameters<z.RefinementCtx["addIssue"]>[0];
+
+const textsMatch = (texts: Record<string, string>, wanted: readonly string[]): boolean =>
+  Object.keys(texts).length === wanted.length && wanted.every((locale) => locale in texts);
+
+const localesProblem = (locales: readonly string[]): string | null => {
+  if (locales.includes(MASTER)) return "the master is not a target";
+  return new Set(locales).size === locales.length ? null : "duplicate locale";
+};
+
+const textsIssues = (pkg: Pkg): Issue[] =>
+  pkg.lines.flatMap((line, i) =>
+    textsMatch(line.texts, [MASTER, ...pkg.locales])
+      ? []
+      : [{ code: "custom" as const, path: ["lines", i, "texts"], message: "locale mismatch" }],
+  );
+
+const localeIssues = (pkg: Pkg): Issue[] => {
+  const problem = localesProblem(pkg.locales);
+  return problem ? [{ code: "custom", path: ["locales"], message: problem }] : [];
+};
+
+/** The full check: the shape, plus unique targets and "texts holds exactly master + targets". */
 export const localizationSchema = (limits: Limits) =>
   z.object(localizationShape(limits)).superRefine((pkg, ctx) => {
-    const wanted = [MASTER, ...pkg.locales];
-    pkg.lines.forEach((line, i) => {
-      if (wanted.some((locale) => !(locale in line.texts)))
-        ctx.addIssue({ code: "custom", path: ["lines", i, "texts"], message: "missing locale" });
-    });
+    [...localeIssues(pkg), ...textsIssues(pkg)].forEach((issue) => ctx.addIssue(issue));
   });
 
 export const copyFitSchema = (limits: Limits) => z.object(copyFitShape(limits));

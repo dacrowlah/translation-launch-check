@@ -90,7 +90,17 @@ use case in `src/application/`.
   service refuses to start without it.
 - **Outbound: none.** The service makes no network requests. No URL from the copy is ever
   fetched; URLs are only compared. A test pins that no code path calls `fetch`.
-- **Input:** every parameter is zod-validated with the bounds in the contract.
+- **Input:** every parameter is zod-validated with the bounds in the contract, inside the
+  tool handler (`safeHandler`), after the SDK's bearer check. The SDK does not validate at
+  request time and has no status hook, so a malformed call does no work and throws a fixed
+  `invalid_input`; the SDK turns that into HTTP 500 `{"error":"invalid_input"}` (no zod text,
+  paths or input). Our only caller validates first, so a malformed call is a caller defect.
+  A defect is `{"error":"internal_error"}`. Never reach the SDK's private router.
+- **Body limit:** `express.json({ limit: "256kb" })`. A 64 KB CSV's package, with JSON
+  escaping, fits; real code-step calls are far smaller. Larger bodies get a generic 413
+  `{"error":"invalid_request"}`; malformed JSON gets a generic 400 of the same body.
+- **SDK registry:** `registerTool` registers on every `ToolsService` ever created (a global
+  registry), so build one app per process and, in tests, one per test file.
 - **Secrets** live in Vercel environment variables, never in the repo; `.env*` is gitignored.
 - **Dependencies:** `pnpm audit` has no high or critical findings at release, or each one is
   explained in the PR.

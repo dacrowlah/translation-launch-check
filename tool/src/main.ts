@@ -21,11 +21,11 @@ export interface AppConfig {
 }
 
 const MIN_TOKEN_LENGTH = 32;
-// 50 lines x 6 texts x 1000 characters is 300 KB before UTF-8 and JSON escaping.
-const BODY_LIMIT = "1mb";
+// Covers a 64 KB CSV's package with JSON escaping; real code-step calls are far smaller.
+const BODY_LIMIT = "256kb";
 
 const requireToken = (token: string | undefined): string => {
-  if (token === undefined || token.length < MIN_TOKEN_LENGTH)
+  if (token === undefined || token !== token.trim() || token.length < MIN_TOKEN_LENGTH)
     throw new Error(`TOOL_BEARER_TOKEN must be set and at least ${MIN_TOKEN_LENGTH} characters`);
   return token;
 };
@@ -42,20 +42,21 @@ const failGenerically: ErrorRequestHandler = (err, _req, res, next) => {
   res.status(status).json({ error: status === 500 ? "internal_error" : "invalid_request" });
 };
 
-const buildService = (app: Express, token: string | undefined): ToolsService => {
+const mountService = (app: Express, token: string | undefined): void => {
   const bearerToken = requireToken(token);
   app.use(express.json({ limit: BODY_LIMIT }));
-  return new ToolsService(app, { authMode: "static_token", bearerToken });
+  new ToolsService(app, { authMode: "static_token", bearerToken });
 };
 
-const registerTools = (service: ToolsService, config: AppConfig): void => {
-  registerLocalizationCheck(service, config, config.logger);
-  registerCopyFitCheck(service, config.rules, config.logger);
+const registerTools = (config: AppConfig): void => {
+  registerLocalizationCheck(config, config.logger);
+  registerCopyFitCheck(config.rules, config.logger);
 };
 
 export const createApp = (config: AppConfig): Express => {
-  const app = express();
-  registerTools(buildService(app, config.token), config);
+  const app = express().disable("x-powered-by");
+  mountService(app, config.token);
+  registerTools(config);
   quietConsole();
   return app.use(failGenerically);
 };

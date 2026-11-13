@@ -52,8 +52,12 @@ check statuses into verdicts.
   text from a request. The SDK's own request-body logging is silenced.
 - **Inputs are validated** with zod against the parameter tables below. The bounds come from
   `limits` in `config/rules.json` (`max_lines`, `max_targets`, `max_cell_chars`) where they
-  exist there, and are fixed in the schemas otherwise. A malformed call returns a validation
-  error and does no work.
+  exist there, and are fixed in the schemas otherwise. A malformed call does no work and
+  returns HTTP 500 `{"error":"invalid_input"}`: a fixed string, never an echo of the input, no
+  field names, no validation text. The only caller (the workflow) validates before calling, so a
+  malformed call is a caller defect, not an expected problem. A genuine defect returns HTTP 500
+  `{"error":"internal_error"}`. Authentication is checked first: a bad or missing token is 401
+  whatever the body holds.
 - **Determinism:** the same inputs, the same rules file and the same run date give the same
   output. Output keeps input order: locales in the order given, lines in the order given,
   findings in the order of the check table (section 3).
@@ -72,7 +76,9 @@ One call covers every locale and line (batched).
 Line fields:
 - `id`, `channel`, `field`: strings, each at most 40 characters;
 - `texts`: an object of locale -> text, each text at most 1000 characters. It must hold the
-  master locale and every locale in `locales`; a missing key is a validation error.
+  master locale and every locale in `locales` and no other key (keys are locales matching
+  `^[a-z]{2}-[A-Z]{2}$`); `locales` entries are unique and never `en-US`. A violation is
+  `invalid_input`.
 
 Types are in `tool/src/domain/types.ts`. It exports `ALL_CHECK_IDS` (a readonly tuple of the
 24 check ids below) and derives `CheckId` from it, so the list exists once.
