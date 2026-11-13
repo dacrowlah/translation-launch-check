@@ -35,6 +35,12 @@ A workflow can have several triggers (one Chat max). Scheduled/webhook/email run
   orchestrator **model** fills Automatic inputs from the trigger and prior outputs, re-typing
   them. Write precise variable descriptions; guard important data (e.g. a checksum the next
   code step recomputes).
+- **A Fixed input on an agent step inside a loop is not passed** - a required one fails every
+  iteration ("Parameter ... is required ... but not found on predicted_parameters"). Make it
+  Automatic with a description that pins the value ("Always exactly the word English").
+- After a loop, the next step gets each iteration's output in item order, but an agent's text
+  output doesn't say which item it came from - match by position, or have the last step in
+  the loop return the item key with its result.
 - A loop's `items_source` names an upstream field and was passed by reference (tokens arrived
   byte-exact).
 - After a loop, the next step receives a **list of each iteration's final output, in item

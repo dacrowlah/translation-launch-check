@@ -33,7 +33,7 @@ Variables: `[[country_code]]`. Mention tools in backticks: `` `copy_fit_check` `
 ## Workflow (export format)
 Top level: `schema_version: "1.3"`, `agent_type: "workflow"`, `workflow_type: "deterministic"`,
 `agent_id`, `name`, `description`, `triggers[]`, `steps[]` (flat list), `specialized_agents[]`
-(full agent objects - an export bundles them; the example file leaves it `[]` only because it was sanitized - importing with `[]` is **unverified**; test it, or keep the bundled agents), `specialized_agents_required[]` (agent_ids),
+(full agent objects - an export bundles them; `[]` imports fine - verified; the reference resolves to the agent already in the instance), `specialized_agents_required[]` (agent_ids),
 `agent_metadata: {nodes[], edges[]}`.
 
 | step_type | Fields |
@@ -45,7 +45,9 @@ Top level: `schema_version: "1.3"`, `agent_type: "workflow"`, `workflow_type: "d
 
 `parameters_schema` entries: `{"<name>": {"type": "predicted" | "static", "value_type": "string"|"number"|"boolean"|"object"|"array", "required": bool, "description": "...", "value": null | <static value>}}`.
 `predicted` = filled by the orchestrator model from the trigger and prior outputs, so the
-`description` is the wiring - be precise. Name the source field: a chat or scheduler run
+`description` is the wiring - be precise. **`static` is ignored on agent steps inside a
+`for_loop`** (verified: a required static input fails the iteration) - use `predicted` with a
+description that pins the value. Name the source field: a chat or scheduler run
 arrives as `text_content` (chat rewrites it - see `mark-platform`), a webhook run as
 `webhook_payload.<field>`, an email run as `email_payload.content.text`.
 
@@ -79,8 +81,9 @@ only the trigger edge needs listing. Recipe:
 - Export: `...` -> Download agent -> **Copy as JSON** (or ZIP with files). Exports strip
   webhook URLs, auth keys, emails; attached files aren't in JSON.
 - Import: Agents -> Add Agent -> **Upload Agent** -> paste or drop the file -> Next. A workflow
-  shows its referenced agents ("Existing" vs **Create new copy** - copy makes `<id>-copy1`;
-  pick the existing one or overwrite) -> trigger reconfiguration -> **Import Agent**. Imported
+  lists its referenced agents with a dropdown that **defaults to "Create new copy"** (makes
+  `<id>-copy1`); choose **"Reuse existing"** (or "Overwrite existing" only for agents you own)
+  -> trigger reconfiguration -> **Import Agent**. Imported
   workflows get new webhook URLs; reconfigure email/scheduler triggers.
 - Round-trip check: export what you imported and diff against your source.
 
