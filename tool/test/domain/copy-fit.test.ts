@@ -5,21 +5,25 @@ import { testRules } from "../support/rules";
 
 describe("measuring copy", () => {
   it("counts_cjk_double_for_ads", () => {
-    expect(measure("春のセール", "ads_chars")).toBe(10);
-    expect(measure("春のセール", "chars")).toBe(5);
+    expect(measure("\u6625\u306e\u30bb\u30fc\u30eb", "ads_chars")).toBe(10);
+    expect(measure("\u6625\u306e\u30bb\u30fc\u30eb", "chars")).toBe(5);
   });
   it.each([
     ["a".repeat(160), 1],
     ["a".repeat(161), 2],
-    ["ç" + "a".repeat(69), 1],
-    ["一".repeat(71), 2],
+    ["\u00e7" + "a".repeat(69), 1],
+    ["\u4e00".repeat(71), 2],
     ["[".repeat(81), 2],
   ])("counts_sms_segments", (text, segments) => {
     expect(measure(text, "sms_segments")).toBe(segments);
   });
   it("japanese_headline_28_of_30_passes_and_reports_length", () => {
     expect(
-      lengthInfo(aLine({ channel: "google_ads", field: "headline" }), "ジ".repeat(14), testRules()),
+      lengthInfo(
+        aLine({ channel: "google_ads", field: "headline" }),
+        "\u30b8".repeat(14),
+        testRules(),
+      ),
     ).toEqual({ value: 28, limit: 30, unit: "ads_chars" });
   });
 });
@@ -71,6 +75,10 @@ describe("fitItem", () => {
       template_artifacts: ["[[cta]]"],
       severity: "blocker",
     });
+  });
+  it("artifact_is_a_blocker_even_on_a_soft_channel", () => {
+    const item = { channel: "email", field: "subject", text: "Shop now [[cta]]" };
+    expect(fitItem(item, testRules()).severity).toBe("blocker");
   });
   it("fitting_text_has_no_severity", () => {
     expect(fitItem({ channel: "email", field: "subject", text: "Hi" }, testRules())).toMatchObject({

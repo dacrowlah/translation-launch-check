@@ -198,8 +198,9 @@ Response: `[{ channel, field, length, limit, unit, fits, over_by, encoding, temp
   - `blocker` when any template artifact is found;
   - else `warning` when over the limit;
   - else `null`.
-  - Exception: channels marked `soft` in the channel table (e.g. email subject) never exceed
-    `warning`.
+  - Template artifacts are a `blocker` on every channel, soft or not.
+  - Exception for length only: an over-limit text on a channel marked `soft` in the channel
+    table (e.g. email subject) is never worse than `warning`.
 - `localization_check` uses the same counting and artifact code (`length_hard`,
   `length_soft`, `template_leftovers`), so the two functions cannot disagree.
 

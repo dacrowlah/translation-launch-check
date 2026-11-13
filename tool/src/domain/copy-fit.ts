@@ -6,7 +6,8 @@ import type { LengthInfo, PackageLine, Severity, Unit } from "./types";
 export { findArtifacts } from "./artifacts";
 export { smsEncoding } from "./sms";
 
-const WIDE = /[ᄀ-ᅟ⺀-꓏가-힣豈-﫿︰-﹏＀-｠￠-￦]/u;
+const WIDE =
+  /[\u1100-\u115f\u2e80-\ua4cf\uac00-\ud7a3\uf900-\ufaff\ufe30-\ufe4f\uff00-\uff60\uffe0-\uffe6]/u;
 
 const adsChars = (text: string): number =>
   [...text].reduce((sum, ch) => sum + (WIDE.test(ch) ? 2 : 1), 0);
