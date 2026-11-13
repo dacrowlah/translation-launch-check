@@ -58,11 +58,12 @@ const suffix = (names: readonly string[]): string => {
   return String.raw`(?:\s?(?:[(\uff08](?<ws>${kanji})(?:${JA_DAY})?[)\uff09]|(?<ws>${kanji})${JA_DAY}))?`;
 };
 
-/** Numeric dates: dotted only in German; none may directly follow a currency. */
+/** Numeric dates: dotted only in German; where "." is the decimal, none may follow a currency. */
 const numeric = (locale: LocaleRule, rules: Rules): string[] => {
   const currency = alternation(Object.keys(rules.currencies));
   const forms = locale.language === "de" ? [DOTTED, SLASHED] : [SLASHED];
-  return forms.map((form) => String.raw`(?<!(?:${currency})[ \u00a0\u202f]?)${form}`);
+  const guard = locale.decimal === "." ? String.raw`(?<!(?:${currency})[ \u00a0\u202f]?)` : "";
+  return forms.map((form) => `${guard}${form}`);
 };
 
 const forms = (locale: LocaleRule, rules: Rules): string =>

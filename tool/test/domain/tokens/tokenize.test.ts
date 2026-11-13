@@ -85,6 +85,19 @@ describe("tokenize", () => {
     expect([found.money, found.dates]).toEqual([[{ minor: 1210, currency: "CHF" }], []]);
   });
 
+  it.each([
+    ["Fr. 27.11.", 27, 4],
+    ["EUR 29.11.", 29, null],
+  ])("reads_a_german_date_after_a_currency_word %s", (text, day, weekday) => {
+    const found = tokenize(text, "de-DE", testRules());
+    expect([found.dates, found.money]).toEqual([[{ month: 11, day, year: null, weekday }], []]);
+  });
+
+  it("reads_a_weekday_comma_date_in_swiss_german_as_a_date", () => {
+    const found = tokenize("Fr., 29.11.", "de-CH", testRules());
+    expect(found.dates).toEqual([{ month: 11, day: 29, year: null, weekday: 4 }]);
+  });
+
   it("does_not_count_the_year_of_a_dotted_date_as_a_number", () => {
     expect(tokenize("bis 29.11.2026", "de-DE", testRules()).numbers).toEqual([]);
   });
