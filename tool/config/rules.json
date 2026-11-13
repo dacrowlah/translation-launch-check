@@ -14,7 +14,8 @@
       "script": "latin",
       "decimal": ".",
       "group": [","],
-      "formality": "not_applicable"
+      "formality": "not_applicable",
+      "date_order": "mdy"
     },
     "de-DE": {
       "language": "de",
