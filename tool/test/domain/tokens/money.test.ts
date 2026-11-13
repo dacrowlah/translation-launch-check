@@ -8,10 +8,10 @@ describe("extractMoney", () => {
   it.each([
     ["en-US", "USD 20", { minor: 2000, currency: "USD" }],
     ["en-US", "20 USD", { minor: 2000, currency: "USD" }],
-    ["en-GB", "£9.99", { minor: 999, currency: "GBP" }],
+    ["en-GB", "\u00a39.99", { minor: 999, currency: "GBP" }],
     ["de-CH", "CHF 1'299.50", { minor: 129950, currency: "CHF" }],
-    ["de-DE", "49,- €", { minor: 4900, currency: "EUR" }],
-    ["de-DE", "5,5 €", { minor: 550, currency: "EUR" }],
+    ["de-DE", "49,- \u20ac", { minor: 4900, currency: "EUR" }],
+    ["de-DE", "5,5\u00a0\u20ac", { minor: 550, currency: "EUR" }],
   ])("reads_amounts_and_currencies %s %s", (locale, text, money) => {
     expect(read(locale, text).money).toEqual([money]);
   });

@@ -54,7 +54,7 @@ export const extractDates = (
 
 const weekdaysIn = (text: string, calendar: Compiled): number[] =>
   [...text.matchAll(calendar.bare)].flatMap(
-    (m) => calendar.weekdays.get((m[1] ?? "").toLowerCase()) ?? [],
+    (m) => calendar.weekdays.get((m.groups?.w ?? "").toLowerCase()) ?? [],
   );
 
 /** Finds weekday names standing alone: full names only, never a short form like "So" or "Do". */

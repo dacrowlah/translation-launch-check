@@ -8,7 +8,7 @@ describe("extractUrls", () => {
       "https://example.com/de/agb?utm_campaign=bf26",
     ],
     ["(https://example.com/x)", "https://example.com/x"],
-    ["« https://example.com/x »", "https://example.com/x"],
+    ["\u00ab https://example.com/x \u00bb", "https://example.com/x"],
     ["Go https://example.com/x!", "https://example.com/x"],
   ])("strips_trailing_punctuation_from_urls %s", (text, raw) => {
     expect(extractUrls(text).urls[0]?.raw).toBe(raw);

@@ -10,10 +10,11 @@ export const numberPattern = (locale: LocaleRule, dash = false): string => {
   return `(?:\\d{1,3}(?:${group}\\d{3})+(?!\\d)|\\d+)${decimals}`;
 };
 
-/** "1.299,00" in de becomes "1299.00"; a trailing "-" decimal (",-") becomes "00". */
+/** "1.299,00" in de becomes "1299"; ",-" counts as ",00"; trailing fractional zeros are dropped. */
 export const normalizeNumber = (raw: string, locale: LocaleRule): string => {
   const plain = [...raw].filter((char) => !locale.group.includes(char)).join("");
-  return plain.replace(locale.decimal, ".").replace(/\.-$/u, ".00");
+  const dotted = plain.replace(locale.decimal, ".").replace(/\.-$/u, ".00");
+  return dotted.replace(/(\.\d*?)0+$/u, "$1").replace(/\.$/u, "");
 };
 
 /** Finds numbers (percent signs dropped, never signed); each becomes one space in rest. */

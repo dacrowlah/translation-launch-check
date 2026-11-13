@@ -3,10 +3,13 @@ import { alternation } from "./regex";
 
 const DAY = String.raw`(?<d>\d{1,2})(?!\d)`;
 const YEAR = String.raw`(?<y>(?:19|20)\d\d)(?!\d)`;
-const NUMERIC = [
-  String.raw`(?<n1>\d{1,2})/(?<n2>\d{1,2})(?:/${YEAR})?(?![/\d])`,
-  String.raw`(?<n1>\d{1,2})\.(?<n2>\d{1,2})\.(?!\d)(?:\s?${YEAR})?`,
-];
+const SLASHED = String.raw`(?<n1>\d{1,2})/(?<n2>\d{1,2})/${YEAR}(?![/\d])`;
+const DOTTED = String.raw`(?<n1>\d{1,2})\.(?<n2>\d{1,2})\.(?:\s?${YEAR})?(?!\d)`;
+const ARTICLES: Readonly<Record<string, readonly string[]>> = {
+  en: ["the"],
+  de: ["den", "dem"],
+  fr: ["le"],
+};
 const FORMS: Readonly<Record<string, (month: string) => string[]>> = {
   en: (m) => [
     String.raw`${m}\.?\s+${DAY}(?:st|nd|rd|th)?(?:,?\s+${YEAR})?`,
@@ -14,7 +17,7 @@ const FORMS: Readonly<Record<string, (month: string) => string[]>> = {
   ],
   de: (m) => [String.raw`${DAY}\.\s*${m}\.?(?:\s+${YEAR})?`],
   fr: (m) => [String.raw`${DAY}(?:er)?\s+${m}\.?(?:\s+${YEAR})?`],
-  ja: () => [String.raw`(?:${YEAR}年)?(?<mi>\d{1,2})月${DAY}日`],
+  ja: () => [String.raw`(?:${YEAR}\u5e74)?(?<mi>\d{1,2})\u6708${DAY}\u65e5`],
 };
 
 /** Everything tokenizing needs for one language, compiled once from the rules. */
@@ -40,28 +43,48 @@ const japanese = (locale: LocaleRule): boolean => locale.script === "japanese";
 const lead = (locale: LocaleRule): string =>
   japanese(locale) ? String.raw`(?<!\d)` : String.raw`(?<![\p{L}\d])`;
 
-const prefix = (names: readonly string[]): string =>
-  String.raw`(?:(?<wd>${alternation(names)})(?!\p{L})\.?,?\s+)?`;
+/** A full name may be followed by one article ("Sonntag, den 29."); a short form must touch the date. */
+const prefix = (names: readonly string[], articles: readonly string[]): string => {
+  const full = alternation(names.filter((n) => n.length > 3));
+  const article = `(?:(?:${alternation(articles)})\\s+)?`;
+  const short = alternation(names.filter((n) => n.length <= 3));
+  return String.raw`(?:(?<wd>${full})(?!\p{L})\.?,?\s+${article}|(?<wd>${short})(?!\p{L})\.?,?\s+)?`;
+};
 
-const suffix = (names: readonly string[]): string =>
-  `(?:[(\uff08](?<ws>${names.join("|")})[)\uff09])?`;
+const JA_DAY = String.raw`\u66dc\u65e5`;
+
+const suffix = (names: readonly string[]): string => {
+  const kanji = names.join("|");
+  return String.raw`(?:\s?(?:[(\uff08](?<ws>${kanji})(?:${JA_DAY})?[)\uff09]|(?<ws>${kanji})${JA_DAY}))?`;
+};
+
+/** Numeric dates: dotted only in German; none may directly follow a currency. */
+const numeric = (locale: LocaleRule, rules: Rules): string[] => {
+  const currency = alternation(Object.keys(rules.currencies));
+  const forms = locale.language === "de" ? [DOTTED, SLASHED] : [SLASHED];
+  return forms.map((form) => String.raw`(?<!(?:${currency})[ \u00a0\u202f]?)${form}`);
+};
 
 const forms = (locale: LocaleRule, rules: Rules): string =>
   [
     ...(FORMS[locale.language]?.(monthPart(flat(rules.calendar.months, locale))) ?? []),
-    ...NUMERIC,
+    ...numeric(locale, rules),
   ].join("|");
 
 const dateSource = (locale: LocaleRule, rules: Rules): string => {
   const names = flat(rules.calendar.weekdays, locale);
-  const [before, after] = japanese(locale) ? ["", suffix(names)] : [prefix(names), ""];
+  const articles = ARTICLES[locale.language] ?? [];
+  const [before, after] = japanese(locale) ? ["", suffix(names)] : [prefix(names, articles), ""];
   return `${lead(locale)}${before}(?:${forms(locale, rules)})${after}`;
 };
 
 const bareSource = (locale: LocaleRule, rules: Rules): string => {
   const names = flat(rules.calendar.weekdays, locale);
-  if (japanese(locale)) return `[(\uff08](${names.join("|")})[)\uff09]`;
-  return String.raw`(?<!\p{L})(${alternation(names.filter((n) => n.length > 3))})(?!\p{L})`;
+  const kanji = names.join("|");
+  if (japanese(locale)) {
+    return String.raw`[(\uff08](?<w>${kanji})(?:${JA_DAY})?[)\uff09]|(?<w>${kanji})${JA_DAY}`;
+  }
+  return String.raw`(?<!\p{L})(?<w>${alternation(names.filter((n) => n.length > 3))})(?!\p{L})`;
 };
 
 const build = (locale: LocaleRule, rules: Rules): Compiled => ({

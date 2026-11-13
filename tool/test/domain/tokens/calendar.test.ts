@@ -26,7 +26,11 @@ describe("calendar", () => {
     expect(nextOccurrence(2, 29, FAKE_NOW)).toBe("2028-02-29");
   });
 
-  it("rejects_a_date_that_never_exists", () => {
-    expect(() => nextOccurrence(2, 30, FAKE_NOW)).toThrow(RangeError);
+  it.each([
+    [2, 30],
+    [11, 31],
+    [4, 31],
+  ])("returns_null_for_a_date_that_never_exists %s/%s", (m, d) => {
+    expect(nextOccurrence(m, d, FAKE_NOW)).toBeNull();
   });
 });

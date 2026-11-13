@@ -21,14 +21,10 @@ export const weekdayOf = (date: string): number => (epochDays(...parts(date)) + 
 const occursIn = (year: number, month: number, day: number, today: string): boolean =>
   day <= daysIn(year, month) && iso(year, month, day) >= today;
 
-const nothing = (month: number, day: number): RangeError =>
-  new RangeError(`no ${month}/${day} within ${LOOKAHEAD_YEARS} years`);
-
-/** The first date on or after today that falls on this month and day; throws if none exists. */
-export const nextOccurrence = (month: number, day: number, today: string): string => {
+/** The first date on or after today on this month and day; null when no such date exists. */
+export const nextOccurrence = (month: number, day: number, today: string): string | null => {
   const first = parts(today)[0];
   const years = Array.from({ length: LOOKAHEAD_YEARS }, (_, i) => first + i);
   const found = years.find((year) => occursIn(year, month, day, today));
-  if (found === undefined) throw nothing(month, day);
-  return iso(found, month, day);
+  return found === undefined ? null : iso(found, month, day);
 };

@@ -14,6 +14,7 @@ export interface Tokens {
   readonly weekdays: number[];
   readonly money: Money[];
   readonly numbers: string[];
+  /** The NFKC working copy, minus the tokens: never use it for typography or trademark checks. */
   readonly rest: string;
 }
 
