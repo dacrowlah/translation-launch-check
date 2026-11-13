@@ -110,7 +110,7 @@ Binding rules; the how-to is the `writing-tests` skill
 - **Fakes over mocks.** In-memory implementations of our own ports live in `test/support/`.
   Mock only third-party pieces that cannot run in tests, with a one-line justification.
   Nothing is monkeypatched globally.
-- **Fake clock** starts at a nonzero epoch, `FAKE_NOW = "2026-11-13"`.
+- **Fake clock** starts at a nonzero epoch, `FAKE_NOW = "2026-11-12"`.
 - **Each new test is proven able to fail.** Break the production line it pins, watch it go
   red for the right reason, restore from a scratch copy, then byte-compare.
 - A **harness's assertion helpers** have their own tests.

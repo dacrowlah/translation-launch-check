@@ -60,7 +60,7 @@ names its fix. Use part 1 for `tool/`, part 2 for `mark/`.
   - Make every "empty" assertion pair with a test that demands a finding on the same path.
     "No findings for de-DE" is paired with "a blocker for the same line when the number
     changes".
-- **Fake clock** starts at `FAKE_NOW = "2026-11-13"` (nonzero; a named constant in
+- **Fake clock** starts at `FAKE_NOW = "2026-11-12"` (nonzero; a named constant in
   `tool/test/support/clock.ts`).
 - **Fakes import only domain and ports**, never infrastructure.
 - **Harness assertion helpers are plain exported functions** with their own tests. They pass
