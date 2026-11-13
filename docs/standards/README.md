@@ -28,7 +28,7 @@ not yet facts.
    `opal_tms_sdk` is the port, faked in tests.
 6. **Sandi Metz's rules**, section 3.
 7. **Model only where language judgment is needed.** Anything rule-based (input checks,
-   facts, severities, scoring, links, report text, delivery) is code.
+   facts, severities, scoring, report text, delivery) is code.
 8. **Tests follow 1-7 exactly as strictly as production code.** Only the Metz size limits
    differ.
 
@@ -83,9 +83,12 @@ CLAUDE.md                         operating manual for Claude
 docs/contract/TOOL_CONTRACT.md    the tool's binding behaviour
 docs/standards/                   this file, TOOL.md, MARK.md
 .claude/skills/writing-tests/     test workflow and traps for both halves
+demo/                (planned)    CSV demo files: template, clean, errors, broken, uk-ch, seeded errors
 tool/                (planned)    the Vercel app (its own package.json; Vercel root directory)
 mark/                (planned)    agents, skills, code steps, layout, build.py, tests
-scripts/             (planned)    preflight.sh (all gates, both halves), prove-gates.sh
+scripts/             (planned)    preflight.sh (all gates, both halves), prove-gates.sh,
+                                  send_package.py (webhook sender, the CMP stand-in),
+                                  catch_rate.py (seeded test set: caught, missed, extra)
 .githooks/           (planned)    pre-commit: format and lint on staged files
 ```
 

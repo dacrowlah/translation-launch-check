@@ -30,11 +30,10 @@ names its fix. Use part 1 for `tool/`, part 2 for `mark/`.
 
    | Layer | Test kind | What it pins |
    |---|---|---|
-   | domain | unit, table-driven, literal values | rounding, counting, severities, alias resolution |
-   | application | use case over fakes | statuses per market, isolation of one market's failure, one FX call for all currencies |
-   | infrastructure | recording-fake HTTP + shared contract test | exact URL and query, call count, timeout -> `source_unavailable`, non-allow-listed host refused, cache and stale serving |
-   | presentation | requests through the Express app | 401 without the bearer token, zod rejection, response shape, no diagnostics or `authorization` text in the body |
-   | live smoke (opt-in) | real Nager.Date and Frankfurter | DE 2027 holidays non-empty; Golden Week period 2027-04-29..2027-05-05 for JP |
+   | domain | unit, table-driven, literal values | token parsing per locale, each check's findings and severities, length counting, language-text stripping |
+   | application | use case over fakes | one finding list per line and locale, `unsupported_locale`, `checks` verified vs not_applicable, master carries only the language checks |
+   | infrastructure | adapter + shared contract test | `eld-detector` against the `LanguageDetector` contract; `rules-schema` rejects a bad severity or a missing check id |
+   | presentation | requests through the Express app | 401 without the bearer token, zod rejection (missing locale key in `texts`, over-long cell), response shape, no diagnostics or `authorization` text, no request body on stdout |
 
 5. **Prove each new test can fail.**
    - Copy the production file to a scratch path, break the line the test pins, and watch the
@@ -47,20 +46,21 @@ names its fix. Use part 1 for `tool/`, part 2 for `mark/`.
 
 ### Design rules for tests
 
-- **Fakes over mocks.** Use `FakeHolidayProvider`, `FakeFxProvider`, `FakeCache`,
-  `FakeClock`, `RecordingHttp` (planned names) instead of `vi.mock` on our own modules.
+- **Fakes over mocks.** Use `FakeLanguageDetector`, `FakeClock`,
+  `RecordingLogger` (planned names) instead of `vi.mock` on our own modules.
   `vi.mock` is allowed only for a third-party module that cannot run in tests, with a
   one-line comment saying why.
-- **One behaviour per test**, named for it: `marks_market_unverified_when_holiday_source_times_out`.
-- **Expected values are literals:** `expect(suggest(44.22, "EUR")).toBe(44.99)`. Never
+- **One behaviour per test**, named for it: `reports_unsupported_locale_without_findings`.
+- **Expected values are literals:** `expect(parseAmount("1.299,00 \u20ac", "de-DE")).toBe(129900)`. Never
   compute the expected value with the code's own formula.
-- **Fixtures are builders** with defaults plus overrides (`aBrief({ markets: ["DE"] })`).
+- **Fixtures are builders** with defaults plus overrides (`aPackage({ locales: ["de-DE"] })`).
   They build the shape production uses today.
 - **Discriminating fixtures.**
   - Seed values that must be overwritten.
   - Make every "empty" assertion pair with a test that demands a finding on the same path.
-    "No findings for FR" is paired with "a blocker for JP on Showa Day".
-- **Fake clock** starts at `FAKE_NOW = "2026-11-12"` (nonzero; a named constant in
+    "No findings for de-DE" is paired with "a blocker for the same line when the number
+    changes".
+- **Fake clock** starts at `FAKE_NOW = "2026-11-13"` (nonzero; a named constant in
   `tool/test/support/clock.ts`).
 - **Fakes import only domain and ports**, never infrastructure.
 - **Harness assertion helpers are plain exported functions** with their own tests. They pass
@@ -82,10 +82,11 @@ names its fix. Use part 1 for `tool/`, part 2 for `mark/`.
 
 | Path | Provides | Use when |
 |---|---|---|
-| (planned) `tool/test/support/clock.ts` | `FAKE_NOW`, `FakeClock` | anything date-dependent |
-| (planned) `tool/test/support/http.ts` | `RecordingHttp` (records URL, query, call count; scripted responses, timeouts, errors) | adapter tests |
-| (planned) `tool/test/support/providers.ts` | `FakeHolidayProvider`, `FakeFxProvider`, `FakeCoverageProvider` | use case tests |
-| (planned) `tool/test/support/builders.ts` | `aCheckRequest`, `aHoliday`, `aRateTable` | any test needing inputs |
+| `tool/test/support/rules.ts` | `rawRules()` (parsed real `rules.json`), `testRules()` (`parseRules(rawRules())`) | any test needing rules |
+| (planned) `tool/test/support/clock.ts` | `FAKE_NOW`, `FakeClock` | anything date-dependent (weekday vs date) |
+| (planned) `tool/test/support/language.ts` | `FakeLanguageDetector` (scripted answers, including null) | language check tests |
+| (planned) `tool/test/support/logger.ts` | `RecordingLogger` | asserting what is logged, and that no copy is |
+| (planned) `tool/test/support/builders.ts` | `aPackage`, `aLine` | any test needing inputs |
 
 Update this table in the same change that adds or renames a support module.
 
@@ -101,15 +102,18 @@ Update this table in the same change that adds or renames a support module.
 
 ### Known traps
 
-- `fetch` stubbed globally leaks between tests. Fix: inject `HttpClient`; never touch
-  `globalThis.fetch` in unit tests.
-- Date math across time zones (`new Date("2027-04-29")` is UTC midnight). Fix: keep dates
-  as ISO strings in the domain, and compute day differences on parsed UTC dates in one
-  helper.
-- Floating-point prices (`44.22 * 1.0` style drift). Fix: price math in integer minor units
-  inside the domain helper; tests use literal minor-unit and display values.
+- Date math across time zones (`new Date("2026-11-29")` is UTC midnight). Fix: inject
+  `Clock`, keep dates as ISO strings in the domain, and compute weekdays on parsed UTC dates
+  in one helper.
+- Locale number formats: `1.299,00` is 1299 in de and 1.299 in en. Fix: test the same text
+  under each locale with literal expected amounts, and keep amounts in integer minor units.
 - CJK width: test both `ads_chars` (CJK = 2) and plain `chars`, with literal strings such as
-  `"\u6625\u306e\u30bb\u30fc\u30eb"` (5 CJK characters, 10 ads_chars). Tests may contain non-ASCII test data; code and docs stay ASCII.
+  `"\u6625\u306e\u30bb\u30fc\u30eb"` (5 CJK characters, 10 ads_chars). Tests may contain
+  non-ASCII test data, preferably as escapes; code and docs stay ASCII.
+- The language detector is statistical. Fix: domain tests use `FakeLanguageDetector`; only
+  the adapter's own tests touch `eld`, with long, unambiguous sentences.
+- Reordered tokens (merge tags, URLs, dates) are not findings. Pair "no finding when
+  reordered" with "a finding when one token changes".
 
 ## Part 2: mark/ (Python code steps, pytest)
 ### Workflow
@@ -123,11 +127,11 @@ Update this table in the same change that adds or renames a support module.
      `handler(input, ctx)`.
    - Never re-implement a step's logic inside a test.
 4. **Script the platform through the fake.**
-   - `fake_tools.respond("markets_launch_check", ok({...}))` returns a success;
+   - `fake_tools.respond("localization_check", ok({...}))` returns a success;
      `fake_tools.respond(..., error(500))` returns
      `{"response_type": "error", "response": {...}}`, the verified failure shape.
    - Assert on recorded calls: the name, the parameters, and the call count (one batched
-     call, not one per market).
+     call for the whole package, not one per locale).
 5. **Prove each new test can fail.** Break the production line, watch the named failure,
    restore from a scratch copy, then `cmp` it. Never restore with git.
 6. **Run** `scripts/preflight.sh` (planned) and read the test count from its output file.
@@ -136,20 +140,22 @@ Update this table in the same change that adds or renames a support module.
 
 | Step | Must-have tests |
 |---|---|
-| validate_and_gather (C1) | every required field missing at once -> all listed; past date; duplicate market after alias; tool `response_type: error` -> "not your fault, re-run"; invalid code -> brief rejected with suggestion; checksum present per market; chat runs -> `notify_email` null |
-| score (C2) | blocker beats unverified; unverified -> `check_incomplete`; missing review -> `not_checked`; checksum mismatch -> `not_checked`; all green -> `ready`; tracking-link tool error -> status, no raise |
-| report (C3) | one template per mode with literal expected text; canvas called with `name`, `content`, `mime_type`; unique canvas name per run; email only to an allow-listed `notify_email`; an address inside the brief is never emailed |
+| read_and_check | CSV saved by Excel (BOM, semicolon, CRLF, quoted multi-line cell) parses; every problem listed at once; near-miss locale gets a suggestion; unknown channel/field pair; duplicate id; empty cell; webhook checksum mismatch -> needs_info; tool `response_type: error` -> "not your fault, re-run"; one `localization_check` call; checksum per locale; chat runs -> `notify_email` null |
+| score | blocker beats incomplete beats warning; missing or malformed review (JSON string accepted, prose or fence -> `not_checked`); echoed locale or checksum mismatch -> `check_incomplete`; `unsupported_locale` -> `check_incomplete`; all clean -> `ready` |
+| report | one template per mode with literal expected text; "Checked against market rules v..." line; fixes re-checked with one call and marked; canvas called with `name`, `content`, `mime_type`; unique canvas name per run; Markdown table characters escaped; email only to an allow-listed `notify_email` |
+| needs_info | every problem with its suggestion; link to the template; no canvas |
 | `_shared` | `call_tool` maps both response shapes; `run_safely` turns an exception into `internal_error` and prints nothing; `facts_checksum` is order-independent for keys |
-| build.py | generated JSON has no local imports, no `print(`, every node positioned, no overlaps, code byte-identical to the built source |
+| build.py | generated JSON has no local imports, no `print(`, every node positioned, no overlaps, code byte-identical to the built source; `--example` builds without private values |
 
 ### Design rules
 
-- **Builders** (`a_brief`, `a_market_facts`, `a_review`) produce today's shapes: the tool
-  contract for facts, and the agent output schema for reviews.
+- **Builders** in `mark/tests/builders.py` (e.g. `a_package`, `a_locale_result`, `a_review`)
+  produce today's shapes: the tool contract for results, and the agent output schema for
+  reviews.
 - **Literal expected text** for templates. Copy the exact sentence into the test; never
   rebuild it from the template.
-- **Every "clean" assertion has a partner.** "No findings for FR" is paired with "a blocker
-  for JP on Showa Day".
+- **Every "clean" assertion has a partner.** "No findings for de-DE" is paired with "a blocker
+  for the same line when the number changes".
 - **Silence:** for any step test, use `capsys` to assert that nothing was printed, since chat
   would narrate it.
 
@@ -160,6 +166,6 @@ Update this table in the same change that adds or renames a support module.
 - The `summary` key is stripped before downstream steps see it, so never let later logic
   depend on it.
 - An oversized return (over 256 KB) becomes `null` silently. Keep returns small; a test pins
-  the size of a 10-market return.
+  the size of a 5-locale, 50-line return.
 - A pytest filter (`-k`) that matches nothing still exits 0 when other tests run. Read the
   count.

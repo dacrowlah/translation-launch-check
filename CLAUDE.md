@@ -1,26 +1,31 @@
 # launch-readiness-check: operating manual for Claude
 
-A "Launch Readiness Check" built on Optimizely's Agent Platform ("Mark"). A marketer submits
-a multi-market campaign brief (chat or email) and gets a per-market verdict and fix list:
-- holiday clashes;
-- copy that no longer fits after translation;
-- local pricing;
-- translation and terminology quality;
-- tracking links.
+A "Translation Launch Check" built on Optimizely's Agent Platform ("Mark"). A marketer
+attaches a localization file (a CSV string table: master copy plus each translation) in Mark
+chat, or sends it by email or webhook, and gets a verdict per language, the findings and
+suggested fixes:
+- numbers, dates, prices, merge tags, link parameters and promo codes that differ from the
+  master;
+- copy that no longer fits its channel, or is in the wrong language;
+- formality, glossary and market spelling;
+- meaning, claims and tone (judged by a model).
 
-Nothing is called "ready" that the system couldn't verify.
+Nothing is called "ready" that the system couldn't verify. The report is a screening aid,
+never linguistic or legal sign-off.
 
 Two halves, one repository:
 - `tool/`: a TypeScript service on Vercel, registered in Mark as a custom tool. It does the
-  deterministic work: live holiday and FX data, price points, character counting,
-  rule-based findings, tracking links.
-- `mark/`: the Agent Platform side. Two specialized agents (brief interpretation; copy and
-  translation review), skills, the workflow, and the Python code steps it runs, generated
-  into an importable workflow JSON with a readable canvas layout.
+  deterministic work: every rule check (`localization_check`), channel length counting
+  (`copy_fit_check`) and the language check, all from one rules file. It makes no outbound
+  requests.
+- `mark/`: the Agent Platform side. Two specialized agents (Translation Review; Translation
+  Fix Suggestions), two skills, the workflow, and the Python code steps it runs, generated
+  into an importable workflow JSON with a readable canvas layout. It reuses Optimizely's
+  Content Translation agent for the back-translation.
 
 Hard constraints:
-- Free, keyless data sources.
-- No stored user data.
+- No outbound requests from the tool.
+- No stored user data, and no campaign copy in logs.
 - Responses carry statuses, never diagnostics.
 - A model is used only where language judgment is needed.
 - This repository becomes **public**: no secrets, instance ids, webhook URLs or personal
@@ -39,8 +44,8 @@ Hard constraints:
 A change that violates any of these is rejected, however well it works.
 
 1. **Clean Architecture.** Domain <- application <- infrastructure <- presentation <-
-   composition root. Dependencies point inward. Implementation names (`Nager`,
-   `Frankfurter`, `Express`) appear only in `tool/src/infrastructure/` and the composition
+   composition root. Dependencies point inward. Implementation names (`eld`,
+   `Express`) appear only in `tool/src/infrastructure/` and the composition
    root.
 2. **SOLID.**
 3. **DRY.** The second copy of a value, rule, template or block is the defect. Similar
@@ -73,7 +78,7 @@ the same change. The contract changes only with the owner's approval.
 |---|---|
 | Any change | [standards README](docs/standards/README.md) |
 | `tool/` code | [TOOL.md](docs/standards/TOOL.md); the [contract](docs/contract/TOOL_CONTRACT.md) for behaviour; the [opal-custom-tools skill](.claude/skills/opal-custom-tools/SKILL.md) |
-| `mark/` code steps | [MARK.md](docs/standards/MARK.md) section 2; the [mark-code-step-patterns skill](.claude/skills/mark-code-step-patterns/SKILL.md) |
+| `mark/` code steps | [MARK.md](docs/standards/MARK.md) section 2 (Python 3.12); the [mark-code-step-patterns skill](.claude/skills/mark-code-step-patterns/SKILL.md) |
 | Agents or skills (Mark) | [MARK.md](docs/standards/MARK.md) section 3; the [mark-json-authoring skill](.claude/skills/mark-json-authoring/SKILL.md) |
 | The workflow or its canvas layout | [MARK.md](docs/standards/MARK.md) section 4; the [mark-json-authoring skill](.claude/skills/mark-json-authoring/SKILL.md) |
 | Any test, fake, builder or harness | the [writing-tests skill](.claude/skills/writing-tests/SKILL.md) |
@@ -91,8 +96,18 @@ docs/standards/README.md  TOOL.md  MARK.md
 .claude/skills/mark-platform/  mark-code-step-patterns/  mark-json-authoring/  opal-custom-tools/
 ```
 
-Planned, created by the scaffold: `tool/`, `mark/`, `scripts/`, `.githooks/` and a
-`README.md`; see [standards README section 4](docs/standards/README.md#4-repository-layout).
+Planned, created as the build proceeds:
+```
+README.md
+demo/        template.csv, black-friday-{clean,errors,broken,uk-ch}.csv, seeded-errors.csv
+scripts/     preflight.sh  prove-gates.sh  send_package.py  catch_rate.py
+.githooks/   pre-commit
+tool/        api/  config/rules.json  src/{domain,application,infrastructure,presentation}  test/
+mark/        code_steps/  agents/  skills/  workflow/  _build/  build.py  tests/  dist/ (generated)
+```
+See [standards README section 4](docs/standards/README.md#4-repository-layout), and
+[TOOL.md](docs/standards/TOOL.md) section 1 and [MARK.md](docs/standards/MARK.md) section 1
+for the full trees.
 
 ## Working conventions
 

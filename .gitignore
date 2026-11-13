@@ -4,3 +4,9 @@ node_modules/
 coverage/
 dist/
 .DS_Store
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+mark/local.config.json
+mark/dist/

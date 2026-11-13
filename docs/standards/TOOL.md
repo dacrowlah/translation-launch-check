@@ -9,23 +9,32 @@ git rules are in [README.md](README.md); the behaviour to build is
 ## 1. Architecture and layers
 
 Planned layout under `tool/` (its own `package.json`; the Vercel project's root directory),
-created by the scaffold:
+created as the build proceeds:
 
 ```
 api/index.ts                      Vercel entry: imports src/main.ts, exports the Express app
-config/rules.json                 policy data (contract section 7)
+config/rules.json                 the one source of market rules (contract section 6)
 src/domain/                       pure types and rules, no I/O
-  ports/                          HolidayProvider, FxProvider, CoverageProvider, Clock, Cache, Logger
-  countries.ts  holidays.ts  pricing.ts  copy-fit.ts  artifacts.ts  tracking.ts  rules.ts
-src/application/                  use cases over ports: check-markets.ts, check-copy-fit.ts,
-                                  build-tracking-links.ts
-src/infrastructure/               adapters: nager-*.ts, frankfurter-fx.ts, http-client.ts
-                                  (allow-list, timeout), memory-cache.ts, console-logger.ts,
-                                  system-clock.ts
-src/presentation/                 opal-tools-sdk registrations: zod schemas, request -> use
-                                  case -> response mapping
-src/main.ts                       composition root: loads rules.json, wires adapters into use
-                                  cases, registers tools
+  types.ts                        package, finding, report types; ALL_CHECK_IDS and CheckId
+  rules.ts  finding.ts            Rules type (shape of rules.json); makeFinding()
+  ports/                          LanguageDetector, Clock, Logger
+  tokens/                         tokenize, urls, merge-tags, promo-codes, numbers, money,
+                                  dates, calendar
+  checks/                         compare, numbers, money, dates, merge-tags, urls,
+                                  promo-codes, trademarks, markup, length,
+                                  template-leftovers, length-ratio, formality, glossary,
+                                  untranslated, typography, time-zone, language,
+                                  language-text
+  copy-fit.ts                     units: chars, ads_chars, sms_segments; artifacts
+src/application/                  use cases over ports: check-localization.ts,
+                                  locale-checks.ts, check-copy-fit.ts
+src/infrastructure/               adapters: eld-detector.ts, console-logger.ts,
+                                  system-clock.ts, rules-schema.ts (zod, parses rules.json)
+src/presentation/                 opal-tools-sdk registrations: schemas.ts,
+                                  localization-check-tool.ts, copy-fit-check-tool.ts,
+                                  safe-handler.ts (request -> use case -> response mapping)
+src/main.ts                       composition root: createApp(config); loads rules.json, wires
+                                  adapters into use cases, registers tools, silences the console
 test/                             mirrors src/; test/support/ holds fakes, builders, harnesses
 ```
 
@@ -35,7 +44,7 @@ Import rules (enforced by lint and the architecture test; section 5):
 |---|---|
 | `src/domain/**` | `src/domain/**` only. No Node built-ins with I/O, no packages except `zod` types |
 | `src/application/**` | domain |
-| `src/infrastructure/**` | domain, application (ports and their types only), Node built-ins |
+| `src/infrastructure/**` | domain, application (ports and their types only), Node built-ins; `zod` (for `rules-schema.ts`); `eld` (only `eld-detector.ts`) |
 | `src/presentation/**` | domain, application, `@optimizely-opal/opal-tools-sdk`, `zod` |
 | `src/main.ts` | everything in `src/` and `config/` |
 | `api/index.ts` | `src/main.ts` only |
@@ -64,24 +73,23 @@ use case in `src/application/`.
 ## 3. Errors, logging and security
 
 - **Statuses, not exceptions,** for every expected problem (contract section 2). Use cases
-  return results; adapters convert upstream failures into `source_unavailable` and never
+  return results; adapters (e.g. the language detector answering null when unsure) never
   throw past the port.
-- **No diagnostics in responses.** Upstream codes, timings and messages go to the `Logger`
-  port only, as one structured line `{ event, source, market, status, latency_ms }`.
+- **No diagnostics in responses.** Technical detail goes to the `Logger` port only, as one
+  structured line `{ event, tool, status, counts, latency_ms }`, never any request text.
 - **Never log or echo** request headers, the bearer token, environment variables or
   campaign copy. A test pins that a response contains no `authorization` text.
 - **The SDK itself `console.log`s full request bodies and tool results** (SDK 0.1.41-dev;
-  seen in Vercel logs). That would put campaign copy in logs, so the composition root silences
-  or wraps that logging **(verify at scaffold: the exact mechanism)**, and a test pins that a
-  tool call writes no request body to stdout.
+  seen in Vercel logs). That would put campaign copy in logs, so the console is silenced in the
+  composition root (`src/main.ts`), and a test pins that a tool call writes no request body
+  to stdout.
 - **Don't use the SDK's error helpers** (`providerError`, `validationError`,
   `resourceNotFound`) for expected problems. They reply HTTP 200 with an error envelope that a
   workflow code step sees as a success. Expected problems are per-item statuses.
 - **Auth:** SDK `static_token` mode with `TOOL_BEARER_TOKEN` from the environment. The
   service refuses to start without it.
-- **Outbound:** only `api.frankfurter.dev` and `date.nager.at`, enforced in `http-client.ts`,
-  with a 5 s timeout. No user-supplied URL is ever fetched (`landing_page_url_template` is
-  only formatted, never requested).
+- **Outbound: none.** The service makes no network requests. No URL from the copy is ever
+  fetched; URLs are only compared. A test pins that no code path calls `fetch`.
 - **Input:** every parameter is zod-validated with the bounds in the contract.
 - **Secrets** live in Vercel environment variables, never in the repo; `.env*` is gitignored.
 - **Dependencies:** `pnpm audit` has no high or critical findings at release, or each one is
@@ -101,21 +109,18 @@ Binding rules; the how-to is the `writing-tests` skill
 - **Literal expectations.** Never compute an expected value the way the code does.
 - **Fakes over mocks.** In-memory implementations of our own ports live in `test/support/`.
   Mock only third-party pieces that cannot run in tests, with a one-line justification.
-  `fetch` is replaced by a recording fake through the `http-client` seam, never by global
-  monkeypatching.
-- **Fake clock** starts at a nonzero epoch, `FAKE_NOW = "2026-11-12"`.
+  Nothing is monkeypatched globally.
+- **Fake clock** starts at a nonzero epoch, `FAKE_NOW = "2026-11-13"`.
 - **Each new test is proven able to fail.** Break the production line it pins, watch it go
   red for the right reason, restore from a scratch copy, then byte-compare.
 - A **harness's assertion helpers** have their own tests.
 - **Layers to tests:**
   - domain: unit tests, literal tables (rounding, counting, severities);
   - application: use cases over fakes;
-  - infrastructure: recording-fake HTTP (URL, query, call count, timeout path, allow-list
-    rejection) plus contract tests shared by the fake and the real adapter;
+  - infrastructure: the real adapter against the fake's contract test (`eld-detector`
+    against `FakeLanguageDetector`), and `rules-schema` against the shipped `rules.json`;
   - presentation: requests through the Express app (auth required, validation errors,
     response shape, no diagnostics);
-  - one **live smoke test** against the real APIs. It is opt-in
-    (`LIVE=1 pnpm test:live`), never part of the gates.
 - **Read the test count** on every run. Zero tests or any unexpected skip is a failure (the
   gate enforces it).
 
@@ -153,8 +158,8 @@ scripts, `tool/package.json`.
 - The Agent Platform fetches `/discovery` without auth and calls `POST /tools/<name>` with
   `Authorization: Bearer <token>`. The body is `{ parameters, auth_credentials, environment,
   ... }`, and parameters arrive natively typed.
-- The tool endpoint path derives from the name: `markets_launch_check` ->
-  `/tools/markets-launch-check`.
+- The tool endpoint path derives from the name: `localization_check` ->
+  `/tools/localization-check`.
 - After adding or renaming a function, run **Sync** on the registry (Connectors ->
   Registries -> Actions -> Sync). New tools are enabled by default.
 - Called from a workflow code step, a tool failure does **not** raise in the caller. It
