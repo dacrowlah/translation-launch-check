@@ -135,9 +135,12 @@ Binding rules; the how-to is the `writing-tests` skill
 Versions are exact in `tool/pnpm-lock.yaml`. Verified together at scaffold: ESLint 10,
 typescript-eslint 8, TypeScript 6.0 (typescript-eslint 8 does not support TypeScript 7 yet),
 `eslint-plugin-metz` 1.0.0, Prettier 3, Vitest, jscpd. Express 4 and `@types/express` 4 are
-pinned (the SDK's peer range, and what was verified with Mark). Known and accepted peer warnings:
+pinned (the SDK's peer range; express 4.22.3 is the version a throwaway probe tool ran on when
+Mark's calls to a custom tool were verified, 2026-11). Known and accepted peer warnings:
 the SDK declares `typescript ^5.1.6` and `@types/node ^20`; we use TypeScript 6.0 and
-`@types/node` 24 (Node 24), and the typecheck gate covers the SDK's type files.
+`@types/node` 24 (Node 24). The SDK's types are not yet exercised (nothing imports the SDK, and
+`tsconfig.json` has `"types": ["node"]`): the first task that imports it (presentation, Task 12) must
+typecheck without `skipLibCheck`, or restore it with the exact errors recorded.
 
 Gates, each proven by a planted violation that turns it red for its named reason:
 
