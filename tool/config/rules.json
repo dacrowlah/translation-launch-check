@@ -1,0 +1,458 @@
+{
+  "version": "1.0",
+  "effective_date": "2026-11-13",
+  "limits": {
+    "max_file_bytes": 65536,
+    "max_lines": 50,
+    "max_targets": 5,
+    "max_cell_chars": 1000
+  },
+  "master_locale": "en-US",
+  "locales": {
+    "en-US": {
+      "language": "en",
+      "script": "latin",
+      "decimal": ".",
+      "group": [","],
+      "formality": "not_applicable"
+    },
+    "de-DE": {
+      "language": "de",
+      "script": "latin",
+      "decimal": ",",
+      "group": [".", " ", "\u00a0", "\u202f"],
+      "formality": "formal",
+      "length_ratio_max": 1.35
+    },
+    "fr-FR": {
+      "language": "fr",
+      "script": "latin",
+      "decimal": ",",
+      "group": [" ", "\u00a0", "\u202f", "."],
+      "formality": "formal",
+      "length_ratio_max": 1.3,
+      "typography": {
+        "space_before": [";", ":", "!", "?"],
+        "guillemets": true
+      }
+    },
+    "ja-JP": {
+      "language": "ja",
+      "script": "japanese",
+      "decimal": ".",
+      "group": [","],
+      "formality": "not_applicable",
+      "date_order": "mdy"
+    },
+    "en-GB": {
+      "language": "en",
+      "script": "latin",
+      "decimal": ".",
+      "group": [","],
+      "formality": "not_applicable",
+      "date_order": "dmy",
+      "length_ratio_max": 1.15
+    },
+    "de-CH": {
+      "language": "de",
+      "script": "latin",
+      "decimal": ".",
+      "group": ["'", "\u2019"],
+      "formality": "formal",
+      "date_order": "dmy",
+      "length_ratio_max": 1.35
+    }
+  },
+  "locale_aliases": {
+    "de": "de-DE",
+    "fr": "fr-FR",
+    "ja": "ja-JP",
+    "jp": "ja-JP",
+    "en": "en-US",
+    "uk": "en-GB",
+    "gb": "en-GB",
+    "en-uk": "en-GB",
+    "ch": "de-CH"
+  },
+  "channels": [
+    {
+      "channel": "email",
+      "field": "subject",
+      "limit": 40,
+      "unit": "chars",
+      "soft": true
+    },
+    {
+      "channel": "email",
+      "field": "preheader",
+      "limit": 90,
+      "unit": "chars",
+      "soft": true
+    },
+    {
+      "channel": "email",
+      "field": "body",
+      "limit": null,
+      "unit": "chars",
+      "soft": true
+    },
+    {
+      "channel": "email",
+      "field": "cta",
+      "limit": null,
+      "unit": "chars",
+      "soft": true
+    },
+    {
+      "channel": "google_ads",
+      "field": "headline",
+      "limit": 30,
+      "unit": "ads_chars",
+      "soft": false
+    },
+    {
+      "channel": "google_ads",
+      "field": "description",
+      "limit": 90,
+      "unit": "ads_chars",
+      "soft": false
+    },
+    {
+      "channel": "sms",
+      "field": "body",
+      "limit": 1,
+      "unit": "sms_segments",
+      "soft": false
+    },
+    {
+      "channel": "web",
+      "field": "meta_title",
+      "limit": 60,
+      "unit": "chars",
+      "soft": true
+    },
+    {
+      "channel": "web",
+      "field": "meta_description",
+      "limit": 155,
+      "unit": "chars",
+      "soft": true
+    }
+  ],
+  "severities": {
+    "numbers": "blocker",
+    "currency_amount": "blocker",
+    "currency_code": "warning",
+    "dates": "blocker",
+    "weekday_date_match": "warning",
+    "merge_tags": "blocker",
+    "url_params": "blocker",
+    "url_path": "info",
+    "promo_codes": "blocker",
+    "template_leftovers": "blocker",
+    "length_hard": "blocker",
+    "length_soft": "warning",
+    "formality": "warning",
+    "glossary_forbidden": "blocker",
+    "glossary_dnt": "warning",
+    "untranslated": "warning",
+    "language_column": "blocker",
+    "language_line": "warning",
+    "typography": "info",
+    "length_ratio": "info",
+    "trademark_symbols": "warning",
+    "markup": "blocker",
+    "time_zone": "warning",
+    "locale_spelling": "warning"
+  },
+  "spelling": {
+    "en-GB": {
+      "words": {
+        "color": "colour",
+        "colors": "colours",
+        "colored": "coloured",
+        "colorful": "colourful",
+        "center": "centre",
+        "centers": "centres",
+        "centered": "centred",
+        "favorite": "favourite",
+        "favorites": "favourites",
+        "catalog": "catalogue",
+        "catalogs": "catalogues",
+        "fulfill": "fulfil",
+        "fulfills": "fulfils",
+        "jewelry": "jewellery",
+        "gray": "grey",
+        "grays": "greys",
+        "theater": "theatre",
+        "theaters": "theatres",
+        "aluminum": "aluminium",
+        "mom": "mum",
+        "moms": "mums",
+        "neighbor": "neighbour",
+        "neighbors": "neighbours",
+        "neighborhood": "neighbourhood",
+        "honor": "honour",
+        "honors": "honours",
+        "labor": "labour",
+        "flavor": "flavour",
+        "flavors": "flavours",
+        "humor": "humour",
+        "behavior": "behaviour",
+        "behaviors": "behaviours",
+        "rumor": "rumour",
+        "savior": "saviour",
+        "harbor": "harbour",
+        "vapor": "vapour",
+        "odor": "odour",
+        "armor": "armour",
+        "candor": "candour",
+        "fiber": "fibre",
+        "fibers": "fibres",
+        "liter": "litre",
+        "liters": "litres",
+        "defense": "defence",
+        "offense": "offence",
+        "pretense": "pretence",
+        "plow": "plough",
+        "plows": "ploughs",
+        "skeptic": "sceptic",
+        "skeptical": "sceptical",
+        "pajamas": "pyjamas",
+        "cozy": "cosy",
+        "smolder": "smoulder",
+        "sulfur": "sulphur",
+        "donut": "doughnut",
+        "donuts": "doughnuts",
+        "artifact": "artefact",
+        "enrollment": "enrolment",
+        "installment": "instalment",
+        "maneuver": "manoeuvre",
+        "aging": "ageing",
+        "mustache": "moustache",
+        "traveler": "traveller",
+        "travelers": "travellers",
+        "traveling": "travelling",
+        "canceled": "cancelled",
+        "canceling": "cancelling",
+        "labeled": "labelled",
+        "judgment": "judgement",
+        "acknowledgment": "acknowledgement",
+        "pediatric": "paediatric",
+        "tumor": "tumour"
+      },
+      "ize_to_ise": true,
+      "ize_exceptions": ["size", "seize", "prize", "capsize", "baize", "maize"]
+    },
+    "de-CH": {
+      "chars": {
+        "\u00df": "ss"
+      }
+    }
+  },
+  "trademark_symbols": ["\u2122", "\u00ae", "\u00a9"],
+  "void_tags": ["br", "img", "hr", "meta", "link", "input", "wbr"],
+  "time_expressions": {
+    "en": [
+      "\\b\\d{1,2}(:\\d{2})?\\s?(am|pm)\\b",
+      "\\b\\d{1,2}:\\d{2}\\b",
+      "midnight",
+      "noon",
+      "today only",
+      "tonight",
+      "ends today"
+    ],
+    "de": [
+      "\\b\\d{1,2}(:\\d{2})?\\s?Uhr\\b",
+      "\\b\\d{1,2}:\\d{2}\\b",
+      "Mitternacht",
+      "Mittag",
+      "nur heute",
+      "heute Nacht"
+    ],
+    "fr": [
+      "\\b\\d{1,2}\\s?h(\\s?\\d{2})?\\b",
+      "\\b\\d{1,2}:\\d{2}\\b",
+      "minuit",
+      "midi",
+      "aujourd'hui seulement",
+      "ce soir"
+    ],
+    "ja": ["\\d{1,2}\\u6642", "\\d{1,2}:\\d{2}", "\\u672c\\u65e5\\u9650\\u308a", "\\u6df1\\u591c"]
+  },
+  "time_zones": [
+    "CET",
+    "CEST",
+    "MEZ",
+    "MESZ",
+    "GMT",
+    "UTC",
+    "BST",
+    "ET",
+    "EST",
+    "EDT",
+    "PT",
+    "PST",
+    "PDT",
+    "JST",
+    "heure de Paris",
+    "deutscher Zeit",
+    "\u65e5\u672c\u6642\u9593"
+  ],
+  "merge_tag_patterns": ["\\{\\{[^{}]+\\}\\}", "\\*\\|[A-Z0-9_]+\\|\\*", "%%[A-Za-z0-9_]+%%"],
+  "promo_code_pattern": "\\b[A-Z]{2,}[0-9]{1,4}\\b",
+  "artifact_patterns": ["\\[\\[[^\\]]*\\]\\]", "\\{skill:"],
+  "artifact_phrases": [
+    "(at least one needed)",
+    "(mindestens eines erforderlich)",
+    "(au moins un requis)",
+    "Here is the translation",
+    "Translated text:"
+  ],
+  "currencies": {
+    "$": "USD",
+    "US$": "USD",
+    "USD": "USD",
+    "\u20ac": "EUR",
+    "EUR": "EUR",
+    "\u00a3": "GBP",
+    "GBP": "GBP",
+    "\u00a5": "JPY",
+    "\uffe5": "JPY",
+    "\u5186": "JPY",
+    "JPY": "JPY",
+    "CHF": "CHF",
+    "Fr.": "CHF"
+  },
+  "calendar": {
+    "months": {
+      "en": [
+        ["January", "Jan"],
+        ["February", "Feb"],
+        ["March", "Mar"],
+        ["April", "Apr"],
+        ["May"],
+        ["June", "Jun"],
+        ["July", "Jul"],
+        ["August", "Aug"],
+        ["September", "Sep", "Sept"],
+        ["October", "Oct"],
+        ["November", "Nov"],
+        ["December", "Dec"]
+      ],
+      "de": [
+        ["Januar", "Jan"],
+        ["Februar", "Feb"],
+        ["M\u00e4rz", "Mrz", "M\u00e4r"],
+        ["April", "Apr"],
+        ["Mai"],
+        ["Juni", "Jun"],
+        ["Juli", "Jul"],
+        ["August", "Aug"],
+        ["September", "Sep", "Sept"],
+        ["Oktober", "Okt"],
+        ["November", "Nov"],
+        ["Dezember", "Dez"]
+      ],
+      "fr": [
+        ["janvier", "janv"],
+        ["f\u00e9vrier", "f\u00e9vr"],
+        ["mars"],
+        ["avril", "avr"],
+        ["mai"],
+        ["juin"],
+        ["juillet", "juil"],
+        ["ao\u00fbt"],
+        ["septembre", "sept"],
+        ["octobre", "oct"],
+        ["novembre", "nov"],
+        ["d\u00e9cembre", "d\u00e9c"]
+      ]
+    },
+    "weekdays": {
+      "en": [
+        ["Monday", "Mon"],
+        ["Tuesday", "Tue", "Tues"],
+        ["Wednesday", "Wed"],
+        ["Thursday", "Thu", "Thur", "Thurs"],
+        ["Friday", "Fri"],
+        ["Saturday", "Sat"],
+        ["Sunday", "Sun"]
+      ],
+      "de": [
+        ["Montag", "Mo"],
+        ["Dienstag", "Di"],
+        ["Mittwoch", "Mi"],
+        ["Donnerstag", "Do"],
+        ["Freitag", "Fr"],
+        ["Samstag", "Sa", "Sonnabend"],
+        ["Sonntag", "So"]
+      ],
+      "fr": [
+        ["lundi", "lun"],
+        ["mardi", "mar"],
+        ["mercredi", "mer"],
+        ["jeudi", "jeu"],
+        ["vendredi", "ven"],
+        ["samedi", "sam"],
+        ["dimanche", "dim"]
+      ],
+      "ja": [["\u6708"], ["\u706b"], ["\u6c34"], ["\u6728"], ["\u91d1"], ["\u571f"], ["\u65e5"]]
+    }
+  },
+  "formality_markers": {
+    "de": {
+      "formal": ["Sie", "Ihnen", "Ihr", "Ihre", "Ihren", "Ihrem", "Ihrer", "Ihres"],
+      "informal": [
+        "du",
+        "dich",
+        "dir",
+        "dein",
+        "deine",
+        "deinen",
+        "deinem",
+        "deiner",
+        "deines",
+        "Du",
+        "Dich",
+        "Dir",
+        "Dein",
+        "Deine",
+        "Deinen",
+        "Deinem",
+        "Deiner",
+        "Entdecke",
+        "Sichere",
+        "Melde",
+        "Spare",
+        "Hol",
+        "Hole",
+        "Schau",
+        "Bestelle"
+      ]
+    },
+    "fr": {
+      "formal": ["vous", "votre", "vos", "Vous", "Votre", "Vos"],
+      "informal": ["tu", "te", "toi", "ton", "ta", "tes", "Tu", "Toi", "Ton", "Ta", "Tes"]
+    }
+  },
+  "glossary": {
+    "do_not_translate": ["TrailPro Ultra", "TrailPro", "Black Friday", "Cyber Monday"],
+    "approved_translations": {
+      "ja-JP": {
+        "Black Friday": "\u30d6\u30e9\u30c3\u30af\u30d5\u30e9\u30a4\u30c7\u30fc",
+        "Cyber Monday": "\u30b5\u30a4\u30d0\u30fc\u30de\u30f3\u30c7\u30fc"
+      }
+    },
+    "forbidden": {
+      "de-DE": ["garantiert"],
+      "de-CH": ["garantiert"],
+      "en-GB": ["guaranteed lowest price"],
+      "fr-FR": ["garanti", "garantie"],
+      "ja-JP": ["\u6700\u5b89\u5024\u4fdd\u8a3c"]
+    }
+  },
+  "language_check": {
+    "min_letters": 20
+  }
+}

@@ -136,4 +136,9 @@ export default defineConfig([
     files: ["test/support/**/*.ts"],
     rules: { [FORBID]: forbidNoZodPaths(reach("infrastructure", "presentation")) },
   },
+  {
+    // testRules() is parseRules(rawRules()): the one test helper that needs the real parser.
+    files: ["test/support/rules.ts"],
+    rules: { [FORBID]: forbidNoZodPaths(reach("presentation")) },
+  },
 ]);
