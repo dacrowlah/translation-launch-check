@@ -124,7 +124,7 @@ Binding rules; the how-to is the `writing-tests` skill
 - **Read the test count** on every run. Zero tests or any unexpected skip is a failure (the
   gate enforces it).
 
-## 5. Tooling and gates (planned; commands verified when the scaffold lands)
+## 5. Tooling and gates (verified at scaffold)
 
 - pnpm 11.
 - ESLint 10 with `typescript-eslint` 8 and `eslint-plugin-metz` 1.0.0 (`strict`).
@@ -132,16 +132,17 @@ Binding rules; the how-to is the `writing-tests` skill
 - Vitest.
 - jscpd for duplicate code.
 
-Pinned versions are recorded in `package.json` at scaffold **(verify at scaffold: ESLint 10 +
-typescript-eslint 8 + TypeScript 6 compatibility)**.
+Versions are exact in `tool/pnpm-lock.yaml`. Verified together at scaffold: ESLint 10,
+typescript-eslint 8, TypeScript 6.0 (typescript-eslint 8 does not support TypeScript 7 yet),
+`eslint-plugin-metz` 1.0.0, Prettier 3, Vitest, jscpd.
 
 Gates, each proven by a planted violation that turns it red for its named reason:
 
-| Gate | Command (planned) | Catches |
+| Gate | Command | Catches |
 |---|---|---|
 | Format | `pnpm format:check` | unformatted code (counted lines assume Prettier output) |
 | Lint | `pnpm lint` | Metz limits, `no-restricted-imports` per layer, LoD selector, `no-explicit-any`, `Date.now` outside the clock |
-| Waiver directives | `pnpm lint:directives` (`metz-check-directives src test api`) | waivers without a reason, block disables |
+| Waiver directives | `pnpm lint:directives` (`metz-check-directives .`) | waivers without a reason, block disables |
 | Typecheck | `pnpm typecheck` | type errors |
 | Architecture test | part of `pnpm test` (`test/architecture.test.ts`) | any import that breaks section 1, in every form (`import`, `import type`, `export from`, dynamic `import()`) |
 | Duplicates | `pnpm dup` | large copied blocks fail; small ones are reported for review |

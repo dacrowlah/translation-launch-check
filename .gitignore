@@ -10,3 +10,5 @@ __pycache__/
 .ruff_cache/
 mark/local.config.json
 mark/dist/
+.preflight/
+tool/.vitest.json

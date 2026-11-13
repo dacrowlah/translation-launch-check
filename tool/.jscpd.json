@@ -1,0 +1,10 @@
+{
+  "path": ["."],
+  "format": ["typescript"],
+  "ignore": ["**/node_modules/**", "**/.vercel/**", "**/coverage/**", "**/dist/**"],
+  "minTokens": 50,
+  "minLines": 3,
+  "threshold": 0,
+  "reporters": ["console"],
+  "gitignore": true
+}
