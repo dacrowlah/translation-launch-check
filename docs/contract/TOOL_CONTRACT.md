@@ -1,4 +1,4 @@
-# Tool contract: launch-readiness-tools
+# Tool contract: the launch-readiness tool (`tool/`)
 
 The authoritative contract of this service: what each tool function takes, what it
 returns, and the rules it applies. It is consumed by the Launch Readiness Check workflow
