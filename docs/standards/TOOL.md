@@ -40,15 +40,15 @@ test/                             mirrors src/; test/support/ holds fakes, build
 
 Import rules (enforced by lint and the architecture test; section 5):
 
-| Layer | May import |
-|---|---|
-| `src/domain/**` | `src/domain/**` only. No Node built-ins with I/O, no packages except `zod` types |
-| `src/application/**` | domain |
+| Layer                   | May import                                                                                                                      |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `src/domain/**`         | `src/domain/**` only. No Node built-ins with I/O, no packages except `zod` types                                                |
+| `src/application/**`    | domain                                                                                                                          |
 | `src/infrastructure/**` | domain, application (ports and their types only), Node built-ins; `zod` (for `rules-schema.ts`); `eld` (only `eld-detector.ts`) |
-| `src/presentation/**` | domain, application, `@optimizely-opal/opal-tools-sdk`, `zod` |
-| `src/main.ts` | everything in `src/` and `config/` |
-| `api/index.ts` | `src/main.ts` only |
-| `test/**` | the layer under test, plus `test/support/**`. Fakes import only domain and ports |
+| `src/presentation/**`   | domain, application, `@optimizely-opal/opal-tools-sdk`, `zod`                                                                   |
+| `src/main.ts`           | everything in `src/` and `config/`                                                                                              |
+| `api/index.ts`          | `src/main.ts` only                                                                                                              |
+| `test/**`               | the layer under test, plus `test/support/**`. Fakes import only domain and ports                                                |
 
 Ports live in `src/domain/ports/`. A port used by exactly one use case may live beside that
 use case in `src/application/`.
@@ -137,21 +137,19 @@ typescript-eslint 8, TypeScript 6.0 (typescript-eslint 8 does not support TypeSc
 `eslint-plugin-metz` 1.0.0, Prettier 3, Vitest, jscpd. Express 4 and `@types/express` 4 are
 pinned to match the SDK's peer range. Known and accepted peer warnings:
 the SDK declares `typescript ^5.1.6` and `@types/node ^20`; we use TypeScript 6.0 and
-`@types/node` 24 (Node 24). The SDK's types are not yet exercised (nothing imports the SDK, and
-`tsconfig.json` has `"types": ["node"]`): the first task that imports it (presentation, Task 12) must
-typecheck without `skipLibCheck`, or restore it and list the exact errors in this section.
+`@types/node` 24 (Node 24). The SDK's types are exercised since Task 12 (presentation imports it) and typecheck cleanly without `skipLibCheck`.
 
 Gates, each proven by a planted violation that turns it red for its named reason:
 
-| Gate | Command | Catches |
-|---|---|---|
-| Format | `pnpm format:check` | unformatted code (counted lines assume Prettier output) |
-| Lint | `pnpm lint` | Metz limits, `no-restricted-imports` per layer, LoD selector, `no-explicit-any`, `Date.now` outside the clock |
-| Waiver directives | `pnpm lint:directives` (`metz-check-directives .`) | waivers without a reason, block disables |
-| Typecheck | `pnpm typecheck` | type errors |
-| Architecture test | part of `pnpm test` (`test/architecture.test.ts`) | any import that breaks section 1, in every form (`import`, `import type`, `export from`, dynamic `import()`) |
-| Duplicates | `pnpm dup` | large copied blocks fail; small ones are reported for review |
-| Tests + count | `pnpm test:gate` | failures, zero tests, skips |
+| Gate              | Command                                            | Catches                                                                                                       |
+| ----------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Format            | `pnpm format:check`                                | unformatted code (counted lines assume Prettier output)                                                       |
+| Lint              | `pnpm lint`                                        | Metz limits, `no-restricted-imports` per layer, LoD selector, `no-explicit-any`, `Date.now` outside the clock |
+| Waiver directives | `pnpm lint:directives` (`metz-check-directives .`) | waivers without a reason, block disables                                                                      |
+| Typecheck         | `pnpm typecheck`                                   | type errors                                                                                                   |
+| Architecture test | part of `pnpm test` (`test/architecture.test.ts`)  | any import that breaks section 1, in every form (`import`, `import type`, `export from`, dynamic `import()`)  |
+| Duplicates        | `pnpm dup`                                         | large copied blocks fail; small ones are reported for review                                                  |
+| Tests + count     | `pnpm test:gate`                                   | failures, zero tests, skips                                                                                   |
 
 All commands run inside `tool/`. The root `scripts/preflight.sh` runs them, and the root
 `.githooks/pre-commit` runs format and lint on staged `tool/` files (see
@@ -163,7 +161,7 @@ scripts, `tool/package.json`.
 
 - The Agent Platform fetches `/discovery` without auth and calls `POST /tools/<name>` with
   `Authorization: Bearer <token>`. The body is `{ parameters, auth_credentials, environment,
-  ... }`, and parameters arrive natively typed.
+... }`, and parameters arrive natively typed.
 - The tool endpoint path derives from the name: `localization_check` ->
   `/tools/localization-check`.
 - After adding or renaming a function, run **Sync** on the registry (Connectors ->
