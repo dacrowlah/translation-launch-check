@@ -14,4 +14,9 @@ describe("extractMergeTags", () => {
   it("replaces_each_tag_with_one_space", () => {
     expect(extractMergeTags("Hi {{a}}, bye", testRules()).rest).toBe("Hi  , bye");
   });
+
+  it("finds_nothing_when_there_are_no_patterns", () => {
+    const rules = { ...testRules(), merge_tag_patterns: [] };
+    expect(extractMergeTags("Hi {{a}}", rules)).toEqual({ tags: [], rest: "Hi {{a}}" });
+  });
 });

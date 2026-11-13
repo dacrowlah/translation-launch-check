@@ -36,4 +36,20 @@ describe("extractUrls", () => {
     const result = extractUrls("Bad http://[oops here");
     expect(result).toEqual({ urls: [], rest: "Bad http://[oops here" });
   });
+
+  it("keeps_a_merge_tag_at_the_end_of_a_url", () => {
+    const url = extractUrls("Use https://shop.com/?c={{code}} now").urls[0];
+    expect([url?.raw, url?.query]).toEqual(["https://shop.com/?c={{code}}", { c: "{{code}}" }]);
+  });
+
+  it.each([
+    ["See (https://e.com/Foo_(bar))", "https://e.com/Foo_(bar)"],
+    ["https://e.com/x\u201d", "https://e.com/x"],
+    ["https://e.com/x\u3002", "https://e.com/x"],
+    ["\u00abhttps://e.com/x\u00bb", "https://e.com/x"],
+    ["https://e.com/x\u203a", "https://e.com/x"],
+    ["\uff08https://e.com/x\uff09", "https://e.com/x"],
+  ])("strips_closers_by_bracket_balance %s", (text, raw) => {
+    expect(extractUrls(text).urls[0]?.raw).toBe(raw);
+  });
 });
