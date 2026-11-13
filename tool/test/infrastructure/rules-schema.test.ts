@@ -75,6 +75,15 @@ describe("parseRules", () => {
     expect(() => parseRules(withGlossary({ approved_translations: { "xx-XX": {} } }))).toThrow();
   });
 
+  it("rejects_accepted_loanwords_for_a_language_no_locale_uses", () => {
+    const bad = { ...rawRules(), accepted_loanwords: { xx: ["a"] } };
+    expect(() => parseRules(bad)).toThrow(/accepted_loanwords: unknown language xx/);
+  });
+
+  it("rejects_accepted_loanwords_that_are_not_string_lists", () => {
+    expect(() => parseRules({ ...rawRules(), accepted_loanwords: { de: "sale" } })).toThrow();
+  });
+
   it("rejects_spelling_for_a_locale_that_is_not_configured", () => {
     const locales = Object.entries(section("locales")).filter(([id]) => id !== "de-CH");
     const aliases = Object.entries(section("locale_aliases")).filter(([, id]) => id !== "de-CH");

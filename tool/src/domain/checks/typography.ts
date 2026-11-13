@@ -12,8 +12,11 @@ const GAP = "\\s\\u00a0\\u202f";
 const OPENING = new RegExp(`(\\u00ab)([^${GAP}])`, "gu");
 const CLOSING = new RegExp(`([^${GAP}])(\\u00bb)`, "gu");
 
-const beforeMarks = (marks: readonly string[]): RegExp =>
-  new RegExp(`([^${GAP}])([${marks.map(escapeInClass).join("")}])`, "gu");
+/** A mark after a space is fine, and so is one after another mark ("?!"). */
+const beforeMarks = (marks: readonly string[]): RegExp => {
+  const set = marks.map(escapeInClass).join("");
+  return new RegExp(`([^${GAP}${set}])([${set}])`, "gu");
+};
 
 /** Each tight pair as [what it should read, what it reads]. */
 const tight = (text: string, pattern: RegExp): Row[] =>

@@ -25,11 +25,13 @@ const present = (text: string, [term, ...more]: readonly string[]): string[] => 
 
 const kept = (pair: LinePair, term: string, ctx: LocaleContext): boolean => {
   const approved = ctx.rules.glossary.approved_translations[pair.locale]?.[term];
-  return termsPattern([term]).test(pair.targetText) || pair.targetText.includes(approved ?? "\0");
+  const target = withoutSpans(pair.targetText, ctx.rules);
+  return termsPattern([term]).test(target) || target.includes(approved ?? "\0");
 };
 
 const dntResult = (pair: LinePair, ctx: LocaleContext) => {
-  const terms = present(pair.masterText, dntTerms(ctx.rules));
+  const master = withoutSpans(pair.masterText, ctx.rules);
+  const terms = present(master, dntTerms(ctx.rules));
   const rows = terms.filter((term) => !kept(pair, term, ctx)).map((term): Row => [term, undefined]);
   return resultOf(ctx.rules, DNT, terms.length > 0, rows);
 };

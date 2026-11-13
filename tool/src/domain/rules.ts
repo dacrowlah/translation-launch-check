@@ -72,5 +72,6 @@ export interface Rules {
   readonly calendar: Calendar;
   readonly formality_markers: Readonly<Record<string, Lexicon>>;
   readonly glossary: Glossary;
+  readonly accepted_loanwords: Readonly<Record<string, Strings>>;
   readonly language_check: { readonly min_letters: number };
 }

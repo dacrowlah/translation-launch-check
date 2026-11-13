@@ -76,6 +76,7 @@ const shape = z.strictObject({
   calendar: z.strictObject({ months: names(12), weekdays: names(7) }),
   formality_markers: z.record(z.string(), z.strictObject({ formal: strings, informal: strings })),
   glossary,
+  accepted_loanwords: z.record(z.string(), strings),
   language_check: z.strictObject({ min_letters: count }),
 });
 
@@ -91,10 +92,19 @@ const references = (r: Rules): [string, string[]][] => [
   ["spelling", Object.keys(r.spelling)],
 ];
 
-const crossIssues = (r: Rules): string[] =>
-  references(r).flatMap(([label, keys]) =>
+const languageIssues = (r: Rules): string[] => {
+  const used = new Set(Object.values(r.locales).map((l) => l.language));
+  return Object.keys(r.accepted_loanwords)
+    .filter((k) => !used.has(k))
+    .map((k) => `accepted_loanwords: unknown language ${k}`);
+};
+
+const crossIssues = (r: Rules): string[] => [
+  ...references(r).flatMap(([label, keys]) =>
     keys.filter((k) => !(k in r.locales)).map((k) => `${label}: unknown locale ${k}`),
-  );
+  ),
+  ...languageIssues(r),
+];
 
 /** Start-up only: throws a ZodError when config/rules.json is invalid. */
 export const parseRules = (json: unknown): Rules => {

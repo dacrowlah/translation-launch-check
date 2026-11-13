@@ -243,7 +243,26 @@
         "tumor": "tumour"
       },
       "ize_to_ise": true,
-      "ize_exceptions": ["size", "seize", "prize", "capsize", "baize", "maize"]
+      "ize_exceptions": [
+        "size",
+        "seize",
+        "prize",
+        "capsize",
+        "baize",
+        "maize",
+        "oversize",
+        "oversized",
+        "resize",
+        "resized",
+        "resizing",
+        "downsize",
+        "downsized",
+        "downsizing",
+        "supersize",
+        "supersized",
+        "upsize",
+        "upsized"
+      ]
     },
     "de-CH": {
       "chars": {
@@ -272,7 +291,8 @@
       "heute Nacht"
     ],
     "fr": [
-      "\\b\\d{1,2}\\s?h(\\s?\\d{2})?\\b",
+      "(?:\u00e0|jusqu['\u2019]\u00e0|d\u00e8s|avant)\\s\\d{1,2}\\s?h(?:\\s?\\d{2})?",
+      "\\b\\d{1,2}\\s?h\\s?\\d{2}\\b",
       "\\b\\d{1,2}:\\d{2}\\b",
       "minuit",
       "midi",
@@ -423,7 +443,6 @@
         "Deinem",
         "Deiner",
         "Entdecke",
-        "Sichere",
         "Melde",
         "Spare",
         "Hol",
@@ -452,6 +471,20 @@
       "fr-FR": ["garanti", "garantie"],
       "ja-JP": ["\u6700\u5b89\u5024\u4fdd\u8a3c"]
     }
+  },
+  "accepted_loanwords": {
+    "de": [
+      "sale",
+      "shop",
+      "online",
+      "newsletter",
+      "outlet",
+      "deals",
+      "black friday",
+      "cyber monday"
+    ],
+    "fr": ["shopping", "newsletter", "outlet", "black friday", "cyber monday"],
+    "ja": []
   },
   "language_check": {
     "min_letters": 20

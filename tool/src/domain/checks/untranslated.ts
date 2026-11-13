@@ -1,33 +1,41 @@
 import type { Rules } from "../rules";
-import { resultOf, type LineCheck, type Row, type Spec } from "./compare";
+import { resultOf, type LinePair, type LineCheck, type Row, type Spec } from "./compare";
 import { tokensWithoutTerms } from "./terms";
+import { wholeWords } from "./words";
 
 export const UNTRANSLATED_DETAIL = "The line is the same as the master.";
 
 const UNTRANSLATED: Spec = { check: "untranslated", detail: UNTRANSLATED_DETAIL };
 
-/** The words left once terms, tags, URLs, codes, numbers and punctuation are gone. */
-const wordsOf = (text: string, locale: string, rules: Rules): string => {
-  const { rest } = tokensWithoutTerms(text, locale, rules);
-  return rest
+const lettersOf = (text: string): string =>
+  text
     .replace(/[\p{P}\p{S}\p{N}\s]+/gu, " ")
     .trim()
     .toLowerCase();
+
+/** The words left once terms, tags, URLs, codes, numbers, punctuation and loanwords are gone. */
+const wordsOf = (text: string, locale: string, rules: Rules, loanwords: RegExp): string =>
+  lettersOf(tokensWithoutTerms(text, locale, rules).rest.replace(loanwords, " "));
+
+const languageOf = (locale: string, rules: Rules): string => rules.locales[locale]?.language ?? "";
+
+const loanwordsFor = (locale: string, rules: Rules): RegExp =>
+  wholeWords(rules.accepted_loanwords[languageOf(locale, rules)] ?? [], "giu");
+
+const sides = (pair: LinePair, rules: Rules): [master: string, target: string] => {
+  const loan = loanwordsFor(pair.locale, rules);
+  return [
+    wordsOf(pair.masterText, rules.master_locale, rules, loan),
+    wordsOf(pair.targetText, pair.locale, rules, loan),
+  ];
 };
 
-const sameLanguage = (a: string, b: string, rules: Rules): boolean =>
-  rules.locales[a]?.language === rules.locales[b]?.language;
-
-/** One word may be a loanword or a label ("Sale"), so a line needs two to count. */
-const hasWords = (words: string): boolean => words.split(" ").length > 1;
-
-const applies = (master: string, locale: string, rules: Rules): boolean =>
-  hasWords(master) && !sameLanguage(locale, rules.master_locale, rules);
+const otherLanguage = (locale: string, rules: Rules): boolean =>
+  languageOf(locale, rules) !== languageOf(rules.master_locale, rules);
 
 export const checkUntranslated: LineCheck = (pair, ctx) => {
-  const master = wordsOf(pair.masterText, ctx.rules.master_locale, ctx.rules);
-  const same = master === wordsOf(pair.targetText, pair.locale, ctx.rules);
-  const applicable = applies(master, pair.locale, ctx.rules);
-  const rows: Row[] = applicable && same ? [[undefined, pair.targetText]] : [];
+  const [master, target] = sides(pair, ctx.rules);
+  const applicable = otherLanguage(pair.locale, ctx.rules) && /\p{L}/u.test(master);
+  const rows: Row[] = applicable && master === target ? [[undefined, pair.targetText]] : [];
   return resultOf(ctx.rules, UNTRANSLATED, applicable, rows);
 };

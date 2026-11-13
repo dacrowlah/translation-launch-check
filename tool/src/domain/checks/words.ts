@@ -6,10 +6,11 @@ export const LATIN_WORD = `${LATIN}+`;
 const phrase = (term: string): string => term.split(/\s+/u).map(escape).join("\\s+");
 
 /** Terms as whole words: a neighbouring Latin letter blocks a match, so CJK text still matches. */
+export const bounded = (source: string): string => `(?<!${LATIN})(?:${source})(?!${LATIN})`;
+
 export const wholeWordSource = (terms: readonly string[]): string => {
   const sorted = [...terms].sort((a, b) => b.length - a.length);
-  const any = sorted.length === 0 ? "(?!)" : sorted.map(phrase).join("|");
-  return `(?<!${LATIN})(?:${any})(?!${LATIN})`;
+  return bounded(sorted.length === 0 ? "(?!)" : sorted.map(phrase).join("|"));
 };
 
 export const wholeWords = (terms: readonly string[], flags: string): RegExp =>
