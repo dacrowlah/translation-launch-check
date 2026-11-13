@@ -68,6 +68,10 @@ A workflow can have several triggers (one Chat max). Scheduled/webhook/email run
   normally. Calls made from code are **not** logged as separate tool-call entries.
 - A step that fails to start (e.g. syntax error) is diagnosed **to the end user in chat**,
   line number included - its own try/except cannot catch it.
+- **Runtimes (verified 2026-11):** Python steps run Python 3.12 with `opal_tms_sdk`.
+  JavaScript steps (`"language": "javascript"`, `async function handler(input, ctx)`) run
+  Node 24 (CommonJS) and read attachments the same way, but **have no tool SDK**: they can't
+  call custom or platform tools. Any step that calls a tool must be Python.
 
 ## Agents' `code_execute` sandbox
 Python/Node/Bash VM with pandas, numpy, scipy, requests... but **no internet** (DNS fails).
