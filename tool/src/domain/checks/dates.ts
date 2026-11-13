@@ -1,8 +1,7 @@
 import type { CheckResult } from "../types";
 import { nextOccurrence, weekdayOf } from "../tokens/calendar";
 import type { DateToken } from "../tokens/dates";
-import { escape } from "../tokens/regex";
-import { tokenize, type Tokens } from "../tokens/tokenize";
+import type { Tokens } from "../tokens/tokenize";
 import {
   diffRows,
   type LinePair,
@@ -12,6 +11,7 @@ import {
   type Row,
   type Spec,
 } from "./compare";
+import { tokensWithoutTerms } from "./terms";
 
 export const DATES_DETAIL = "A date or weekday differs from the master.";
 export const WEEKDAY_DETAIL = "The weekday doesn't match the date.";
@@ -23,24 +23,6 @@ const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const name = (weekday: number): string => DAYS[weekday] ?? "";
 const label = (date: DateToken, weekday = date.weekday): string =>
   `${date.month}/${date.day}${weekday === null ? "" : ` ${name(weekday)}`}`;
-
-const termPattern = (term: string): string =>
-  term
-    .split(/[\s-]+/u)
-    .map(escape)
-    .join("[\\s-]");
-
-/** A term's words may be joined by a space, hyphen or no-break space ("Black-Friday"). */
-const termsPattern = (terms: readonly string[]): RegExp =>
-  new RegExp(terms.length === 0 ? "(?!)" : terms.map(termPattern).join("|"), "giu");
-
-/** Do-not-translate terms ("Black Friday") hold weekday names that are not dates. */
-const tokensOf = (text: string, locale: string, ctx: LocaleContext): Tokens => {
-  const terms = termsPattern(
-    [...ctx.rules.glossary.do_not_translate].sort((x, y) => y.length - x.length),
-  );
-  return tokenize(text.replace(terms, " "), locale, ctx.rules);
-};
 
 const labels = (tokens: Tokens): string[] => [
   ...tokens.dates.map((d) => label(d)),
@@ -76,8 +58,8 @@ const datesDiffer = (m: Tokens, t: Tokens): boolean =>
   differ(monthDays(m), monthDays(t)) || (days(m).length > 0 && differ(days(m), days(t)));
 
 const sides = (pair: LinePair, ctx: LocaleContext): [Tokens, Tokens] => [
-  tokensOf(pair.masterText, ctx.rules.master_locale, ctx),
-  tokensOf(pair.targetText, pair.locale, ctx),
+  tokensWithoutTerms(pair.masterText, ctx.rules.master_locale, ctx.rules),
+  tokensWithoutTerms(pair.targetText, pair.locale, ctx.rules),
 ];
 
 const datesResult = (m: Tokens, t: Tokens, ctx: LocaleContext): CheckResult => {

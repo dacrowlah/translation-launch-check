@@ -1,0 +1,31 @@
+import type { LocaleRule } from "../rules";
+import { escapeInClass } from "../tokens/regex";
+import { resultOf, type LineCheck, type Row, type Spec } from "./compare";
+import { withoutSpans } from "./spans";
+
+export const TYPOGRAPHY_DETAIL = "French spacing is missing before ; : ! ? or inside guillemets.";
+
+const TYPOGRAPHY: Spec = { check: "typography", detail: TYPOGRAPHY_DETAIL };
+const NARROW = String.fromCodePoint(0x202f);
+const GAP = "\\s\\u00a0\\u202f";
+
+const OPENING = new RegExp(`(\\u00ab)([^${GAP}])`, "gu");
+const CLOSING = new RegExp(`([^${GAP}])(\\u00bb)`, "gu");
+
+const beforeMarks = (marks: readonly string[]): RegExp =>
+  new RegExp(`([^${GAP}])([${marks.map(escapeInClass).join("")}])`, "gu");
+
+/** Each tight pair as [what it should read, what it reads]. */
+const tight = (text: string, pattern: RegExp): Row[] =>
+  [...text.matchAll(pattern)].map((m): Row => [`${m[1]}${NARROW}${m[2]}`, `${m[1]}${m[2]}`]);
+
+const rowsOf = (text: string, rule: NonNullable<LocaleRule["typography"]>): Row[] => [
+  ...tight(text, beforeMarks(rule.space_before)),
+  ...(rule.guillemets ? [...tight(text, OPENING), ...tight(text, CLOSING)] : []),
+];
+
+export const checkTypography: LineCheck = (pair, ctx) => {
+  const rule = ctx.rules.locales[pair.locale]?.typography;
+  const text = withoutSpans(pair.targetText, ctx.rules).replace(/\d{1,2}:\d{2}/gu, " ");
+  return resultOf(ctx.rules, TYPOGRAPHY, rule !== undefined, rule ? rowsOf(text, rule) : []);
+};
