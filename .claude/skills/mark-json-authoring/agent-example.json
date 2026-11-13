@@ -1,0 +1,88 @@
+{
+  "schema_version": "1.3",
+  "agent_type": "specialized",
+  "cwd": null,
+  "name": "Example Reviewer",
+  "output": {
+    "type": "json",
+    "description": "Findings for one market",
+    "schema": {
+      "type": "object",
+      "required": [
+        "country_code",
+        "findings"
+      ],
+      "properties": {
+        "country_code": {
+          "type": "string"
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "severity",
+              "detail"
+            ],
+            "properties": {
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "blocker",
+                  "warning",
+                  "info"
+                ]
+              },
+              "detail": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0.0",
+  "agent_id": "example_reviewer",
+  "roi_unit": null,
+  "is_active": true,
+  "roi_label": null,
+  "is_deleted": false,
+  "parameters": [
+    {
+      "name": "country_code",
+      "type": "string",
+      "default": null,
+      "required": true,
+      "item_type": null,
+      "max_items": null,
+      "min_items": null,
+      "description": "ISO 3166-1 alpha-2 country code, e.g. DE"
+    }
+  ],
+  "roi_amount": null,
+  "description": "Reviews one market and returns structured findings.",
+  "llm_provider": null,
+  "prompt_pills": null,
+  "enabled_tools": [
+    "copy_fit_check"
+  ],
+  "agent_metadata": {
+    "enable_auto_skill_prediction": false,
+    "enable_auto_skill_prediction_by_tools": true
+  },
+  "inference_type": "simple",
+  "initial_message": null,
+  "prompt_template": "{skill: `lr-glossary`} \n\nReview the launch copy for market [[country_code]]. Call `copy_fit_check` on every line. Return JSON matching the output schema.\n\n{skill: **auto-tool**}",
+  "input_guardrails": null,
+  "internal_version": 1,
+  "conversation_mode": false,
+  "first_prompt_mode": "open",
+  "is_enabled_in_chat": false,
+  "memory_token_limit": 100000,
+  "private_executions": false,
+  "evaluation_criteria": null,
+  "system_prompt_template": "",
+  "enable_personal_context": false,
+  "enable_auto_tool_prediction": false
+}

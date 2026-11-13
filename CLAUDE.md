@@ -30,6 +30,7 @@ Hard constraints:
 - How we build (binding): [docs/standards/README.md](docs/standards/README.md),
   [TOOL.md](docs/standards/TOOL.md), [MARK.md](docs/standards/MARK.md)
 - How we test: [.claude/skills/writing-tests/SKILL.md](.claude/skills/writing-tests/SKILL.md)
+- How the platform behaves (verified): [.claude/skills/mark-platform/SKILL.md](.claude/skills/mark-platform/SKILL.md)
 
 ---
 
@@ -71,13 +72,14 @@ the same change. The contract changes only with the owner's approval.
 | Task | Read first |
 |---|---|
 | Any change | [standards README](docs/standards/README.md) |
-| `tool/` code | [TOOL.md](docs/standards/TOOL.md); the [contract](docs/contract/TOOL_CONTRACT.md) for behaviour |
-| `mark/` code steps | [MARK.md](docs/standards/MARK.md) section 2 |
-| Agents or skills (Mark) | [MARK.md](docs/standards/MARK.md) section 3 |
-| The workflow or its canvas layout | [MARK.md](docs/standards/MARK.md) section 4 |
+| `tool/` code | [TOOL.md](docs/standards/TOOL.md); the [contract](docs/contract/TOOL_CONTRACT.md) for behaviour; the [opal-custom-tools skill](.claude/skills/opal-custom-tools/SKILL.md) |
+| `mark/` code steps | [MARK.md](docs/standards/MARK.md) section 2; the [mark-code-step-patterns skill](.claude/skills/mark-code-step-patterns/SKILL.md) |
+| Agents or skills (Mark) | [MARK.md](docs/standards/MARK.md) section 3; the [mark-json-authoring skill](.claude/skills/mark-json-authoring/SKILL.md) |
+| The workflow or its canvas layout | [MARK.md](docs/standards/MARK.md) section 4; the [mark-json-authoring skill](.claude/skills/mark-json-authoring/SKILL.md) |
 | Any test, fake, builder or harness | the [writing-tests skill](.claude/skills/writing-tests/SKILL.md) |
 | Gates, hooks, lint or format config | [README](docs/standards/README.md) section 5, then [TOOL.md](docs/standards/TOOL.md) section 5 or [MARK.md](docs/standards/MARK.md) section 6 |
-| Deploy, registry, security | [TOOL.md](docs/standards/TOOL.md) sections 3 and 6, [MARK.md](docs/standards/MARK.md) section 7 |
+| Deploy, registry, security | [TOOL.md](docs/standards/TOOL.md) sections 3 and 6, [MARK.md](docs/standards/MARK.md) section 7; the [opal-custom-tools skill](.claude/skills/opal-custom-tools/SKILL.md) |
+| Anything about how Mark behaves | the [mark-platform skill](.claude/skills/mark-platform/SKILL.md); unverified claims get a throwaway test first |
 
 ## Repository layout
 
@@ -86,6 +88,7 @@ CLAUDE.md
 docs/contract/TOOL_CONTRACT.md
 docs/standards/README.md  TOOL.md  MARK.md
 .claude/skills/writing-tests/SKILL.md
+.claude/skills/mark-platform/  mark-code-step-patterns/  mark-json-authoring/  opal-custom-tools/
 ```
 
 Planned, created by the scaffold: `tool/`, `mark/`, `scripts/`, `.githooks/` and a

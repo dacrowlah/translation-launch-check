@@ -70,6 +70,13 @@ use case in `src/application/`.
   port only, as one structured line `{ event, source, market, status, latency_ms }`.
 - **Never log or echo** request headers, the bearer token, environment variables or
   campaign copy. A test pins that a response contains no `authorization` text.
+- **The SDK itself `console.log`s full request bodies and tool results** (SDK 0.1.41-dev;
+  seen in Vercel logs). That would put campaign copy in logs, so the composition root silences
+  or wraps that logging **(verify at scaffold: the exact mechanism)**, and a test pins that a
+  tool call writes no request body to stdout.
+- **Don't use the SDK's error helpers** (`providerError`, `validationError`,
+  `resourceNotFound`) for expected problems. They reply HTTP 200 with an error envelope that a
+  workflow code step sees as a success. Expected problems are per-item statuses.
 - **Auth:** SDK `static_token` mode with `TOOL_BEARER_TOKEN` from the environment. The
   service refuses to start without it.
 - **Outbound:** only `api.frankfurter.dev` and `date.nager.at`, enforced in `http-client.ts`,
