@@ -1,10 +1,10 @@
 {
   "schema_version": "1.3",
   "agent_type": "workflow",
-  "name": "Example Launch Check",
-  "description": "Chat -> code -> loop(agent) -> condition -> two code branches.",
+  "name": "Example Workflow",
+  "description": "Template. Trigger: Chat. Flow: code -> condition -> loop(agent, save) -> code -> condition -> join; each condition follows a code step, never an agent or the loop. Route tokens use the reserved prefix example_route_, as in example_step.py, which is the webhook variant of the first step. The loop's max_iterations (5) equals the first step's item cap; the top-level max_iterations (10) is the workflow's own exported setting, separate from the loop's and not verified.",
   "version": "",
-  "agent_id": "example_launch_check",
+  "agent_id": "example_workflow",
   "objective": "",
   "plan": "",
   "is_active": true,
@@ -12,9 +12,9 @@
   "agent_metadata": {
     "edges": [
       {
-        "id": "trigger-chat-step-prepare",
+        "id": "trigger-chat-step-read",
         "source": "trigger-chat",
-        "target": "step-prepare",
+        "target": "step-read",
         "sourceHandle": "source-right",
         "targetHandle": "target-body"
       }
@@ -23,24 +23,38 @@
       {
         "id": "trigger-chat",
         "position": {
-          "x": 375,
-          "y": 90
+          "x": 400,
+          "y": 0
         }
       },
       {
-        "id": "step-prepare",
+        "id": "step-read",
         "position": {
-          "x": 375,
-          "y": 240
+          "x": 400,
+          "y": 220
+        }
+      },
+      {
+        "id": "step-usable",
+        "position": {
+          "x": 400,
+          "y": 440
+        }
+      },
+      {
+        "id": "step-needs-info",
+        "position": {
+          "x": 40,
+          "y": 660
         }
       },
       {
         "id": "step-loop",
         "width": 320,
-        "height": 188,
+        "height": 348,
         "position": {
-          "x": 375,
-          "y": 390
+          "x": 400,
+          "y": 660
         }
       },
       {
@@ -52,47 +66,102 @@
         }
       },
       {
-        "id": "step-condition",
+        "id": "step-save",
+        "parentId": "step-loop",
         "position": {
-          "x": 375,
-          "y": 650
+          "x": 40,
+          "y": 240
         }
       },
       {
-        "id": "step-blocked",
+        "id": "step-score",
         "position": {
-          "x": 200,
-          "y": 800
+          "x": 400,
+          "y": 1100
         }
       },
       {
-        "id": "step-else",
+        "id": "step-anything",
         "position": {
-          "x": 550,
-          "y": 800
+          "x": 400,
+          "y": 1320
+        }
+      },
+      {
+        "id": "step-fix",
+        "position": {
+          "x": 40,
+          "y": 1540
+        }
+      },
+      {
+        "id": "step-report",
+        "position": {
+          "x": 400,
+          "y": 1760
         }
       }
     ]
   },
-  "internal_version": 4,
+  "internal_version": 1,
   "steps": [
     {
-      "step_id": "step-condition",
+      "step_id": "step-read",
+      "step_type": "code",
+      "name": "Read the input",
+      "description": "",
+      "code": "def handler(input: dict, ctx: dict) -> dict:\n    # Stub (chat variant; example_step.py is the webhook variant). A real step reads the chat\n    # attachment from ctx['input_dir']; uses email inputs only when trigger_name is 'Email'\n    # and the attachment has the recorded shape; uses a webhook payload (sent <= 50,000\n    # bytes) only when its package_sha256 (full 64-hex SHA-256) verifies. It validates a\n    # strict schema (unknown keys rejected at every level; reserved prefix 'example_route_'\n    # rejected anywhere; campaign <= 100 chars; at most 5 locales = the loop's\n    # max_iterations and 50 lines, counted first; locale codes, master not listed, no\n    # duplicate locales; each line exactly id (letter first, unique), channel, field,\n    # texts; visible text in every cell; no control characters in any string field;\n    # unencodable or non-JSON data rejected first; each item <= 60 KB, all <= 200 KB),\n    # calls its\n    # tool once and writes report.json to\n    # /workspace/example/<run_key>/.\n    # Loop items: example_step.py builds {locale, lines: [{id, master, text}]}; a real\n    # step adds 'checksum' (locale code + lines + rule findings). This stub pre-renders\n    # 'lines' as text because the review agent's 'lines' input is a string.\n    lines = '[L1] Hello => Hallo'\n    locales = [{'locale': 'de-DE', 'lines': lines, 'checksum': '0123456789abcdef'}]\n    return {'route': 'example_route_check', 'message': '', 'run_key': '0123456789abcdef',\n            'report_checksum': '0123456789abcdef', 'locales': locales,\n            'summary': 'example_route_check'}",
+      "language": "python",
+      "parameters_schema": {
+        "trigger_name": {
+          "type": "predicted",
+          "value": null,
+          "required": true,
+          "value_type": "string",
+          "description": "trigger_context.trigger_name, unchanged"
+        },
+        "email_sender": {
+          "type": "predicted",
+          "value": null,
+          "required": false,
+          "value_type": "string",
+          "description": "trigger_context.email_payload.sender, unchanged; absent for chat and webhook runs; used only when trigger_name is Email"
+        },
+        "email_attachments": {
+          "type": "predicted",
+          "value": null,
+          "required": false,
+          "value_type": "array",
+          "description": "trigger_context.email_payload.attachments, unchanged; absent for chat and webhook runs; used only when trigger_name is Email"
+        },
+        "webhook_payload": {
+          "type": "predicted",
+          "value": null,
+          "required": false,
+          "value_type": "object",
+          "description": "trigger_context.webhook_payload, unchanged; absent for chat and email runs; used only when its package_sha256 verifies"
+        }
+      },
+      "next_step_id": "step-usable",
+      "timeout_seconds": 60
+    },
+    {
+      "step_id": "step-usable",
       "step_type": "condition",
-      "name": "Any network blocked?",
+      "name": "Is the input usable?",
       "description": "",
       "conditions": [
         {
-          "matching_condition": "",
-          "match_type": "else",
-          "target_step_id": "step-else",
+          "matching_condition": "\\bexample_route_needs_info\\b",
+          "match_type": "regex",
+          "target_step_id": "step-needs-info",
           "priority": 0,
-          "case_sensitive": false
+          "case_sensitive": true
         },
         {
-          "matching_condition": "blocked",
-          "match_type": "contains",
-          "target_step_id": "step-blocked",
+          "matching_condition": "",
+          "match_type": "else",
+          "target_step_id": "step-loop",
           "priority": 0,
           "case_sensitive": false
         }
@@ -101,78 +170,190 @@
       "timeout_seconds": null
     },
     {
+      "step_id": "step-needs-info",
+      "step_type": "code",
+      "name": "Ask for a corrected input",
+      "description": "",
+      "code": "def handler(input: dict, ctx: dict) -> dict:\n    # Shows the templated message from 'Read the input' (it says whose problem it is).\n    return {'message': str(input.get('message') or ''), 'summary': 'needs info'}",
+      "language": "python",
+      "parameters_schema": {
+        "message": {
+          "type": "predicted",
+          "value": null,
+          "required": true,
+          "value_type": "string",
+          "description": "The message field of the step 'Read the input', copied exactly"
+        }
+      },
+      "next_step_id": null,
+      "timeout_seconds": 30
+    },
+    {
       "step_id": "step-loop",
       "step_type": "for_loop",
-      "name": "For each market",
-      "description": "Runs the probe agent per market",
-      "items_source": "markets",
-      "item_name": "market",
-      "max_iterations": 10,
+      "name": "For each locale",
+      "description": "Reviews each locale, then saves the review",
+      "items_source": "locales",
+      "item_name": "locale_item",
+      "max_iterations": 5,
       "parallel": true,
       "child_steps": [
         {
           "step_id": "step-review",
           "step_type": "specialized",
-          "name": "Review market",
+          "name": "Review the locale",
           "description": "",
           "agent_id": "example_reviewer",
           "parameters_schema": {
-            "country_code": {
+            "locale": {
               "type": "predicted",
               "value": null,
               "required": true,
               "value_type": "string",
-              "description": "The current market's ISO country code"
+              "description": "The current loop item's locale, copied exactly"
+            },
+            "lines": {
+              "type": "predicted",
+              "value": null,
+              "required": true,
+              "value_type": "string",
+              "description": "The current loop item's lines, copied exactly, character for character"
+            },
+            "checksum": {
+              "type": "predicted",
+              "value": null,
+              "required": true,
+              "value_type": "string",
+              "description": "The current loop item's checksum, copied exactly"
+            }
+          },
+          "next_step_id": "step-save",
+          "timeout_seconds": 3600,
+          "is_interactive": false
+        },
+        {
+          "step_id": "step-save",
+          "step_type": "code",
+          "name": "Save the review",
+          "description": "",
+          "code": "def handler(input: dict, ctx: dict) -> dict:\n    # Stub. Declares only small inputs (never the loop item). A real step validates run_key\n    # and the locale with fullmatch, checks the review echoes the same checksum, strips\n    # Content Translation's exact trailing leak (linear string operations, no regex; an\n    # empty result -> check_incomplete), and writes\n    # /workspace/example/<run_key>/reviews/<locale>.json as {data, checksum}, the data\n    # carrying the locale checksum in its 'checksum' field. Its fallback writes nothing.\n    return {'saved': True, 'summary': 'review saved'}",
+          "language": "python",
+          "parameters_schema": {
+            "run_key": {
+              "type": "predicted",
+              "value": null,
+              "required": true,
+              "value_type": "string",
+              "description": "The run_key from the step 'Read the input', copied exactly"
+            },
+            "locale": {
+              "type": "predicted",
+              "value": null,
+              "required": true,
+              "value_type": "string",
+              "description": "The current loop item's locale, copied exactly"
+            },
+            "checksum": {
+              "type": "predicted",
+              "value": null,
+              "required": true,
+              "value_type": "string",
+              "description": "The current loop item's checksum, copied exactly"
+            },
+            "review": {
+              "type": "predicted",
+              "value": null,
+              "required": true,
+              "value_type": "object",
+              "description": "The JSON output of the step 'Review the locale' in this iteration, unchanged"
             }
           },
           "next_step_id": null,
-          "timeout_seconds": 3600,
-          "is_interactive": false
+          "timeout_seconds": 30
         }
       ],
-      "next_step_id": "step-condition",
+      "next_step_id": "step-score",
       "timeout_seconds": 3600
     },
     {
-      "step_id": "step-else",
+      "step_id": "step-score",
       "step_type": "code",
-      "name": "Branch: else",
+      "name": "Score each locale",
       "description": "",
-      "code": "def handler(input: dict, ctx: dict) -> dict:\n    return {'branch': 'else', 'summary': 'took ELSE branch'}",
-      "language": "python",
-      "parameters_schema": {},
-      "next_step_id": null,
-      "timeout_seconds": 30
-    },
-    {
-      "step_id": "step-prepare",
-      "step_type": "code",
-      "name": "Normalize markets",
-      "description": "",
-      "code": "def handler(input: dict, ctx: dict) -> dict:\n    markets = [str(m).strip().upper() for m in input.get('markets', [])]\n    return {'markets': markets, 'market_count': len(markets), 'summary': f'{len(markets)} markets normalized'}",
+      "code": "def handler(input: dict, ctx: dict) -> dict:\n    # Stub. A real step reads report.json (own checksum, then == report_checksum), takes the\n    # locale list and locale checksums from it, reads each review (own checksum, then its\n    # 'checksum' echo == the report's; a missing value fails closed); a missing or unbound\n    # file -> check_incomplete. It takes no loop output. It scores and writes the scores back.\n    return {'route': 'example_route_report', 'run_key': input.get('run_key'),\n            'summary': 'example_route_report'}",
       "language": "python",
       "parameters_schema": {
-        "markets": {
+        "run_key": {
           "type": "predicted",
           "value": null,
           "required": true,
-          "value_type": "array",
-          "description": "The 'markets' list of ISO country codes from the webhook payload"
+          "value_type": "string",
+          "description": "The run_key from the step 'Read the input', copied exactly"
+        },
+        "report_checksum": {
+          "type": "predicted",
+          "value": null,
+          "required": true,
+          "value_type": "string",
+          "description": "The report_checksum from the step 'Read the input', copied exactly"
         }
       },
-      "next_step_id": "step-loop",
+      "next_step_id": "step-anything",
+      "timeout_seconds": 60
+    },
+    {
+      "step_id": "step-anything",
+      "step_type": "condition",
+      "name": "Anything to fix?",
+      "description": "",
+      "conditions": [
+        {
+          "matching_condition": "\\bexample_route_fix\\b",
+          "match_type": "regex",
+          "target_step_id": "step-fix",
+          "priority": 0,
+          "case_sensitive": true
+        },
+        {
+          "matching_condition": "",
+          "match_type": "else",
+          "target_step_id": "step-report",
+          "priority": 0,
+          "case_sensitive": false
+        }
+      ],
+      "next_step_id": null,
+      "timeout_seconds": null
+    },
+    {
+      "step_id": "step-fix",
+      "step_type": "code",
+      "name": "Prepare fixes",
+      "description": "",
+      "code": "def handler(input: dict, ctx: dict) -> dict:\n    return {'fixes': [], 'summary': 'fixes prepared'}",
+      "language": "python",
+      "parameters_schema": {},
+      "next_step_id": "step-report",
       "timeout_seconds": 30
     },
     {
-      "step_id": "step-blocked",
+      "step_id": "step-report",
       "step_type": "code",
-      "name": "Branch: blocked",
-      "description": "",
-      "code": "def handler(input: dict, ctx: dict) -> dict:\n    return {'branch': 'blocked', 'summary': 'took BLOCKED branch'}",
+      "name": "Write the report",
+      "description": "Reached from both branches (branch join)",
+      "code": "def handler(input: dict, ctx: dict) -> dict:\n    return {'message': 'Report written.', 'summary': 'report written'}",
       "language": "python",
-      "parameters_schema": {},
+      "parameters_schema": {
+        "run_key": {
+          "type": "predicted",
+          "value": null,
+          "required": true,
+          "value_type": "string",
+          "description": "The run_key from the step 'Score each locale', copied exactly"
+        }
+      },
       "next_step_id": null,
-      "timeout_seconds": 30
+      "timeout_seconds": 60
     }
   ],
   "specialized_agents_required": [

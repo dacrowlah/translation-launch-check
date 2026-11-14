@@ -5,15 +5,19 @@
   "name": "Example Reviewer",
   "output": {
     "type": "json",
-    "description": "Findings for one market",
+    "description": "Findings for one locale, with the locale and checksum echoed back",
     "schema": {
       "type": "object",
       "required": [
-        "country_code",
+        "locale",
+        "checksum",
         "findings"
       ],
       "properties": {
-        "country_code": {
+        "locale": {
+          "type": "string"
+        },
+        "checksum": {
           "type": "string"
         },
         "findings": {
@@ -21,10 +25,14 @@
           "items": {
             "type": "object",
             "required": [
+              "line_id",
               "severity",
               "detail"
             ],
             "properties": {
+              "line_id": {
+                "type": "string"
+              },
               "severity": {
                 "type": "string",
                 "enum": [
@@ -50,22 +58,42 @@
   "is_deleted": false,
   "parameters": [
     {
-      "name": "country_code",
+      "name": "locale",
       "type": "string",
       "default": null,
       "required": true,
       "item_type": null,
       "max_items": null,
       "min_items": null,
-      "description": "ISO 3166-1 alpha-2 country code, e.g. DE"
+      "description": "The locale under review, e.g. de-DE. Echo it back unchanged."
+    },
+    {
+      "name": "lines",
+      "type": "string",
+      "default": null,
+      "required": true,
+      "item_type": null,
+      "max_items": null,
+      "min_items": null,
+      "description": "One line per entry: [L1] master text => translated text"
+    },
+    {
+      "name": "checksum",
+      "type": "string",
+      "default": null,
+      "required": true,
+      "item_type": null,
+      "max_items": null,
+      "min_items": null,
+      "description": "Integrity token. Echo it back unchanged; never use it in the review."
     }
   ],
   "roi_amount": null,
-  "description": "Reviews one market and returns structured findings.",
+  "description": "Reviews one locale's translated lines and returns findings with severities.",
   "llm_provider": null,
   "prompt_pills": null,
   "enabled_tools": [
-    "copy_fit_check"
+    "example_check"
   ],
   "agent_metadata": {
     "enable_auto_skill_prediction": false,
@@ -73,7 +101,7 @@
   },
   "inference_type": "simple",
   "initial_message": null,
-  "prompt_template": "{skill: `lr-glossary`} \n\nReview the launch copy for market [[country_code]]. Call `copy_fit_check` on every line. Return JSON matching the output schema.\n\n{skill: **auto-tool**}",
+  "prompt_template": "{skill: `example-glossary`} \n\nReview the translated lines for [[locale]]:\n\n[[lines]]\n\nFor each line, judge whether the meaning or a claim changed and whether the tone fits. Call `example_check` on every line you flag. Return JSON matching the output schema: echo `locale` and `checksum` exactly as given ([[checksum]]). Never output a verdict.\n\n{skill: **auto-tool**}",
   "input_guardrails": null,
   "internal_version": 1,
   "conversation_mode": false,
