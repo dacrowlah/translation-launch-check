@@ -47,7 +47,7 @@ The platform contract (verified):
   - `input` holds the step's declared variables;
   - `ctx["output_dir"]` and `ctx["input_dir"]` hold the step's directories; a chat
     attachment is at `ctx["input_dir"]/attachments/<name>`, byte-exact.
-- **Runtime:** **Python 3.12** (verified 2026-11-13), standard library plus the preinstalled
+- **Runtime:** **Python 3.12** (3.12.3, verified 2026-11-13; local venv `.venv` from `python3.12`, ruff `target-version = "py312"`), standard library plus the preinstalled
   `opal_tms_sdk`. **No network.** One file after the build; local imports are impossible.
   JavaScript code steps cannot call tools (verified 2026-11-13), so steps are Python.
 - **Platform tools:** `from opal_tms_sdk import tools`, then `tools.<name>(**params)`.

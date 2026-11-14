@@ -1,0 +1,11 @@
+{
+  "allow_list": { "addresses": ["owner@example.com"], "domains": ["example.org"] },
+  "qa_inbox": "owner@example.com",
+  "template_url": "https://example.com/translation-launch-check/template.csv",
+  "webhook": {
+    "url": "https://example.invalid/webhook",
+    "auth_header": "X-Api-Key",
+    "auth_key": "replace-me"
+  },
+  "tool_token": "replace-me"
+}

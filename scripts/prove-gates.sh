@@ -89,5 +89,70 @@ plant waiver-without-reason lint:directives 'needs .-- <description>.' \
 export const w = 1;'
 control
 
+# ---- Mark half: plants run in a scratch copy of mark/ plus tool/config/rules.json ----
+VENV="$ROOT/.venv/bin"
+mkdir -p "$SCRATCH/mbase/tool"
+rsync -a --exclude __pycache__ "$ROOT/mark/" "$SCRATCH/mbase/mark/"
+rsync -a "$ROOT/tool/config/" "$SCRATCH/mbase/tool/config/"
+
+# mark_plant <label> <gate: lint|format|test> <expected output regex> <file under mark/> <content>
+mark_plant() {
+  local label="$1" gate="$2" pattern="$3" file="$4" content="$5"
+  local dir="$SCRATCH/m-$label"
+  cp -Rc "$SCRATCH/mbase" "$dir" 2>/dev/null || cp -R "$SCRATCH/mbase" "$dir"
+  mkdir -p "$dir/mark/$(dirname "$file")"
+  printf '%s\n' "$content" >"$dir/mark/$file"
+  mark_gate "$dir" "$gate" >"$dir/out.log" 2>&1
+  local status=$?
+  if [ "$status" -ne 0 ] && grep -Eq "$pattern" "$dir/out.log"; then
+    echo "OK   $label: mark gate '$gate' is red for '$pattern'"
+    echo "       > $(grep -Em1 "$pattern" "$dir/out.log" | cut -c1-150)"
+  else
+    echo "FAIL $label: mark gate '$gate' exit $status, pattern '$pattern'; output follows"
+    head -30 "$dir/out.log"
+    FAILED=1
+  fi
+}
+
+mark_gate() {
+  local dir="$1"
+  case "$2" in
+    lint) (cd "$dir" && "$VENV/ruff" check mark --no-cache) ;;
+    format) (cd "$dir" && "$VENV/ruff" format --check --no-cache mark) ;;
+    test) bash "$ROOT/scripts/mark-test-gate.sh" "$dir" ;;
+  esac
+}
+
+mark_control() {
+  local dir="$SCRATCH/m-control" gate
+  cp -Rc "$SCRATCH/mbase" "$dir" 2>/dev/null || cp -R "$SCRATCH/mbase" "$dir"
+  printf 'NOOP = 1\n' >"$dir/mark/code_steps/_noop.py"
+  for gate in lint format test; do
+    if ! mark_gate "$dir" "$gate" >"$dir/$gate.log" 2>&1; then
+      echo "FAIL mark-control: gate '$gate' is red on a no-op plant (see $dir/$gate.log)"
+      FAILED=1
+      return
+    fi
+  done
+  echo "OK   mark-control: every mark gate is green on a no-op plant"
+}
+
+mark_plant mark-print-in-step lint 'T201' code_steps/printing.py \
+  'def handler(input, ctx):
+    print("hello")
+    return {}'
+mark_plant mark-five-params lint 'PLR0913' code_steps/wide.py \
+  'def wide(a, b, c, d, e):
+    return a'
+mark_plant mark-unformatted format 'would be reformatted' code_steps/ugly.py 'X   =   {"a":1}'
+mark_plant mark-skipped-test test 'some were skipped' tests/test_skipped.py \
+  'import pytest
+
+
+@pytest.mark.skip(reason="planted")
+def test_skipped():
+    pass'
+mark_control
+
 [ "$FAILED" -eq 0 ] && echo "prove-gates: every plant failed its own gate; control green"
 exit "$FAILED"
