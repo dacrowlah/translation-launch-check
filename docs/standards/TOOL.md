@@ -63,10 +63,12 @@ use case in `src/application/`.
 - **Time:** never call `Date.now()` or `new Date()` outside `SystemClock`. Inject `Clock`.
   Dates are ISO `YYYY-MM-DD` strings in the domain.
 - **Randomness:** none is needed. If it ever is, inject it like `Clock`.
-- Tool registration uses the SDK's `registerTool(name, { description, inputSchema }, handler)`
-  with zod schemas; parameters are inferred from the schema. `new ToolsService(app, config)`
-  is created **before** any `registerTool` call. `app.use(express.json())` is added
-  explicitly.
+- Each tool is a `ToolDefinition` (`src/presentation/tool-definition.ts`: name, description,
+  zod shape, handler). `src/main.ts` creates `new ToolsService(app, config)` and registers
+  each definition on that service only, with `registerOn`, which calls the SDK's public
+  instance method `service.registerTool(...)`. The discovery parameters are built from
+  `z.toJSONSchema` of the shape, the same way the SDK's global `registerTool` builds them.
+  `app.use(express.json())` is added explicitly, before the service.
 - Tool descriptions are written for the calling model: what the function does, when to call
   it, and what comes back.
 
@@ -99,8 +101,8 @@ use case in `src/application/`.
 - **Body limit:** `express.json({ limit: "256kb" })`. A 64 KB CSV's package, with JSON
   escaping, fits; real code-step calls are far smaller. Larger bodies get a generic 413
   `{"error":"invalid_request"}`; malformed JSON gets a generic 400 of the same body.
-- **SDK registry:** `registerTool` registers on every `ToolsService` ever created (a global
-  registry), so build one app per process and, in tests, one per test file.
+- **SDK registry:** the SDK's global `registerTool()` registers on every `ToolsService` ever
+  created. We never call it (see section 2), so apps built in one process do not share tools.
 - **Secrets** live in Vercel environment variables, never in the repo; `.env*` is gitignored.
 - **Dependencies:** `pnpm audit` has no high or critical findings at release, or each one is
   explained in the PR.

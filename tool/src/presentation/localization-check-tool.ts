@@ -1,24 +1,20 @@
-import { registerTool } from "@optimizely-opal/opal-tools-sdk";
 import { checkLocalization, type CheckDeps } from "../application/check-localization";
-import type { Logger } from "../domain/ports/logger";
-import type { Limits } from "../domain/rules";
 import type { LocalizationPackage } from "../domain/types";
+import { safeHandler, type Telemetry } from "./safe-handler";
 import { localizationSchema, localizationShape } from "./schemas";
-import { safeHandler } from "./safe-handler";
+import type { ToolDefinition } from "./tool-definition";
 
 const NAME = "localization_check";
-const DESCRIPTION =
-  "Runs every rule check on a localization package (master en-US plus translations): " +
+const WHAT_AND_WHEN =
   "numbers, currency, dates, merge tags, URLs, promo codes, template leftovers, length, " +
   "formality, glossary, language, typography, trademarks, markup, time zones and market " +
   "spelling. Call it once with the whole package and once more to re-check suggested fixes. " +
-  "Returns, per locale, findings with severities, per-line lengths, spelling fixes and a " +
-  "status for each of the 24 checks. It never decides a verdict.";
+  'Returns status "ok" with, per locale, findings with severities, per-line lengths, ' +
+  "spelling fixes and a status for each of the 24 checks; any other status means the call " +
+  "failed. It never decides a verdict.";
 
-const spec = (limits: Limits) => ({
-  description: DESCRIPTION,
-  inputSchema: localizationShape(limits),
-});
+const describe = (master: string): string =>
+  `Runs every rule check on a localization package (master ${master} plus translations): ${WHAT_AND_WHEN}`;
 
 const check = (deps: CheckDeps) => (pkg: LocalizationPackage) => ({
   body: checkLocalization(pkg, deps),
@@ -26,9 +22,10 @@ const check = (deps: CheckDeps) => (pkg: LocalizationPackage) => ({
   locales: pkg.locales.length,
 });
 
-const handler = (deps: CheckDeps, logger: Logger) =>
-  safeHandler(NAME, logger, localizationSchema(deps.rules.limits), check(deps));
-
-export const registerLocalizationCheck = (deps: CheckDeps, logger: Logger): void => {
-  registerTool(NAME, spec(deps.rules.limits), handler(deps, logger));
-};
+/** The use case gets the rules, clock and detector only: never the bearer token. */
+export const localizationCheckTool = (deps: CheckDeps, telemetry: Telemetry): ToolDefinition => ({
+  name: NAME,
+  description: describe(deps.rules.master_locale),
+  shape: localizationShape(deps.rules),
+  handler: safeHandler(NAME, telemetry, localizationSchema(deps.rules), check(deps)),
+});

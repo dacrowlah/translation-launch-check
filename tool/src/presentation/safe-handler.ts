@@ -1,5 +1,6 @@
 import type { z } from "zod";
-import type { Logger } from "../domain/ports/logger";
+import type { Logger, ToolEvent } from "../domain/ports/logger";
+import type { Stopwatch } from "../domain/ports/stopwatch";
 
 /** Rejects a Promise result at compile time (anything PromiseLike collapses to never). */
 type Sync<R> = R extends PromiseLike<unknown> ? never : unknown;
@@ -10,57 +11,76 @@ export interface Handled<R> {
   readonly locales: number;
 }
 
-class InvalidInputError extends Error {}
+export interface Telemetry {
+  readonly logger: Logger;
+  readonly stopwatch: Stopwatch;
+}
 
-const ms = (since: number): number => Math.round(performance.now() - since);
+/** A failed call carries its status token and nothing else: Mark reads responses aloud. */
+type Failure = { readonly status: "invalid_input" | "internal_error" };
+type Reply<R> = ({ readonly status: "ok" } & R) | Failure;
+
+interface Call extends Telemetry {
+  readonly tool: string;
+  readonly start: number;
+}
+
+type Outcome = Omit<ToolEvent, "tool" | "latency_ms">;
+
+const NO_COUNTS = { lines: 0, locales: 0 };
 
 const isThenable = (value: unknown): boolean =>
   typeof (value as { then?: unknown } | null)?.then === "function";
 
-const accept = <P>(schema: z.ZodType<P>, raw: unknown): P => {
-  const parsed = schema.safeParse(raw);
-  if (!parsed.success) throw new InvalidInputError();
-  return parsed.data;
+const record = (call: Call, outcome: Outcome): void => {
+  const { event, status, ...counts } = outcome;
+  const latency_ms = call.stopwatch.elapsedMs(call.start);
+  call.logger.event({ event, tool: call.tool, status, latency_ms, ...counts });
 };
 
-const succeed = <R>(logger: Logger, tool: string, since: number, d: Handled<R>): R => {
-  if (isThenable(d.body)) throw new Error("handler returned a promise");
-  const { body, ...counts } = d;
-  logger.event({ event: "tool_call", tool, status: "ok", latency_ms: ms(since), ...counts });
-  return body;
+const succeed = <R extends object>(call: Call, handled: Handled<R>): Reply<R> => {
+  if (isThenable(handled) || isThenable(handled.body)) throw new Error("returned a promise");
+  const { body, ...counts } = handled;
+  record(call, { event: "tool_call", status: "ok", ...counts });
+  return { ...body, status: "ok" };
 };
 
-const outcomeOf = (error: unknown) =>
-  error instanceof InvalidInputError
-    ? ({ event: "tool_call", status: "invalid_input", message: "invalid_input" } as const)
-    : ({ event: "defect", status: "error", message: "internal_error" } as const);
-
-const fail = (logger: Logger, tool: string, since: number, error: unknown): never => {
-  const { message, ...logged } = outcomeOf(error);
-  logger.event({ ...logged, tool, latency_ms: ms(since), lines: 0, locales: 0 });
-  throw new Error(message);
+const fail = (call: Call, event: ToolEvent["event"], status: Failure["status"]): Failure => {
+  record(call, { event, status, ...NO_COUNTS });
+  return { status };
 };
 
-const guarded = <R>(logger: Logger, tool: string, run: () => Handled<R>): R => {
-  const since = performance.now();
+const run = <P, R extends object>(
+  call: Call,
+  parsed: z.ZodSafeParseResult<P>,
+  fn: (params: P) => Handled<R>,
+): Reply<R> =>
+  parsed.success ? succeed(call, fn(parsed.data)) : fail(call, "tool_call", "invalid_input");
+
+const guarded = <P, R extends object>(
+  call: Call,
+  schema: z.ZodType<P>,
+  raw: unknown,
+  fn: (params: P) => Handled<R>,
+): Reply<R> => {
   try {
-    return succeed(logger, tool, since, run());
-  } catch (error) {
-    return fail(logger, tool, since, error);
+    return run(call, schema.safeParse(raw), fn);
+  } catch {
+    return fail(call, "defect", "internal_error");
   }
 };
 
 /**
- * Validates the raw params (no work on failure), logs one event per call. Invalid input
- * throws a fixed "invalid_input"; any other throw is a defect: "internal_error". Neither
- * message carries input, zod text or the original error.
+ * Validates the raw params (no work on failure) and logs one event per call. The reply is
+ * {...body, status: "ok"} (a body never overrides the status), or a bare {status: "invalid_input"} or {status: "internal_error"}
+ * (any throw is a defect): never input, zod text or the original error.
  */
 export const safeHandler =
-  <P, R>(
+  <P, R extends object>(
     tool: string,
-    logger: Logger,
+    telemetry: Telemetry,
     schema: z.ZodType<P>,
     fn: (params: P) => Handled<R> & Sync<R>,
   ) =>
-  (raw: unknown): R =>
-    guarded(logger, tool, () => fn(accept(schema, raw)));
+  (raw: unknown): Reply<R> =>
+    guarded({ ...telemetry, tool, start: telemetry.stopwatch.start() }, schema, raw, fn);

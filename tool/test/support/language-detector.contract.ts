@@ -17,9 +17,10 @@ const recognises = (make: MakeDetector): void => {
   expect(make(known()).detect(paragraph("fr"), CANDIDATES)).toBe("fr");
 };
 
+/** A paragraph the detector is sure of, asked with its language left out of the candidates. */
 const staysInside = (make: MakeDetector): void => {
-  const answer = make(known()).detect(paragraph("en"), ["de", "fr"]);
-  expect(answer === null || ["de", "fr"].includes(answer)).toBe(true);
+  const answer = make(known()).detect(paragraph("fr"), ["de", "en"]);
+  expect(["de", "en", null]).toContain(answer);
 };
 
 export const describeLanguageDetectorContract = (make: MakeDetector): void => {
@@ -28,6 +29,6 @@ export const describeLanguageDetectorContract = (make: MakeDetector): void => {
       expect(make(known()).detect("", CANDIDATES)).toBeNull();
     });
     it("german_and_french_paragraphs_are_recognised", () => recognises(make));
-    it("the_answer_is_null_or_a_candidate", () => staysInside(make));
+    it("a_sure_answer_outside_the_candidates_is_null_or_a_candidate", () => staysInside(make));
   });
 };

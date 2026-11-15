@@ -34,5 +34,47 @@ const headersFor = (token: string | null): Record<string, string> => ({
   ...(token ? { authorization: `Bearer ${token}` } : {}),
 });
 
+export interface RawRequest {
+  readonly method: string;
+  readonly path: string;
+  /** Sent as is: malformed or oversized JSON too. */
+  readonly body?: string | undefined;
+  /** The bearer token, or null for none. */
+  readonly token: string | null;
+}
+
+export const send = (base: string, request: RawRequest) => {
+  const { method, path, body, token } = request;
+  return fetch(base + path, {
+    method,
+    headers: headersFor(token),
+    ...(body === undefined ? {} : { body }),
+  });
+};
+
+/** POSTs `text` as is, with the bearer token unless null. */
+export const postText = (base: string, path: string, text: string, token: string | null) =>
+  send(base, { method: "POST", path, body: text, token });
+
 export const postTo = (base: string, path: string, body: unknown, token: string | null) =>
-  fetch(base + path, { method: "POST", headers: headersFor(token), body: JSON.stringify(body) });
+  postText(base, path, JSON.stringify(body), token);
+
+/** [HTTP status, parsed JSON body]. */
+export const outcome = async (res: Response): Promise<[number, unknown]> => [
+  res.status,
+  await res.json(),
+];
+
+export interface DiscoveredFunction {
+  readonly name: string;
+  readonly description: string;
+  readonly parameters: readonly { name: string; type: string; required: boolean }[];
+}
+
+/** The functions GET /discovery lists (no token: discovery is public). */
+export const discoveryOf = async (base: string): Promise<DiscoveredFunction[]> => {
+  const body = (await (await fetch(`${base}/discovery`)).json()) as {
+    functions: DiscoveredFunction[];
+  };
+  return body.functions;
+};

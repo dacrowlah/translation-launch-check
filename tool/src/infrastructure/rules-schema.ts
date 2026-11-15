@@ -1,7 +1,8 @@
 import { z } from "zod";
 import type { Rules } from "../domain/rules";
 import { patternIssues } from "../domain/tokens/pattern-issues";
-import { ALL_CHECK_IDS, type CheckId } from "../domain/types";
+import { LOCALE_CODE } from "../domain/locale-code";
+import { ALL_CHECK_IDS } from "../domain/types";
 import { crossIssues } from "./rules-cross-checks";
 import { compiles, isTemplate } from "./rules-patterns";
 
@@ -50,9 +51,7 @@ const channel = z.strictObject({
   soft: z.boolean(),
 });
 /** Exactly the ALL_CHECK_IDS keys: a missing or an unknown check id is rejected. */
-const severities = z.strictObject(
-  Object.fromEntries(ALL_CHECK_IDS.map((id) => [id, severity])) as Record<CheckId, typeof severity>,
-);
+const severities = z.record(z.enum(ALL_CHECK_IDS), severity);
 const spelling = z.strictObject({
   "en-GB": z.strictObject({ words: table, ize_to_ise: z.boolean(), ize_exceptions: strings }),
   "de-CH": z.strictObject({ chars: table }),
@@ -73,7 +72,7 @@ const shape = z.strictObject({
     max_cell_chars: count,
   }),
   master_locale: z.literal("en-US"),
-  locales: z.record(z.string(), locale),
+  locales: z.record(z.string().regex(LOCALE_CODE), locale),
   locale_aliases: table,
   channels: z.array(channel),
   severities,
@@ -115,8 +114,9 @@ const shape = z.strictObject({
 });
 
 /**
- * Start-up only: throws a ZodError when config/rules.json has the wrong shape, and an Error
- * when it points at unknown locales or its composed patterns do not compile.
+ * Start-up only: throws a ZodError (shape) when config/rules.json has the wrong shape, or an
+ * Error (cross-references) when it points at unknown locales or languages, or its composed
+ * patterns do not compile.
  */
 export const parseRules = (json: unknown): Rules => {
   const rules: Rules = shape.parse(json);

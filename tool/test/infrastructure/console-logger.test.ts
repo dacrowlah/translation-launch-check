@@ -21,12 +21,12 @@ describe("ConsoleLogger", () => {
 });
 
 describe("quietConsole", () => {
-  it("silences_log_info_debug_and_warn_but_not_error", () => {
+  it("silences_every_console_channel_the_sdk_writes_to", () => {
     const spies = { log: vi.fn(), info: vi.fn(), debug: vi.fn(), warn: vi.fn(), error: vi.fn() };
-    const fake = { ...spies };
-    quietConsole(fake as unknown as Console);
-    [fake.log, fake.info, fake.debug, fake.warn, fake.error].forEach((fn) => fn("x"));
+    const target = { ...spies };
+    quietConsole(target);
+    [target.log, target.info, target.debug, target.warn, target.error].forEach((fn) => fn("x"));
     const called = Object.values(spies).map((spy) => spy.mock.calls.length);
-    expect(called).toEqual([0, 0, 0, 0, 1]);
+    expect(called).toEqual([0, 0, 0, 0, 0]);
   });
 });

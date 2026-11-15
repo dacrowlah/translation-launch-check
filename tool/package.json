@@ -1,9 +1,9 @@
 {
-  "name": "launch-readiness-check-tool",
+  "name": "translation-launch-check-tool",
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=24"
+    "node": "24.x"
   },
   "dependencies": {
     "@optimizely-opal/opal-tools-sdk": "0.1.41-dev",

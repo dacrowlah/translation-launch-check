@@ -44,7 +44,8 @@ export interface PackageLine {
 }
 export interface LocalizationPackage {
   readonly campaign: string;
-  readonly master_locale: "en-US";
+  /** The rules' master_locale; the tool's input schema checks it. */
+  readonly master_locale: string;
   readonly locales: readonly string[];
   readonly lines: readonly PackageLine[];
 }

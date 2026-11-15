@@ -1,0 +1,85 @@
+import type { Server } from "node:http";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { ConsoleLogger } from "../../src/infrastructure/console-logger";
+import { startApp, TOKEN } from "../support/app";
+import { globalConsole } from "../support/console";
+import { aBody, postText, postTo } from "../support/http";
+import { SwitchableDetector } from "../support/language-detector";
+import { aLogEvent } from "../support/telemetry";
+
+const CHANNELS = ["log", "info", "debug", "warn", "error"] as const;
+const realConsole = Object.fromEntries(CHANNELS.map((c) => [c, globalConsole()[c]]));
+const consoleCalls: unknown[][] = [];
+const detector = new SwitchableDetector();
+
+let server: Server;
+let base = "";
+beforeAll(async () => {
+  // createApp must replace every one of these with a no-op.
+  CHANNELS.forEach((c) => (globalConsole()[c] = (...args) => void consoleCalls.push(args)));
+  ({ server, base } = await startApp({ detector, logger: new ConsoleLogger() }));
+});
+afterAll(() => {
+  Object.assign(globalConsole(), realConsole);
+  server.close();
+});
+
+const written = { stdout: [] as string[], stderr: [] as string[] };
+const capture = (stream: NodeJS.WriteStream, into: string[]) =>
+  vi.spyOn(stream, "write").mockImplementation((chunk) => (into.push(String(chunk)), true));
+beforeEach(() => {
+  detector.throws = false;
+  Object.assign(written, { stdout: [], stderr: [] });
+  capture(process.stdout, written.stdout);
+  capture(process.stderr, written.stderr);
+});
+afterEach(() => vi.restoreAllMocks());
+
+const CHECK = "/tools/localization-check";
+const check = async (body: unknown) => (await postTo(base, CHECK, body, TOKEN)).text();
+const defect = async () => {
+  detector.throws = true;
+  return check(aBody());
+};
+const malformed = async () => (await postText(base, CHECK, "{", TOKEN)).text();
+
+describe("what the app writes", () => {
+  it("no_response_or_output_carries_the_token_or_the_word_authorization", async () => {
+    const replies = [await check(aBody()), await check(aBody({ lines: 51 }))];
+    replies.push(await defect(), await malformed());
+    const everything = [...replies, ...written.stdout, ...written.stderr, String(consoleCalls)];
+    expect(
+      everything.filter((text) => text.includes(TOKEN) || /authorization/i.test(text)),
+    ).toEqual([]);
+  });
+
+  it("an_invalid_call_writes_one_json_line_to_stdout_and_nothing_to_stderr", async () => {
+    await check(aBody({ lines: 51 }));
+    const line = aLogEvent({ tool: "localization_check", status: "invalid_input" });
+    expect([written.stdout, written.stderr, consoleCalls]).toEqual([
+      [`${JSON.stringify(line)}\n`],
+      [],
+      [],
+    ]);
+  });
+
+  it("malformed_json_writes_one_bare_json_line_to_stdout", async () => {
+    await malformed();
+    const line = { event: "request_failed", status: "invalid_request" };
+    expect([written.stdout, written.stderr]).toEqual([[`${JSON.stringify(line)}\n`], []]);
+  });
+
+  it("a_defect_writes_nothing_to_stderr", async () => {
+    await defect();
+    expect([written.stderr, consoleCalls]).toEqual([[], []]);
+  });
+
+  it("never_writes_copy_to_stdout", async () => {
+    await check(aBody({ text: "ZZMARKER copy" }));
+    expect([written.stdout.join("").includes("ZZMARKER"), written.stdout.length]).toEqual([
+      false,
+      1,
+    ]);
+    expect(consoleCalls).toEqual([]);
+  });
+});
