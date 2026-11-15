@@ -378,12 +378,15 @@ The workflow's export format, loops, conditions, triggers and canvas layout: the
   - Every node has the short, human name from the table above.
   - **Verify visually** after each import: a screenshot of the canvas is checked (kept
     with the submission materials, outside this repo).
-- **Triggers:** Chat and Webhook (the Email source is deferred). `auth_key` is null in the source
-  and the platform makes the URL. **Set the webhook's auth key in the import dialog's
-  trigger step, before the workflow is activated:** the platform docs say the key can't be
-  edited after the trigger is saved. Then check that a POST without the header is refused.
-  If the key can't be set there, recreate the webhook trigger with its key before
-  activating. Webhook URLs and auth keys are never committed.
+- **Triggers:** Chat and Webhook (the Email source is deferred). `auth_key` is null in the
+  source and the platform makes the URL on import. **The import dialog has no auth-key
+  field**, so after import: open the workflow editor, click the webhook trigger node, set
+  **Auth Key** under AUTHENTICATION and click **Update** (verified: the key persists across a
+  reload). The URL is shown in the same panel. Mark then expects the raw key in the header
+  `X-Api-Key` (format `{token}`), whatever the imported JSON names; a POST with no key, a
+  wrong key, or the key in `Authorization` (raw or `Bearer`) gets 401
+  `{"detail":"Invalid or missing authentication key"}`. Setup steps: `mark/README.md`
+  section 3. Webhook URLs and auth keys are never committed.
 - **The loop's `max_iterations`** comes from `RULES["limits"]["max_targets"]` at build, the
   same cap "Read and check the file" enforces, so the two can't drift.
 

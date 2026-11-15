@@ -33,7 +33,9 @@ the end-to-end runs.
    - `webhook_trigger_name`: the webhook trigger's name, `Translation Launch Check webhook`.
      Without it, no run counts as a webhook;
    - `scripts.webhook` (`url`, `auth_header`, `auth_key`): only for
-     `scripts/send_package.py`; it never reaches the workflow.
+     `scripts/send_package.py`; it never reaches the workflow. `auth_header` is `X-Api-Key`
+     (as in the example); `url` and `auth_key` come from the webhook trigger after import
+     (section 3).
 4. **Python 3.12**, from the repository's `.venv`:
    ```
    python3.12 -m venv .venv && .venv/bin/pip install -r mark/requirements-dev.txt
@@ -69,19 +71,29 @@ example config into a temp folder, to check the build without private values.
 1. Agents -> Add Agent -> **Upload Agent**, paste `mark/dist/translation_launch_check.json`,
    Next. It bundles both specialized agents, Translation Review and Translation Fix
    Suggestions.
-2. Choose **Reuse existing** for agents already in the instance; the default, "Create new
-   copy", makes duplicates. Use **Overwrite existing** only to update your own agent: it
-   replaces that agent everywhere it is used.
-3. Import Agent. (Verified in Task 23.)
+2. Choose **Reuse existing** for agents already in the instance (all three the workflow
+   references, Content Translation included); the default, "Create new copy", makes
+   duplicates. Use **Overwrite existing** only to update your own agent: it replaces that
+   agent everywhere it is used.
+3. Import Agent. The workflow imports Active, with 8 top-level steps (the loop holds the
+   other three), and no duplicate agents.
 
 **Triggers:**
 
 - **Chat** works at once.
-- **Webhook:** set its auth key in the import dialog's trigger step, before activating the
-  workflow (the key can't be edited after the trigger is saved). Then check that a POST
-  without the auth header is refused; if the key couldn't be set, recreate the webhook
-  trigger with its key before activating. The trigger's name must equal
-  `webhook_trigger_name` in the config; the build refuses a mismatch. (Verified in Task 23.)
+- **Webhook:** the import dialog has no auth-key field (its trigger page only says a new URL
+  will be generated on import), so set the key after import:
+  1. Open the workflow in the editor and click the webhook trigger node.
+  2. Under AUTHENTICATION, set **Auth Key**, then click **Update**. The key persists (it is
+     still there after a reload).
+  3. Copy the webhook URL shown in the same panel into `scripts.webhook.url`, and the key
+     into `scripts.webhook.auth_key`. The URL is specific to your instance: never commit it.
+
+  Mark sends the key in the header `X-Api-Key` as the raw key (format `{token}`), whatever
+  the imported JSON says. A POST with no key, a wrong key, or the key in `Authorization`
+  (raw or as `Bearer`) gets `401 {"detail":"Invalid or missing authentication key"}`. The
+  trigger's name must equal `webhook_trigger_name` in the config; the build refuses a
+  mismatch.
 
 ## 4. Run
 
