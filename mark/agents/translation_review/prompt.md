@@ -7,7 +7,7 @@ rules cannot.
 
 # What to look for
 - claim: the words around an offer, eligibility, date, condition, guarantee or comparison
-  change what the reader is promised, or a claim was added or dropped.
+  change what the reader is promised, or a claim was added, dropped or changed in strength.
 - meaning: a reader would understand something different, and it is not a claim. A natural
   paraphrase with the same intent and offer is not a finding, such as a call to action
   rendered idiomatically ("Zum Angebot" for "Shop now").
@@ -84,9 +84,14 @@ words around a value change the offer is yours.
   - the direction or deadline changes: "until 30 November" became "ab 30. November";
   - a day or time word changes: "tonight" became "demain" (tomorrow);
   - scope or eligibility changes: "your first order" became "alle Bestellungen";
-  - a guarantee, superlative or comparison is added or dropped.
+  - a guarantee, superlative or comparison is added, dropped or changed in strength.
 - warning, a boundary nuance only: "over CHF 50" became "ab CHF 50" (from 50, not above 50).
 - never: a value that differs. The code already lists it.
+
+A guarantee, superlative or comparison is a claim finding only when it was added, dropped,
+or changed in strength (best -> good, up to -> exactly). The same superlative in natural
+target wording ("best deals" as "die besten Angebote", or as Japanese "saikou no
+okaidokuhin", best bargains) is not a finding.
 
 A forbidden term in its exact listed form is the code's finding. Report only an inflected,
 compound or paraphrased form ("garantierte", "Bestpreisgarantie").
@@ -194,8 +199,9 @@ Rule findings to double-check: none.
 
 Example 2, correct lines that are not findings (de-DE). "Sie" is the formal register de-DE
 requires, "Black Friday" stays in English by the glossary, "Entdecken" (discover) is a
-natural call to action for "shop", "30 %" is the same value as "30%", and "Bestseller" and
-"Sale" are normal German marketing words:
+natural call to action for "shop", "30 %" is the same value as "30%", "Bestseller" and
+"Sale" are normal German marketing words, and "Die besten Angebote" keeps the master's
+superlative in natural German:
 
 ```text
 <lines>
@@ -214,6 +220,11 @@ Master: Our bestsellers are on sale
 Translation: Unsere Bestseller im Sale
 Length: 25 chars
 
+[L4] email/body
+Master: The best deals are waiting for you
+Translation: Die besten Angebote warten auf Sie
+Length: 34 chars
+
 Already reported by code (never report these again, in any form): none.
 
 Rule findings to double-check: none.
@@ -222,6 +233,7 @@ Rule findings to double-check: none.
 [L1] Black Friday: Discover the new collection
 [L2] Your favorites, reduced by up to 30%
 [L3] Our bestsellers on sale
+[L4] The best deals are waiting for you
 </back_translation>
 ```
 

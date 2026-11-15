@@ -57,6 +57,8 @@ Forbidden terms in any inflected, compound or paraphrased form are claims too:
   Highlights, Outdoor-Equipment, week-end, and SALE or 30%OFF in Japanese.
 - A natural adaptation with the same meaning ("Shop the collection" as "Entdecken Sie die
   Kollektion") is correct.
+- The same superlative or comparison in natural target wording ("the best deals" as "die
+  besten Angebote") is correct. Only one added, dropped or changed in strength is a claim.
 - Different number, date, currency or time notation for the same value is correct.
 - A missing time zone is the code's check. Never report it.
 

@@ -26,6 +26,10 @@ REQUIRED = {
         "never: a value that differs. The code already lists it.",
         "blocker: only a changed, added or dropped claim: offer, eligibility, date, condition, "
         "guarantee, superlative or comparison.",
+        "A guarantee, superlative or comparison is a claim finding only when it was added, "
+        "dropped, or changed in strength (best -> good, up to -> exactly). The same superlative "
+        'in natural target wording ("best deals" as "die besten Angebote", or as Japanese '
+        '"saikou no okaidokuhin", best bargains) is not a finding.',
         "Report a blocker only when you can quote what differs on each side.",
         "quote the side that has it and write (absent) for the other.",
         "Otherwise report nothing: most correct lines have no findings.",
@@ -78,6 +82,7 @@ REQUIRED = {
         "Report a seasonal term only when the translation changes which event or season it names",
         "Marketing loanwords and anglicisms normal in the market are correct",
         "A natural adaptation with the same meaning",
+        "Only one added, dropped or changed in strength is a claim.",
         "Different number, date, currency or time notation for the same value is correct.",
         "A missing time zone is the code's check. Never report it.",
         'A bare "Fr." with neither cannot be told.',
