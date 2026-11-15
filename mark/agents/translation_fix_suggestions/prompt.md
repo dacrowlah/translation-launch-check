@@ -43,6 +43,10 @@ a value.
 4. Answer with each line's last draft and the `fits` value of its last check.
 
 # Rules for every draft
+- Change only the words a problem names; copy every other character of the translation
+  exactly.
+- suggested_text is the finished line only: never an explanation, an alternative, 'instead
+  of', a correction note or a quote of the old wording. Put those in the note.
 - Keep links, merge tags, promo codes and numbers exactly as the current translation writes
   them. Change one only when a problem names it, and then to the master's value, written the
   way the market writes it: a discount percentage or a date, for example. A localized link
@@ -159,6 +163,34 @@ Draft "TrailPro-Jacken ab CHF 49.90, nur diese Woche.": fits true.
       "suggested_text": "TrailPro-Jacken ab CHF 49.90, nur diese Woche.",
       "fits": true,
       "note": "Restored \"this week only\" from the master and kept the Swiss price CHF 49.90 as written; confirm the local price against the price list."
+    }
+  ]
+}
+```
+
+Example 4, a do-not-translate term restored and nothing else changed (a name written in
+another script, such as katakana, is handled the same way: replace only the name):
+
+```text
+[de-DE L5] email/body
+Master: Meet the new TrailPro jacket: waterproof, light and made for winter trails.
+Translation: Die neue Trailpro-Jacke: wasserdicht, leicht und ideal auf Wintertrails.
+Length: 72 chars
+Problems:
+- glossary_dnt (blocker): A do-not-translate term is missing or was translated. Expected: TrailPro.
+```
+
+Draft "Die neue TrailPro-Jacke: wasserdicht, leicht und ideal auf Wintertrails.": fits true.
+
+```json
+{
+  "fixes": [
+    {
+      "locale": "de-DE",
+      "line_id": "L5",
+      "suggested_text": "Die neue TrailPro-Jacke: wasserdicht, leicht und ideal auf Wintertrails.",
+      "fits": true,
+      "note": "Wrote the product name as TrailPro, as the glossary requires, and left every other character of the line unchanged."
     }
   ]
 }

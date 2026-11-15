@@ -133,6 +133,20 @@ EXAMPLE_3 = an_entry(
 )
 
 
-@pytest.mark.parametrize("example", [EXAMPLE_1, EXAMPLE_2, EXAMPLE_3])
+TRAILPRO = "Die neue Trailpro-Jacke: wasserdicht, leicht und ideal auf Wintertrails."
+DNT = "A do-not-translate term is missing or was translated."
+EXAMPLE_4 = an_entry(
+    ("de-DE", "L5", "email", "body"),
+    (
+        "Meet the new TrailPro jacket: waterproof, light and made for winter trails.",
+        TRAILPRO,
+        TRAILPRO,
+    ),
+    {"value": 72, "limit": None, "unit": "chars"},
+    [a_problem("glossary_dnt", "blocker", DNT, "TrailPro")],
+)
+
+
+@pytest.mark.parametrize("example", [EXAMPLE_1, EXAMPLE_2, EXAMPLE_3, EXAMPLE_4])
 def test_the_fix_inputs_match_the_merged_prompts_examples(example):
     assert fix_input([example]) + "\n```" in prompt(FIX_DIR)

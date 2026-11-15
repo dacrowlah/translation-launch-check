@@ -1,10 +1,13 @@
 """The corrected file: the checked file with every fix that passed the re-check applied, as a
 CSV the user downloads and re-uploads as is. Same columns and rows, comma-delimited, UTF-8
 with a BOM (Excel), CRLF line ends. A fix to a line with a price or currency finding is never
-applied: prices come from the customer's price list. Nothing here raises."""
+applied: prices come from the customer's price list. Neither is a fix that reads like a
+correction note ("X, not Y"): it passes a presence-only re-check but is not copy. Nothing
+here raises."""
 
 import csv
 import io
+import re
 
 from _campaign import clean_campaign
 from _config import RULES
@@ -21,9 +24,35 @@ def _price_lines(scores):
     return {(locale, f["line_id"]) for locale, f in found if f["check"] in FOR_A_PERSON}
 
 
+def _noted(text, finding, master):
+    """The problem's found value still in the text (as a whole token), or its expected value
+    more often than the master has it (at least once): the shape of "X instead of Y"."""
+    found, expected = finding.get("found"), finding.get("expected")
+    if found and re.search(rf"(?<!\w){re.escape(found)}(?!\w)", text):
+        return True
+    return bool(expected) and text.count(expected) > max(1, master.count(expected))
+
+
+def _findings_at(scored, line_id):
+    return [finding for finding in scored["findings"] if finding["line_id"] == line_id]
+
+
+def _line_facts(scores):
+    """{(locale, line_id): (master, that line's findings)}."""
+    lines = ((s, line) for s in scores["locales"] for line in s["lines"])
+    return {(s["locale"], ln["id"]): (ln["master"], _findings_at(s, ln["id"])) for s, ln in lines}
+
+
+def _reads_as_a_note(fix, facts):
+    master, found = facts.get((fix["locale"], fix["line_id"]), ("", []))
+    return any(_noted(fix["text"], finding, master) for finding in found)
+
+
 def applied_fixes(scores, fixes):
-    """{(locale, line_id): text} for every fix that passed the re-check, prices excepted."""
-    kept = [fix for fix in fixes if fix["status"] == "passes"]
+    """{(locale, line_id): text} for every fix that passed the re-check, prices and fixes
+    that read as a correction note excepted."""
+    facts = _line_facts(scores)
+    kept = [fix for fix in fixes if fix["status"] == "passes" and not _reads_as_a_note(fix, facts)]
     keys = {(fix["locale"], fix["line_id"]): fix["text"] for fix in reversed(kept)}
     return {key: text for key, text in keys.items() if key not in _price_lines(scores)}
 

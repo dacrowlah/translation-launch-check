@@ -17,8 +17,8 @@ CODE_CEILINGS = {
     "read_and_check": 41_000,
     "save_review": 10_000,
     "score": 24_000,
-    "report": 42_000,
-    "needs_info": 21_000,
+    "report": 43_000,
+    "needs_info": 20_000,
 }
 ESCAPED = 6  # a non-ASCII character escapes to \uXXXX
 REVIEW_BOUNDS = {"findings": 20, "line_id": 40, "detail": 240, "evidence": 120}

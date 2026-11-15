@@ -95,7 +95,8 @@ checksum per hop:
   (`unsent_checks`). The report reads only this file and says what was left out. When a
   fix passes the re-check, the report also writes the corrected file from it: the same
   columns and rows with each passing fix applied (never to a line with a price or currency
-  finding), UTF-8 with a BOM, CRLF, through `write_content_to_file`, and links its download.
+  finding, nor a fix that still holds a problem's found value or has its expected value
+  more often than the master: a correction note such as "X, not Y"), UTF-8 with a BOM, CRLF, through `write_content_to_file`, and links its download.
 
 **Source of truth: the repo, not the instance.**
 - Every agent, skill and code step is edited here, then built and imported. Mark exports the
@@ -131,7 +132,7 @@ The platform contract (verified; the evidence and more facts are in the
     73,200 and more failed with exit_code=-1 and no message). Rule: the JSON-escaped built
     code plus the escaped input (`json_size`) stays at most 68,000, about 5 KB under the cap.
     `_budgets.py` holds each step's code ceiling (escaped: read and check 41,000, save the
-    review 10,000, score 24,000, report 42,000, ask for a corrected file 21,000; none above
+    review 10,000, score 24,000, report 43,000, ask for a corrected file 20,000; none above
     `MAX_CODE_BYTES`, 60,000) and `input_budget(step)` = 68,000 - ceiling. The caps derive from the budgets: the back-translation cap is Save the
     review's budget less the largest review the agent schema admits; the fixer cap keeps
     the lines' expected fixes (each bounded by the fixer schema) within the report step's

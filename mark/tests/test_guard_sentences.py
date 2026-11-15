@@ -59,6 +59,10 @@ REQUIRED = {
         "Keep links, merge tags, promo codes and numbers exactly as the current translation "
         "writes them. Change one only when a problem names it",
         "A localized link path such as /de-de/ stays.",
+        "Change only the words a problem names; copy every other character of the translation "
+        "exactly.",
+        "suggested_text is the finished line only: never an explanation, an alternative, "
+        "'instead of', a correction note or a quote of the old wording. Put those in the note.",
         "Never change a price, an amount or a currency, even when a finding names it "
         "(currency_code, currency_amount, numbers on a price). Keep them exactly as the current "
         "translation writes them, and put the problem in the note for a person.",

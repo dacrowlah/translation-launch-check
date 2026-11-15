@@ -374,7 +374,7 @@ become limitations or unsure findings, not new parsing rules.
   test.
 - **Lines past the fixer's caps get no suggestion.** The fixer gets the lines to fix in file
   order until one of three caps is reached: 60 lines (its output schema admits 60 fixes), a
-  50,000-byte input, or about 25,800 bytes of expected answers (what the report step's code
+  50,000-byte input, or about 24,800 bytes of expected answers (what the report step's code
   leaves for them). Lines beyond get no suggested fix, and the chat reply says "N more lines
   need a fix but got no suggestion (too many for one run)." Why: one agent call per run keeps
   the run's time and cost bounded, and its answer must fit the report step's input. With 50
