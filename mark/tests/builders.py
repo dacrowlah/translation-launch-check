@@ -81,3 +81,40 @@ def a_module_file(folder, name, lines):
     path = folder / name
     path.write_text("\n".join([*lines, ""]), encoding="utf-8")
     return path
+
+
+AGENTS_DIR = MARK_DIR / "agents"
+REVIEW_DIR = AGENTS_DIR / "translation_review"
+FIX_DIR = AGENTS_DIR / "translation_fix_suggestions"
+SKILLS_DIR = MARK_DIR / "skills"
+RULES_FILE = MARK_DIR.parent / "tool" / "config" / "rules.json"
+_JSON_TYPES = {"object": dict, "array": list, "string": str, "boolean": bool}
+
+
+def schema_errors(value, schema, path="$"):
+    """Where a value breaks an output schema, as "<path>: <problem>" lines; [] when it fits.
+    Covers the keywords our agent schemas use: type, properties, required,
+    additionalProperties false, items and enum."""
+    kind = schema["type"]
+    if not isinstance(value, _JSON_TYPES[kind]):
+        return [f"{path}: expected {kind}"]
+    if "enum" in schema and value not in schema["enum"]:
+        return [f"{path}: {value!r} not in enum"]
+    if kind == "array":
+        return _array_errors(value, schema["items"], path)
+    return _object_errors(value, schema, path) if kind == "object" else []
+
+
+def _array_errors(items, item_schema, path):
+    found = (schema_errors(item, item_schema, f"{path}[{i}]") for i, item in enumerate(items))
+    return [error for errors in found for error in errors]
+
+
+def _object_errors(value, schema, path):
+    props = schema["properties"]
+    missing = [f"{path}: missing {key}" for key in schema["required"] if key not in value]
+    extra = [f"{path}: unexpected {key}" for key in value if key not in props]
+    found = (
+        schema_errors(value[key], props[key], f"{path}.{key}") for key in props if key in value
+    )
+    return missing + extra + [error for errors in found for error in errors]

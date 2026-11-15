@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.3",
+  "agent_type": "specialized",
+  "agent_id": "translation_review",
+  "name": "Translation Review",
+  "description": "Reviews one locale of translated marketing copy against its English master for what rules can't check: changed or added claims, meaning drift, tone, literal idioms and untranslated words. Gives a second opinion on rule findings flagged for it. Returns findings only, never a verdict.",
+  "version": "1.0.0",
+  "is_active": true,
+  "is_deleted": false,
+  "parameters": [
+    {
+      "name": "locale",
+      "type": "string",
+      "default": null,
+      "required": true,
+      "item_type": null,
+      "max_items": null,
+      "min_items": null,
+      "description": "The locale under review, e.g. de-DE, copied exactly from the loop item. Echoed back unchanged."
+    },
+    {
+      "name": "review_input",
+      "type": "string",
+      "default": null,
+      "required": true,
+      "item_type": null,
+      "max_items": null,
+      "min_items": null,
+      "description": "This locale's review text, copied exactly from the loop item: one block per line (id, channel/field, Master, Translation, Length), then the 'Rule findings to double-check:' section, which says 'none.' when it is empty."
+    },
+    {
+      "name": "back_translation",
+      "type": "string",
+      "default": null,
+      "required": true,
+      "item_type": null,
+      "max_items": null,
+      "min_items": null,
+      "description": "The English back-translation of this locale's lines, labelled [L1], [L2] and so on, exactly as Back-translate to English returned it."
+    },
+    {
+      "name": "checksum",
+      "type": "string",
+      "default": null,
+      "required": true,
+      "item_type": null,
+      "max_items": null,
+      "min_items": null,
+      "description": "Integrity token for this locale, copied exactly from the loop item. Echoed back unchanged; never used in the review."
+    }
+  ],
+  "enabled_tools": [],
+  "output": {
+    "type": "json",
+    "description": "Findings for one locale (claim, meaning, tone, idiom, untranslated) and a second opinion on each listed rule finding, with locale and checksum echoed. Never a verdict."
+  },
+  "llm_provider": null,
+  "inference_type": "simple",
+  "conversation_mode": false,
+  "is_enabled_in_chat": false,
+  "first_prompt_mode": "open",
+  "initial_message": null,
+  "prompt_pills": null,
+  "agent_metadata": {
+    "enable_auto_skill_prediction": false,
+    "enable_auto_skill_prediction_by_tools": false
+  },
+  "enable_auto_tool_prediction": false,
+  "enable_personal_context": false,
+  "private_executions": false,
+  "memory_token_limit": 100000,
+  "system_prompt_template": "",
+  "input_guardrails": null,
+  "evaluation_criteria": null,
+  "internal_version": 1,
+  "cwd": null,
+  "roi_unit": null,
+  "roi_label": null,
+  "roi_amount": null
+}

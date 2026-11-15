@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.3",
+  "agent_type": "specialized",
+  "agent_id": "translation_fix_suggestions",
+  "name": "Translation Fix Suggestions",
+  "description": "Drafts a corrected target-language line for each line a translation launch check flagged, checks every draft with copy_fit_check and redrafts up to twice. Keeps values, merge tags, links and formality; never adds claims.",
+  "version": "1.0.0",
+  "is_active": true,
+  "is_deleted": false,
+  "parameters": [
+    {
+      "name": "fix_input",
+      "type": "string",
+      "default": null,
+      "required": true,
+      "item_type": null,
+      "max_items": null,
+      "min_items": null,
+      "description": "The lines to fix, copied exactly from the fix_input field of Score each language: one block per line with locale, line id, channel/field, Master, Translation, an optional Start from, Length and the Problems."
+    }
+  ],
+  "enabled_tools": [
+    "copy_fit_check"
+  ],
+  "output": {
+    "type": "json",
+    "description": "One suggested fix per flagged line, in input order, with whether copy_fit_check says it fits."
+  },
+  "llm_provider": null,
+  "inference_type": "simple",
+  "conversation_mode": false,
+  "is_enabled_in_chat": false,
+  "first_prompt_mode": "open",
+  "initial_message": null,
+  "prompt_pills": null,
+  "agent_metadata": {
+    "enable_auto_skill_prediction": false,
+    "enable_auto_skill_prediction_by_tools": true
+  },
+  "enable_auto_tool_prediction": false,
+  "enable_personal_context": false,
+  "private_executions": false,
+  "memory_token_limit": 100000,
+  "system_prompt_template": "",
+  "input_guardrails": null,
+  "evaluation_criteria": null,
+  "internal_version": 1,
+  "cwd": null,
+  "roi_unit": null,
+  "roi_label": null,
+  "roi_amount": null
+}

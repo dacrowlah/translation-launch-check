@@ -1,7 +1,7 @@
 [tool.ruff]
 target-version = "py312"
 line-length = 100
-src = ["code_steps", "tests"]  # first-party for isort; tests/fakes stays third-party
+src = [".", "code_steps", "tests"]  # first-party for isort (with _build); fakes stay third-party
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "S", "T10", "T20", "A", "PLR0913"]

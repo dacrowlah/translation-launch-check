@@ -1,0 +1,89 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "locale",
+    "checksum",
+    "findings",
+    "rule_checks"
+  ],
+  "properties": {
+    "locale": {
+      "type": "string"
+    },
+    "checksum": {
+      "type": "string"
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "line_id",
+          "check",
+          "severity",
+          "detail",
+          "evidence"
+        ],
+        "properties": {
+          "line_id": {
+            "type": "string"
+          },
+          "check": {
+            "type": "string",
+            "enum": [
+              "meaning",
+              "claim",
+              "tone",
+              "idiom",
+              "untranslated"
+            ]
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "blocker",
+              "warning",
+              "info"
+            ]
+          },
+          "detail": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "rule_checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "finding_id",
+          "opinion",
+          "reason"
+        ],
+        "properties": {
+          "finding_id": {
+            "type": "string"
+          },
+          "opinion": {
+            "type": "string",
+            "enum": [
+              "real_problem",
+              "same_meaning",
+              "cannot_tell"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

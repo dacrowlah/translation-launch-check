@@ -1,0 +1,40 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "fixes"
+  ],
+  "properties": {
+    "fixes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "locale",
+          "line_id",
+          "suggested_text",
+          "fits",
+          "note"
+        ],
+        "properties": {
+          "locale": {
+            "type": "string"
+          },
+          "line_id": {
+            "type": "string"
+          },
+          "suggested_text": {
+            "type": "string"
+          },
+          "fits": {
+            "type": "boolean"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
