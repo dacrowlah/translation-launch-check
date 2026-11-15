@@ -1,11 +1,13 @@
 {
+  "_comment": "allow_list.domains admits anyone at that domain: never list a public mail provider (gmail.com, outlook.com, ...) unless everyone there may receive reports. Not read by code steps.",
   "allow_list": { "addresses": ["owner@example.com"], "domains": ["example.org"] },
   "qa_inbox": "owner@example.com",
   "template_url": "https://example.com/translation-launch-check/template.csv",
-  "webhook": {
-    "url": "https://example.invalid/webhook",
-    "auth_header": "X-Api-Key",
-    "auth_key": "replace-me"
-  },
-  "tool_token": "replace-me"
+  "scripts": {
+    "webhook": {
+      "url": "https://example.invalid/webhook",
+      "auth_header": "X-Api-Key",
+      "auth_key": "replace-me"
+    }
+  }
 }
