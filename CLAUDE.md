@@ -31,10 +31,12 @@ Hard constraints:
 - This repository becomes **public**: no secrets, instance ids, webhook URLs or personal
   data, ever.
 
+- How we test (read before writing or reviewing any test, in either half):
+  [.claude/skills/writing-tests/SKILL.md](.claude/skills/writing-tests/SKILL.md)
 - What the tool must do (binding): [docs/contract/TOOL_CONTRACT.md](docs/contract/TOOL_CONTRACT.md)
 - How we build (binding): [docs/standards/README.md](docs/standards/README.md),
   [TOOL.md](docs/standards/TOOL.md), [MARK.md](docs/standards/MARK.md)
-- How we test: [.claude/skills/writing-tests/SKILL.md](.claude/skills/writing-tests/SKILL.md)
+- Each half's own manual: [tool/CLAUDE.md](tool/CLAUDE.md), [mark/CLAUDE.md](mark/CLAUDE.md)
 - How the platform behaves (verified): [.claude/skills/mark-platform/SKILL.md](.claude/skills/mark-platform/SKILL.md)
 
 ---
@@ -76,12 +78,12 @@ the same change. The contract changes only with the owner's approval.
 
 | Task | Read first |
 |---|---|
+| Writing or reviewing any test, fake, builder or harness, in either half | the [writing-tests skill](.claude/skills/writing-tests/SKILL.md): part 1 for `tool/`, part 2 for `mark/` |
 | Any change | [standards README](docs/standards/README.md) |
-| `tool/` code | [TOOL.md](docs/standards/TOOL.md); the [contract](docs/contract/TOOL_CONTRACT.md) for behaviour; the [opal-custom-tools skill](.claude/skills/opal-custom-tools/SKILL.md) |
-| `mark/` code steps | [MARK.md](docs/standards/MARK.md) section 2 (Python 3.12); the [mark-code-step-patterns skill](.claude/skills/mark-code-step-patterns/SKILL.md) |
+| `tool/` code | [tool/CLAUDE.md](tool/CLAUDE.md); [TOOL.md](docs/standards/TOOL.md); the [contract](docs/contract/TOOL_CONTRACT.md) for behaviour; the [opal-custom-tools skill](.claude/skills/opal-custom-tools/SKILL.md) |
+| `mark/` code steps | [mark/CLAUDE.md](mark/CLAUDE.md); [MARK.md](docs/standards/MARK.md) section 2 (Python 3.12); the [mark-code-step-patterns skill](.claude/skills/mark-code-step-patterns/SKILL.md) |
 | Agents or skills (Mark) | [MARK.md](docs/standards/MARK.md) section 3; the [mark-json-authoring skill](.claude/skills/mark-json-authoring/SKILL.md) |
 | The workflow or its canvas layout | [MARK.md](docs/standards/MARK.md) section 4; the [mark-json-authoring skill](.claude/skills/mark-json-authoring/SKILL.md) |
-| Any test, fake, builder or harness | the [writing-tests skill](.claude/skills/writing-tests/SKILL.md) |
 | Gates, hooks, lint or format config | [README](docs/standards/README.md) section 5, then [TOOL.md](docs/standards/TOOL.md) section 5 or [MARK.md](docs/standards/MARK.md) section 6 |
 | Deploy, registry, security | [TOOL.md](docs/standards/TOOL.md) sections 3 and 6, [MARK.md](docs/standards/MARK.md) section 7; the [opal-custom-tools skill](.claude/skills/opal-custom-tools/SKILL.md) |
 | Anything about how Mark behaves | the [mark-platform skill](.claude/skills/mark-platform/SKILL.md); unverified claims get a throwaway test first |
@@ -89,21 +91,23 @@ the same change. The contract changes only with the owner's approval.
 ## Repository layout
 
 ```
-CLAUDE.md
+CLAUDE.md    tool/CLAUDE.md    mark/CLAUDE.md
 docs/contract/TOOL_CONTRACT.md
 docs/standards/README.md  TOOL.md  MARK.md
 .claude/skills/writing-tests/SKILL.md
 .claude/skills/mark-platform/  mark-code-step-patterns/  mark-json-authoring/  opal-custom-tools/
+scripts/     preflight.sh  prove-gates.sh  mark-test-gate.sh
+.githooks/   pre-commit
+tool/        api/  config/  scripts/  src/{domain,application,infrastructure,presentation}  test/
+mark/        code_steps/ (helper modules)  tests/
 ```
 
 Planned, created as the build proceeds:
 ```
 README.md
 demo/        template.csv, black-friday-{clean,errors,broken,uk-ch}.csv, seeded-errors.csv
-scripts/     preflight.sh  prove-gates.sh  send_package.py  catch_rate.py
-.githooks/   pre-commit
-tool/        api/  config/rules.json  src/{domain,application,infrastructure,presentation}  test/
-mark/        code_steps/  agents/  skills/  workflow/  _build/  build.py  tests/  dist/ (generated)
+scripts/     send_package.py  catch_rate.py
+mark/        code_steps/ (steps)  agents/  skills/  workflow/  _build/  build.py  dist/ (generated)
 ```
 See [standards README section 4](docs/standards/README.md#4-repository-layout), and
 [TOOL.md](docs/standards/TOOL.md) section 1 and [MARK.md](docs/standards/MARK.md) section 1
@@ -112,8 +116,8 @@ for the full trees.
 ## Working conventions
 
 ### Before claiming anything works
-- Run `scripts/preflight.sh` (planned) and read its exit status and the test count from a
-  file, not through a pipe.
+- Run `scripts/preflight.sh` and read its exit status and the test count from a file, not
+  through a pipe.
 - A new test is mutated red, then restored by byte-compare.
 - A gate change is proven with `scripts/prove-gates.sh`.
 - `tool/` is done when the deployed service answers `/discovery` and a real tool call.
@@ -121,10 +125,17 @@ for the full trees.
   log read: inputs, step outputs, and what chat showed the user. The canvas is checked by
   screenshot.
 
+### Review
+- Every change has tests written per the
+  [writing-tests skill](.claude/skills/writing-tests/SKILL.md).
+- Before it is committed, every change is reviewed for spec compliance and quality, and
+  adversarially (trying to break it).
+
 ### Platform facts
-- Use the verified facts in [TOOL.md](docs/standards/TOOL.md) section 6 and
-  [MARK.md](docs/standards/MARK.md) section 2. Anything new is verified hands-on before it is
-  relied on. Read it this session or don't assert it.
+- Use the verified facts in [TOOL.md](docs/standards/TOOL.md) section 6,
+  [MARK.md](docs/standards/MARK.md) section 2 and the
+  [mark-platform skill](.claude/skills/mark-platform/SKILL.md). Anything new is verified
+  hands-on before it is relied on. Read it this session or don't assert it.
 - Library APIs: read the installed package's types or official docs, never memory.
 - Judge Mark's behaviour by the run log, not by chat text: chat narrates and editorializes.
 

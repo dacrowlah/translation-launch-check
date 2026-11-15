@@ -2,8 +2,7 @@
 
 How this repository is built. When code and a standards doc disagree, the doc wins: fix the
 code, or amend the doc in the same change. Never invent a standard. Items marked
-**(planned)** describe files the scaffold creates. Items marked **(verify at scaffold)** are
-not yet facts.
+**(planned)** describe files the build has not created yet.
 
 | Doc | Covers |
 |---|---|
@@ -17,7 +16,8 @@ not yet facts.
 1. **Clean Architecture:** domain <- application <- infrastructure <- presentation <-
    composition root. Dependencies point inward only. No implementation detail in a name
    above the infrastructure layer. Applies fully to `tool/`. In `mark/` it means each code
-   step depends only on its input, `_shared.py` and the `tools` facade.
+   step depends only on its input, the helper modules beside it (`mark/code_steps/_*.py`,
+   [MARK.md](MARK.md) section 2) and the `tools` facade.
 2. **SOLID**, for every module, function, step and test.
 3. **DRY.** Never copy an existing value, constant, rule, template or block of code; the
    second copy is the defect. Similar patterns are extracted at the **third** repeat, never
@@ -50,7 +50,8 @@ Exempt:
 - fluent library APIs designed for chaining (`z.string().describe(...)`).
 
 In `mark/`, a tool result is parsed once into a plain dict at the call site (through
-`_shared.call_tool`), and never reached through deeper than its documented shape.
+`call_tool` or a platform-tool helper), and never reached through deeper than its
+documented shape.
 
 ## 3. Sandi Metz's rules
 
@@ -69,7 +70,11 @@ In `mark/`, a tool result is parsed once into a plain dict at the call site (thr
     `// eslint-disable-next-line metz/max-params -- WAIVER: Express handler signature is fixed`.
   - Gated by `metz-check-directives`.
 - **Python (`mark/`):** no linter reproduces these semantics.
-  - **Review enforces them**, and a change over a limit states its counted-line total.
+  - **Review counts them**, on `ruff format` output, by the same definition: a file total
+    leaves out imports; a function body leaves out its decorators and its whole signature
+    (all lines of a wrapped `def`); module, class and function docstrings, blank lines,
+    comments and lines of only closing punctuation never count.
+  - A change over a limit states its counted-line total.
   - `ruff` gates parameters (`PLR0913`, `max-args = 4`).
   - Waivers are a `# WAIVER: <reason of at least 20 letters>` comment on the line above.
 - Never loosen a number. The fix for too many parameters is a named parameter type or
@@ -78,23 +83,27 @@ In `mark/`, a tool result is parsed once into a plain dict at the call site (thr
 ## 4. Repository layout
 
 ```
-README.md                         what the solution is, how to run and deploy it (planned)
-CLAUDE.md                         operating manual for Claude
+README.md            (planned)    what the solution is, how to run and deploy it
+CLAUDE.md                         operating manual for Claude; tool/ and mark/ have their own
 docs/contract/TOOL_CONTRACT.md    the tool's binding behaviour
 docs/standards/                   this file, TOOL.md, MARK.md
-.claude/skills/writing-tests/     test workflow and traps for both halves
+.claude/skills/                   writing-tests (both halves), mark-platform,
+                                  mark-code-step-patterns, mark-json-authoring,
+                                  opal-custom-tools
 demo/                (planned)    CSV demo files: template, clean, errors, broken, uk-ch, seeded errors
-tool/                (planned)    the Vercel app (its own package.json; Vercel root directory)
-mark/                (planned)    agents, skills, code steps, layout, build.py, tests
-scripts/             (planned)    preflight.sh (all gates, both halves), prove-gates.sh,
-                                  send_package.py (webhook sender, the CMP stand-in),
-                                  catch_rate.py (seeded test set: caught, missed, extra)
-.githooks/           (planned)    pre-commit: format and lint on staged files
+tool/                             the Vercel app (its own package.json; Vercel root directory)
+mark/                             code-step helpers and tests; agents, skills, workflow,
+                                  layout and build.py (planned)
+scripts/                          preflight.sh (all gates, both halves), prove-gates.sh,
+                                  mark-test-gate.sh; planned: send_package.py (webhook
+                                  sender, the CMP stand-in), catch_rate.py (seeded test set:
+                                  caught, missed, extra)
+.githooks/                        pre-commit: format and lint on staged files
 ```
 
 ## 5. Gates overview
 
-- `scripts/preflight.sh` (planned) runs every gate of both halves and is the authority:
+- `scripts/preflight.sh` runs every gate of both halves and is the authority:
   green before any "done" and before any deploy or import.
 - Each gate is proven once by a planted violation that turns it red for its named reason.
   `scripts/prove-gates.sh` replays them in a scratch copy outside the working tree, with a

@@ -24,7 +24,7 @@ Complete runnable example: [example_step.py](example_step.py).
 | Small helpers for platform tools | The `status == "ok"` rule is for your own tool only. Each platform tool gets a helper that checks its own fields: `send_email` succeeded only if `status == "sent"` (`pending` means a compose card, nothing sent); `create_canvas` returns an `artifact_url` string; `create_csv_canvas` returns `data.content` as a string of the expected size. All of them also fail on the error envelope, a non-dict result, a raise or a `status_code >= 400` body. **Confirm these field paths in a code-step run log before relying on them:** `status` and `artifact_url` were seen in agent and chat results, `data.content` in a code step. A helper that reports failure for a canvas that was in fact created invites a re-run, and every run makes a new canvas (no delete), so don't retry canvases. |
 | Never branch on the error's own keys | They differ between tools (verified 2026-11). |
 | Never raise for expected problems | Map each problem to a **status** or **route** and return it. |
-| One last-resort guard | `handler` = `run_safely(impl, input, ctx, fallback)`: any unexpected exception returns that step's `fallback` (a safe output with a templated message). Nothing else catches broadly except the tool-call helpers. |
+| One last-resort guard | `handler` = `run_safely(impl, input, ctx, fallback)`: any unexpected exception returns that step's `fallback` (a safe output with a templated message). Only two other kinds of helper catch broadly, on purpose: the tool-call helpers (any exception from the SDK call is a failure status) and the JSON helpers (canonical JSON, checksums, and the lenient encoding that looks for lone surrogates), which return `None` for anything they can't encode or compare (even a value whose own comparison or `__str__` raises). Everything else catches only the exceptions it expects (`OSError` around file access, `ValueError` when parsing, `UnicodeEncodeError` when encoding). |
 | Never print | No `print`, no logging to stdout/stderr - not even "for the builder's logs". Chat paraphrases it to the user, and the step's return value itself travels on stdout. Technical detail belongs in the tool's own server log. |
 | User text only from templates | A `TEXT` dict keyed by status; the user sees `TEXT[status].format(...)`, never exception text, HTTP codes, URLs, tool names or JSON. `invalid_input` / `invalid_request` get a "check the file against the template" text; `internal_error` / `unavailable` get "couldn't run the checks; your file wasn't the problem; re-run". |
 | No diagnostics in outputs | Return what downstream needs, routing tokens and a one-line user-safe `summary`. |
@@ -255,6 +255,10 @@ the example):
   (non-string keys, tuples, NaN or infinite numbers, a lone surrogate, too deep) with
   `invalid_data`
   and touches nothing: such data would never verify on read, and `Infinity` isn't JSON.
+  It builds the stored bytes (`{data, checksum}`) before it touches the disk, and checks
+  that wrapper, not only the data: the wrapper is one level deeper, so data at the
+  serializer's depth limit can encode while its file can't. Checking the data alone
+  creates the folder and then raises.
 - **Validate both path parts** in `write_run_file` / `read_run_file` with `fullmatch`:
   `run_key` is `[0-9a-f]{16}`; the file name is `[a-z0-9_-]+(/<locale>)?\.json` (or an
   explicit allow-list), where `<locale>` is
@@ -418,6 +422,7 @@ is debugged in front of the user.
 | A condition directly after an agent or a loop | A code step in between emits the route token. |
 | Gating a webhook input on `trigger_name == "Webhook"` | The value is unrecorded; gate on the package checksum. |
 | No item-count check | Reject more items than the loop's `max_iterations`. |
+| Checking only the data before writing its `{data, checksum}` file | Build the stored bytes first (the wrapper is one level deeper); `invalid_data` when they can't be encoded, before touching the disk. |
 | Reading a run file without checking its own checksum | `read_run_file` always checks it; then bind via `read_report` / `read_review`. |
 | A sender computing `package_sha256` with 16 hex or a different serializer | Full 64 hex; reproduce the canonical JSON and test against the fixture. |
 | Duplicate locales in one file | Rejected in the first step; one file per locale. |

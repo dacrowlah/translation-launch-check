@@ -55,6 +55,9 @@ use case in `src/application/`.
 
 ## 2. TypeScript
 
+How the SDK registers, validates and logs: the
+[opal-custom-tools skill](../../.claude/skills/opal-custom-tools/SKILL.md).
+
 - Node 24, ESM (`"type": "module"`), TypeScript ~6.0, `strict: true`,
   `noUncheckedIndexedAccess: true`, `exactOptionalPropertyTypes: true`.
 - No `any`. `unknown` at boundaries is parsed with zod, then narrowed.
@@ -73,6 +76,9 @@ use case in `src/application/`.
   it, and what comes back.
 
 ## 3. Errors, logging and security
+
+The SDK's auth, logging and failure behaviour, and the response rule: the
+[opal-custom-tools skill](../../.claude/skills/opal-custom-tools/SKILL.md).
 
 - **Statuses, not exceptions,** for every expected problem (contract section 2). Use cases
   return results; adapters (e.g. the language detector answering null when unsure) never
@@ -174,6 +180,9 @@ All commands run inside `tool/`. The root `scripts/preflight.sh` runs them, and 
 scripts, `tool/package.json`.
 
 ## 6. Platform facts (verified 2026-11-12 unless marked)
+
+What Mark sends, registry sync and what each caller sees: the
+[opal-custom-tools skill](../../.claude/skills/opal-custom-tools/SKILL.md).
 
 - The Agent Platform fetches `/discovery` without auth and calls `POST /tools/<name>` with
   `Authorization: Bearer <token>`. The body is `{ parameters, auth_credentials, environment,

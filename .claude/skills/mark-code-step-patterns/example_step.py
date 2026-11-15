@@ -47,8 +47,9 @@ What it shows (see SKILL.md):
 - user-facing text comes only from `TEXT`, keyed by status; nothing is printed;
 - every function body is at most 5 counted lines.
 
-The SHARED helpers belong in one module that a build step inlines into every code step
-(a code step is one file; local imports fail). Tests put a fake `opal_tms_sdk` on sys.path.
+The SHARED helpers belong in helper modules (one per concern) that a build step inlines
+into every code step (a code step is one file; local imports fail). Tests put a fake
+`opal_tms_sdk` on sys.path.
 `example_check`, the `example_route_` prefix and `/workspace/example` are placeholders.
 
 This is the webhook variant: the package comes in a webhook payload, which is itself a
@@ -85,8 +86,8 @@ def canonical_bytes(value):
     """The canonical JSON as UTF-8 bytes, or None. Never raises."""
     try:
         return _dumps(value).encode("utf-8")
-    except (TypeError, ValueError, RecursionError):  # UnicodeEncodeError is a ValueError
-        return None
+    except Exception:  # TypeError, ValueError (UnicodeEncodeError), RecursionError, a raising
+        return None  # __lt__ on a key subclass: never raise
 
 
 def canonical_json(value):
@@ -184,10 +185,10 @@ def read_csv_attachment(attachment, title):
     return _csv_text(body, attachment["size_bytes"])
 
 
-def from_trigger(input, trigger_name, key):
+def from_trigger(input_, trigger_name, key):
     """An input used only on its own trigger. Use only recorded names ("Chat", "Scheduler",
     "Email"); the webhook value is unrecorded. Hygiene, not a boundary: the model fills both."""
-    return input.get(key) if input.get("trigger_name") == trigger_name else None
+    return input_.get(key) if input_.get("trigger_name") == trigger_name else None
 
 
 def _package(payload):
@@ -196,9 +197,9 @@ def _package(payload):
     return rest if digest is not None and payload.get("package_sha256") == digest else None
 
 
-def verified_webhook_package(input):
+def verified_webhook_package(input_):
     """The webhook package without its checksum, or None unless `package_sha256` verifies."""
-    payload = input.get("webhook_payload")
+    payload = input_.get("webhook_payload")
     return _package(payload) if isinstance(payload, dict) else None
 
 
@@ -225,10 +226,10 @@ def leak_free_text(text):
     return result if isinstance(result, str) and result.strip() else None
 
 
-def run_safely(impl, input, ctx, fallback):
+def run_safely(impl, input_, ctx, fallback):
     """The one broad guard. Never print: Mark's chat narrates stdout and stderr."""
     try:
-        return impl(input, ctx)
+        return impl(input_, ctx)
     except Exception:
         return fallback
 
@@ -263,26 +264,35 @@ def _store(path, blob):
         return "unavailable"
 
 
-def _round_trips(blob, data):
+def _round_trips(blob, value):
+    """False for data JSON would change: non-string keys, tuples. The except covers a value
+    whose __eq__ raises (json.loads itself succeeds on anything json.dumps wrote)."""
     try:
-        return json.loads(blob) == data
-    except (ValueError, RecursionError):
+        return json.loads(blob) == value
+    except Exception:
         return False
 
 
-def _json_native(data):
-    """True only if the data survives a JSON round trip unchanged (string keys, no tuples)."""
-    blob = canonical_bytes(data)
-    return blob is not None and _round_trips(blob, data)
+def _native_bytes(value):
+    """The canonical bytes, only if they read back as the same value; else None."""
+    blob = canonical_bytes(value)
+    return blob if blob is not None and _round_trips(blob, value) else None
+
+
+def _stored_blob(data):
+    """The file's bytes, or None. Built before anything is touched: the wrapper is one level
+    deeper than the data, so data at the depth limit can serialize while the file can't."""
+    checksum = facts_checksum(data)
+    return _native_bytes({"data": data, "checksum": checksum}) if checksum else None
 
 
 def write_run_file(run_key, name, data):
-    """Returns "ok", "invalid_path" or "invalid_data" (nothing touched), or "unavailable"."""
-    path = _run_path(run_key, name)
-    checksum = facts_checksum(data) if _json_native(data) else None
-    if path is None or checksum is None:
+    """Returns "ok"; "invalid_path" or "invalid_data" (data that would not read back
+    unchanged), touching nothing; or "unavailable" (storage failed)."""
+    path, blob = _run_path(run_key, name), _stored_blob(data)
+    if path is None or blob is None:
         return "invalid_path" if path is None else "invalid_data"
-    return _store(path, canonical_bytes({"data": data, "checksum": checksum}))
+    return _store(path, blob)
 
 
 def not_checked(status="not_checked"):
@@ -494,7 +504,7 @@ def _data_problem(package):
     text = _loose_text(package)
     if text is not None and not _encodable(text):
         return needs_info("unreadable")
-    return None if _json_native(package) else needs_info("invalid_data")
+    return None if _native_bytes(package) is not None else needs_info("invalid_data")
 
 
 def _reserved(package):
@@ -657,19 +667,19 @@ def _checked_package(package):
     return problem or _checked_items([_item(package, each) for each in package["locales"]])
 
 
-def _no_package(input):
+def _no_package(input_):
     """A recorded non-webhook run (e.g. chat), or an empty / non-object payload."""
-    payload = input.get("webhook_payload")
+    payload = input_.get("webhook_payload")
     empty = not isinstance(payload, dict) or not payload
-    return empty or input.get("trigger_name") in RECORDED_NON_WEBHOOK
+    return empty or input_.get("trigger_name") in RECORDED_NON_WEBHOOK
 
 
-def check_package(input, ctx):
-    package = verified_webhook_package(input)
+def check_package(input_, ctx):
+    package = verified_webhook_package(input_)
     if package is None:
-        return needs_info("no_package" if _no_package(input) else "not_verified")
+        return needs_info("no_package" if _no_package(input_) else "not_verified")
     return _checked_package(package)
 
 
-def handler(input: dict, ctx: dict) -> dict:
+def handler(input: dict, ctx: dict) -> dict:  # noqa: A002 - the platform's signature
     return run_safely(check_package, input, ctx, FALLBACK)

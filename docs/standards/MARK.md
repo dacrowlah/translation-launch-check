@@ -3,19 +3,36 @@
 The Optimizely Agent Platform ("Mark") side of the Translation Launch Check: the specialized
 agents, skills, workflow and the Python code steps it runs. Shared principles, Law of
 Demeter, Sandi Metz's rules and git rules are in [README.md](README.md). Platform behaviour
-cited here was verified hands-on in the instance (2026-11-12 and 2026-11-13).
+cited here was verified hands-on in the instance (2026-11); the full record, with a pattern
+for each behaviour, is the
+[mark-platform skill](../../.claude/skills/mark-platform/SKILL.md).
 
 ---
 
 ## 1. Layout and the source-of-truth rule
 
 ```
-mark/                          (planned)   the Agent Platform source
+mark/                                      the Agent Platform source
   local.config.example.json                placeholders for the private values (section 7)
-  README.md  requirements-dev.txt  pyproject.toml
-  code_steps/_shared.py                    call_tool, run_safely, canonical_json, facts_checksum
+  requirements-dev.txt  pyproject.toml     pinned pytest and ruff; their settings
+  code_steps/_shared.py                    call_tool, call_platform, run_safely
+  code_steps/_platform.py                  platform-tool helpers: send_email (allow-list),
+                                           create_canvas, read_csv_attachment, strip_bom
+  code_steps/_address.py                   email address and allow-list rules
+  code_steps/_url.py                       the template URL rule
+  code_steps/_checksum.py                  canonical JSON, sha256_hex, facts_checksum,
+                                           locale_checksum, json_size
+  code_steps/_run_folder.py                run-folder files: write, read, bind to a checksum
   code_steps/_config.py                    RULES and PRIVATE (files in dev, literals after build)
   code_steps/_text.py                      every user-facing template
+  tests/                                   conftest.py, builders.py, fakes/opal_tms_sdk/,
+                                           test_*.py (section 5)
+```
+
+Planned, created as the build proceeds:
+```
+mark/
+  README.md                                setup (section 3) and the demo cases (section 5)
   code_steps/_package.py                   validate_package(): rules shared by CSV and webhook
   code_steps/_csv_package.py               parse_csv() -> package
   code_steps/_webhook_package.py           from_webhook() -> package (checksum)
@@ -24,13 +41,13 @@ mark/                          (planned)   the Agent Platform source
   code_steps/score.py                      step "Score each language"
   code_steps/report.py                     step "Write and send the report"
   code_steps/needs_info.py                 step "Ask for a corrected file"
+  code_steps/<named when written>.py       step "Save the review"
   agents/<agent_id>/                       agent.json, prompt.md, output.schema.json
   skills/market-rules-glossary.template.md rendered from tool/config/rules.json at build
   skills/translation-fix-playbook.md       skill text + When-to-use
   workflow/workflow.json                   steps, triggers, conditions (code by file reference)
   workflow/layout.json                     canvas node positions (section 4)
   build.py  _build/{inline,agents,skills,workflow,layout}.py
-  tests/                                   conftest.py, builders.py, fakes/opal_tms_sdk/, test_*.py
   dist/                                    generated, importable, gitignored (never hand-edited)
 ```
 
@@ -42,61 +59,132 @@ mark/                          (planned)   the Agent Platform source
 
 ## 2. Python code steps
 
-The platform contract (verified):
+How to write a step, with a complete runnable example: the
+[mark-code-step-patterns skill](../../.claude/skills/mark-code-step-patterns/SKILL.md).
+
+The platform contract (verified; the evidence and more facts are in the
+[mark-platform skill](../../.claude/skills/mark-platform/SKILL.md)):
 - **Signature:** `def handler(input: dict, ctx: dict) -> dict`.
   - `input` holds the step's declared variables;
   - `ctx["output_dir"]` and `ctx["input_dir"]` hold the step's directories; a chat
     attachment is at `ctx["input_dir"]/attachments/<name>`, byte-exact.
-- **Runtime:** **Python 3.12** (3.12.3, verified 2026-11-13; local venv `.venv` from `python3.12`, ruff `target-version = "py312"`), standard library plus the preinstalled
+- **Runtime:** **Python 3.12** (3.12.3, verified 2026-11-13; local venv `.venv` from
+  `python3.12`, ruff `target-version = "py312"`), standard library plus the preinstalled
   `opal_tms_sdk`. **No network.** One file after the build; local imports are impossible.
   JavaScript code steps cannot call tools (verified 2026-11-13), so steps are Python.
 - **Platform tools:** `from opal_tms_sdk import tools`, then `tools.<name>(**params)`.
-- **Failures don't raise.** A tool failure comes back as
+- **The observed failures came back as data.** A tool failure came back as
   `{"response_type": "error", "response": {...}}`, and a success as
   `{"response_type": "<mime>", "response": <body>}`. One 500 also came back as a
-  success-typed response with `status_code: 500` in the body. **Every call site goes
-  through** one shared helper `call_tool(name, **params) -> ToolResult` in `_shared.py`,
-  which treats either shape as a failure.
-- **Limits:** input at most 74 KB, return at most 256 KB (an oversized return silently
-  becomes `null`). Timeout is set per step, at most 300 s.
+  success-typed response with `status_code: 500` in the body. The SDK also defines exception
+  classes, so a call can raise too.
+- **Limits:**
+  - a code step's input event is at most 75,776 bytes as Mark wraps it; over that, the step
+    fails, is retried 3 times, and the run fails before the code starts;
+  - a return is at most 256 KB, and a bigger one silently becomes `null` (docs);
+  - the timeout is set per step: default 30 s, at most 300 s (docs).
+- **Loops:** the step after a loop that takes the loop output receives each iteration's full
+  record, including the whole loop item, so it can break the input limit. A code step at the
+  end of the loop body receives only its declared inputs.
+- **Files under `/workspace` persist between the steps of one run.** Large data goes there
+  (the run folder, below), never through step inputs.
 - **The `summary` key** of the return value appears in logs and is stripped before
   downstream steps see the output.
 - **Copy never comes from chat's `text_content`:** that field is model-written. The CSV is
   read from the attachment; a webhook package is verified by its checksum.
 
 Rules:
-- **Never raise for expected problems.** Return a status.
-  - A step's top-level body is wrapped once in `_shared.run_safely(handler_impl)`.
-  - It catches any unexpected exception and returns `{"status": "internal_error", ...}`.
+- **Every tool call goes through a helper.**
+  - Our own tool: `call_tool(tool, /, **params)` in `_shared.py` returns
+    `{"ok", "status", "body"}`. `status` is the tool's own token (`ok`, `invalid_input`,
+    `internal_error`, `invalid_request`), or `unavailable` for an error envelope, a non-dict
+    result, any exception from the SDK, a body `status_code` of 400 or more (an int, a float
+    or a numeric string), or a missing or unknown token. `ok` is `status == "ok"`, and the
+    body is passed on only then. The tool name is positional-only, so a tool parameter
+    called `name` still works.
+  - Platform tools: `call_platform(tool, /, **params)` returns the body dict, or `None` for
+    the same failure shapes. The helpers in `_platform.py` then check that tool's own
+    fields: `send_email` counts only `status == "sent"`, `create_canvas` needs an
+    `artifact_url`, and `read_csv_attachment` returns a status with the text.
+  - Never branch on an error's own keys: they differ between tools.
+- **Never raise for expected problems.** Return a status or a route.
+  - Each step's handler calls `run_safely(impl, input_, ctx, fallback=None)` from
+    `_shared.py`. An exception (including `SystemExit`), or a result that is not a dict of
+    plain JSON within 250,000 bytes as measured by `json_size`, gives `fallback`. The
+    default fallback is the needs-info route (`tlc_route_needs_info`) with the templated
+    "re-run" message.
+  - Only three places catch broadly, on purpose: `run_safely`; the SDK call inside
+    `call_tool` and `call_platform` (an exception is a failure); and the helpers in
+    `_checksum.py`, which return `None` for anything they can't encode or compare, even a
+    value whose own comparison raises.
 - **Never print.** Mark's chat narrates stdout and stderr to the marketer (tested). No
   `print`, no `logging` to stderr.
 - **Steps inside the loop must never fail:** one failed iteration stops the whole workflow
   (tested).
-- **Return only what downstream needs, plus a one-line user-safe `summary`.** No
-  diagnostics. Technical detail stays in the tool's own server log.
+- **Return only what downstream needs, as a plain-JSON dict, plus a one-line user-safe
+  `summary`.** No diagnostics. Technical detail stays in the tool's own server log.
 - **User-facing text comes only from the templates** in `_text.py`. Each template is keyed by
   status and is pure string formatting; the report and canvas code never write prose.
-- **Checksums:**
-  - *Read and check the file* computes `facts_checksum` per locale and the webhook's
-    `package_sha256` is the sha256 of the canonical JSON of every other field;
-  - `canonical_json` is sorted keys, `(",", ":")` separators, UTF-8, `ensure_ascii=False`;
-  - the next step recomputes with the same helper in `_shared.py`. A mismatch makes that
-    locale `check_incomplete` ("re-run").
-- **The email recipient allow-list** lives in the private config (section 7) and is enforced
-  in *Write and send the report*, never only in a prompt.
+- **Checksums** (`_checksum.py`):
+  - canonical JSON is exactly what `json.dumps(sort_keys=True, separators=(",", ":"),
+    ensure_ascii=False, allow_nan=False)` writes, encoded as UTF-8. Data that is not plain
+    JSON (a lone surrogate, NaN or infinity, a non-string key, a tuple or set, nesting too
+    deep) has no canonical form: every helper returns `None` for it, so it never verifies;
+  - the webhook's `package_sha256` is `sha256_hex`: the full 64-hex SHA-256 of the canonical
+    JSON of every other field;
+  - handoffs between steps use `facts_checksum`, the first 16 hex of that digest.
+    `locale_checksum` covers the locale code together with its lines and rule findings, so
+    two locales with identical text get different values;
+  - the reading step recomputes with the same helper. A mismatch makes that locale
+    `check_incomplete` ("re-run").
+- **Large data goes through the run folder** (`_run_folder.py`): `/workspace/tlc/<run_key>/`
+  with a random 16-hex `run_key`, holding `{data, checksum}` files.
+  - The run key and file name reach steps through the model, so both are validated.
+    `write_run_file` returns `ok`, `invalid_path`, `invalid_data` (data that would not read
+    back unchanged) or `unavailable` (storage failed); `invalid_path` and `invalid_data`
+    touch nothing.
+  - `read_run_file` always checks the file's own checksum. `read_verified` and `read_review`
+    then bind the file to a value an earlier step handed over, failing closed.
+  - Every read returns a fresh `{status, data, checksum}` dict with status `ok`,
+    `not_checked` or `invalid_path`. Test `status`: stored data may itself be null.
+  - Step outputs carry only routes, the run key and checksums.
+- **Email goes only to allow-listed recipients, enforced in code:** `send_email` in
+  `_platform.py` refuses, without calling the tool, any recipient `allowed_recipient`
+  rejects, and any subject with a control, format or line-break character. The allow-list is
+  in the private config (section 7). A recipient passes only as a valid bare address that is
+  listed exactly, or whose domain is exactly a listed domain (case-insensitive; no
+  subdomains). Never only in a prompt.
 
-**Build-time inlining** (`build.py`):
+**Build-time inlining** (`build.py`, planned):
 - A module whose name starts with `_` is never a step.
 - The build inlines every `from _x import a, b` line it finds, recursively and each module
   once, so the step is one self-contained file.
-- `_config` is special: it is replaced by literal `RULES = {...}` and `PRIVATE = {...}`.
-  In dev and tests the module reads `tool/config/rules.json` and `mark/local.config.json`
-  (or the example file); after the build both are literals.
+- `_config` is special: the build replaces it with literal `RULES = {...}` and
+  `PRIVATE = {...}`. In dev and tests the module reads files:
+  - `RULES`: the keys of `tool/config/rules.json` the steps use (`limits`, `master_locale`,
+    `locales`, `locale_aliases`, `channels`);
+  - `PRIVATE`: `allow_list`, `qa_inbox` and `template_url` from the file named by
+    `TLC_CONFIG`, else `mark/local.config.json`, else the example file. Script-only values
+    (the webhook section) never reach a step;
+  - the values are checked at import (section 7). A missing key or a wrong shape raises, with
+    a message that names no value.
 - User-facing templates live in `_text.py`, inlined like any other module.
+- **Tests pin what inlining relies on:**
+  - the import graph (`test_import_graph.py`): a helper imports only allow-listed standard
+    library modules (`hashlib`, `json`, `pathlib`, `re`, `secrets`, `unicodedata`; `os` only
+    in `_config`, which the build replaces), `opal_tms_sdk` and other helpers. So no network
+    or process modules. It imports nothing dynamically (`__import__`, `exec`, `eval`,
+    `compile`, `importlib`, ...), and the helpers form no import cycle. A new standard-library
+    module is a reviewed one-line addition to the allow-list;
+  - duplicate names (`test_inlining.py`): each module-level name is bound in one helper only,
+    because inlining puts every helper into one namespace.
 
 Tests import the real modules, so the shipped code and the tested code are the same source.
 
 ## 3. Agents and skills
+
+The authoring format, export fields and import steps: the
+[mark-json-authoring skill](../../.claude/skills/mark-json-authoring/SKILL.md).
 
 - **Agents are authored as files** under `mark/agents/<agent_id>/` (`agent.json`,
   `prompt.md`, `output.schema.json`) and assembled by `build.py` into export-format JSON
@@ -137,9 +225,12 @@ Tests import the real modules, so the shipped code and the tested code are the s
 
 ## 4. Workflow and canvas layout
 
+The workflow's export format, loops, conditions, triggers and canvas layout: the
+[mark-json-authoring skill](../../.claude/skills/mark-json-authoring/SKILL.md).
+
 - **The workflow is generated** by `mark/build.py` into `mark/dist/`, in export format
   (`step_type`, `parameters_schema`, `child_steps`, `target_step_id`), then imported.
-- **Step names** on the canvas are plain, exactly these ten:
+- **Step names** on the canvas are plain, exactly these eleven:
 
   | Step | Kind |
   |---|---|
@@ -149,25 +240,31 @@ Tests import the real modules, so the shipped code and the tested code are the s
   | For each language | Loop |
   | Back-translate to English | Agent step (Content Translation) |
   | Review the translation | Agent step (Translation Review) |
+  | Save the review | Code |
   | Score each language | Code |
   | Anything to fix? | Condition |
   | Suggest fixes | Agent step (Translation Fix Suggestions) |
   | Write and send the report | Code |
 
 - **Conditions** match against the previous step's output text, so a code step emits an exact
-  routing token (`"route": "needs_info"`, `"route": "fix"`) and the condition uses `regex`
-  on it.
-- **Branch join:** both branches of *Anything to fix?* end at *Write and send the report*. If
-  the platform refuses two incoming paths into one step, `build.py` generates that step twice
-  from the same module; no code is duplicated in the repo.
+  routing token with the reserved prefix `tlc_route_` (`tlc_route_needs_info`,
+  `tlc_route_fix`), and the condition uses a whole-token `regex` on it
+  (`\btlc_route_fix\b`). A condition always follows a code step, never an agent or the loop.
+  The first step rejects copy that contains the reserved prefix.
+- **Branch join:** both branches of *Anything to fix?* end at *Write and send the report*.
+  Two incoming paths into one step import and run (verified).
 - **Data passing:**
   - Automatic inputs are filled by the orchestrator model, so every variable has a precise
     `description`;
   - a Fixed input on an agent step inside a loop is dropped, so constants are pinned in an
     Automatic input's description;
   - loop `items_source` names the upstream field (verified to pass by reference);
-  - after a loop, outputs arrive in item order with no key, so agents echo their locale and
-    checksum and the next code step matches by position and checks the echo;
+  - the step after the loop takes no loop output (section 2). Each iteration ends with
+    *Save the review*, which receives only small declared inputs (`run_key`, the loop
+    item's `locale` and `checksum`, and the two agents' answers), never the whole loop item,
+    and writes them to the run folder. *Score each language* reads them back with
+    `read_review`, which accepts a review only if it names its locale and echoes that
+    locale's checksum;
   - facts handed across steps carry a checksum (section 2).
 - **Pretty canvas: owner requirement.** `mark/workflow/layout.json` gives every node an
   explicit position:
@@ -186,17 +283,25 @@ Tests import the real modules, so the shipped code and the tested code are the s
 
 ## 5. Testing
 
-- **Runner:** pytest. Tests live in `mark/tests/`, one file per code step plus
-  `test_build.py`.
-- **`opal_tms_sdk` is replaced by an in-memory fake** in `mark/tests/fakes/opal_tms_sdk/`,
-  put on `sys.path` by `conftest.py`. The fake records calls and returns scripted
-  `{"response_type", "response"}` values, including error responses. It is never a
-  `monkeypatch` of our own modules.
+The how-to is the [writing-tests skill](../../.claude/skills/writing-tests/SKILL.md), part 2.
+
+- **Runner:** pytest. Tests live in `mark/tests/`: one `test_*.py` per helper concern
+  (`test_call_tool.py`, `test_run_folder.py`, `test_config.py`, ...). Each code step and the
+  build get their own test file as they are written.
+- **`conftest.py`** puts the fake and `mark/code_steps/` on `sys.path`, so tests import a
+  module by its own name (`from _shared import call_tool`), and points `TLC_CONFIG` at the
+  example config, never a developer's real one.
+- **`opal_tms_sdk` is replaced by an in-memory fake** in `mark/tests/fakes/opal_tms_sdk/`
+  (the `fake_tools` fixture). It records calls and returns scripted
+  `{"response_type", "response"}` values, including error responses, or raises a scripted
+  exception instance. An unscripted call raises `UnscriptedCall`, a `BaseException`, so a
+  misspelt tool name fails the test. It is never a `monkeypatch` of our own modules.
 - **Fixtures are builders** in `mark/tests/builders.py` with defaults plus overrides,
-  producing the exact shapes the tool contract and the workflow produce today.
+  producing the exact shapes the tool contract and the platform produce today.
 - **Literal expectations.** Each new test is proven able to fail: mutate the production line,
   watch it go red, restore from a scratch copy, byte-compare.
-- **`test_build.py` pins that the generated workflow JSON:**
+- **Helper structure is pinned:** the import graph and duplicate names (section 2).
+- **`test_build.py` (planned) pins that the generated workflow JSON:**
   - imports nothing local;
   - contains no `print(`;
   - has every node positioned;
@@ -206,18 +311,25 @@ Tests import the real modules, so the shipped code and the tested code are the s
   (`mark/README.md`, planned) is run, and the outcome checked in the run log, not only in
   chat text. The run budget is in the plan.
 
-## 6. Tooling and gates (planned; verified at scaffold)
+## 6. Tooling and gates
 
-- `ruff check mark/` and `ruff format --check mark/`. Rules include `PLR0913` with
-  `max-args = 4`, `T20` (no print) and `S` (bandit subset). The scaffold pins ruff in
-  `requirements-dev.txt`.
-- `pytest mark/tests -q`, with a test-count check (zero tests or any skip fails).
-- `python mark/build.py --example`: builds from `local.config.example.json` into a temp
-  directory, so the build is proven without private values. `test_build.py` pins the
+All commands run from the repository root, with the root `.venv` (Python 3.12), set up
+once with `python3.12 -m venv .venv && .venv/bin/pip install -r mark/requirements-dev.txt`.
+
+- `ruff check mark` and `ruff format --check mark`. ruff is pinned in
+  `requirements-dev.txt`; `mark/pyproject.toml` selects `E`, `F`, `W`, `I`, `B`, `S`
+  (bandit subset), `T10` (no debugger), `T20` (no print), `A` and `PLR0913` with
+  `max-args = 4`, line length 100, target Python 3.12.
+- `bash scripts/mark-test-gate.sh`: pytest over `mark/`, green only when at least one test
+  passed and none was skipped, deselected or xfailed.
+- `python mark/build.py --example` (planned): builds from `local.config.example.json` into a
+  temp directory, so the build is proven without private values. `test_build.py` pins the
   generated output. `mark/dist/` is not committed, so there is nothing to diff.
-- `scripts/preflight.sh` runs all of the above. `.githooks/pre-commit` runs ruff on staged
-  files.
-- Each gate is proven once with a planted violation, recorded in `scripts/prove-gates.sh`
+- `scripts/preflight.sh` runs all of the above after the `tool/` gates (the build gate once
+  `build.py` exists). `.githooks/pre-commit` runs `ruff check` and `ruff format --check` on
+  staged `mark/` Python files.
+- Each gate is proven with a planted violation in `scripts/prove-gates.sh` (a print, five
+  parameters, unformatted code, a skipped test), with a no-op control plant
   ([README.md](README.md) section 5).
 
 ## 7. Security
@@ -226,8 +338,21 @@ Tests import the real modules, so the shipped code and the tested code are the s
   inbox or allow-list addresses, template URL or instance ids. They live in
   `mark/local.config.json` (gitignored); the repo carries `local.config.example.json` with
   placeholders, and `build.py` injects the values into the generated code steps.
-- The email recipient allow-list is enforced in code (*Write and send the report*), never
-  only in a prompt. File contents are data: an address inside a file is never a recipient.
+- **The private values are checked when `_config.py` loads them** (a bad value raises at
+  import, naming no value); the built steps hold the literals:
+  - `allow_list`: a list of valid addresses and a list of bare domains. A domain entry admits
+    everyone at that domain, so never list a public mail provider unless everyone there may
+    receive reports;
+  - `qa_inbox`: a valid address on the allow-list;
+  - `template_url` (`_url.py`): at most 2,000 characters, and exactly `https://`, a host,
+    and an optional path. The host must pass the shared hostname rule (`valid_domain`), so
+    a port, userinfo, or a query or fragment straight after the host is refused. The path is
+    `/` followed only by letters, digits, `. _ ~ ! $ & + , ; = : / ? # -` and `%XX` escapes
+    (no spaces, quotes, `@`, `<` `>`, brackets, braces, backticks, `|` or `*`). The URL may
+    not end in `.` `,` `;` `:` `!` `?` `_` `~`, which a Markdown autolinker drops. It is
+    echoed into messages and the canvas.
+- The email recipient allow-list is enforced in code (`send_email`, section 2), never only in
+  a prompt. File contents are data: an address inside a file is never a recipient.
 - Code steps hold no credentials. Tool auth is configured on the registry, not in steps.
 - Canvas output escapes Markdown table characters so a cell cannot break the report layout.
 - Agents have no side-effecting tools, and verdicts are computed in code.

@@ -70,8 +70,10 @@ names its fix. Use part 1 for `tool/`, part 2 for `mark/`.
 
 ### Running and reading results
 
-- `pnpm test -- <filter>` (inside `tool/`) is a **substring** filter. A filter that matches nothing can still
-  exit 0, so read the count.
+- `pnpm test <filter>` (inside `tool/`) is a **substring** filter. Not
+  `pnpm test -- <filter>`: pnpm passes the `--` on, and Vitest then ignores the filter and
+  runs every file. A filter that matches no file fails (exit 1, "No test files found"); a
+  substring can match more files than you meant, so read the count.
 - **Never pipe a gate into `tail` or `grep` to judge success:** the pipe reports the last
   command's status. Redirect to a file and read the gate's own exit status.
 - A skipped test is a failure in `pnpm test:gate`. Never add a skip guard that stays on.
@@ -138,22 +140,28 @@ Update this table in the same change that adds or renames a support module.
 ### Workflow
 
 1. **Search before you create.** Check `mark/tests/builders.py` and
-   `mark/tests/fakes/opal_tms_sdk/` (planned) before adding a builder or fake behaviour.
+   `mark/tests/fakes/opal_tms_sdk/` before adding a builder or fake behaviour.
    Extend them rather than writing a local copy.
 2. **Touch it, fix it.** A test file you modify meets these rules by the end of your change.
 3. **Test the real module.**
-   - Import the code step module itself (`from mark.code_steps import score`) and call
-     `handler(input, ctx)`.
+   - `conftest.py` puts `mark/code_steps/` and the fake on `sys.path`, so a test imports a
+     module by its own name (`from _shared import call_tool`; a step as `import score`)
+     and calls it (a step through `handler(input, ctx)`).
    - Never re-implement a step's logic inside a test.
-4. **Script the platform through the fake.**
+4. **Script the platform through the fake** (the `fake_tools` fixture, reset per test).
    - `fake_tools.respond("localization_check", ok({...}))` returns a success;
      `fake_tools.respond(..., error(500))` returns
-     `{"response_type": "error", "response": {...}}`, the verified failure shape.
-   - Assert on recorded calls: the name, the parameters, and the call count (one batched
-     call for the whole package, not one per locale).
+     `{"response_type": "error", "response": {...}}`, the verified failure shape; an
+     exception instance (`ToolUnavailableError("...")`) is raised instead.
+   - A call nobody scripted raises `UnscriptedCall`, a `BaseException`, so a misspelt tool
+     name fails the test instead of passing as `unavailable`.
+   - Assert on recorded calls (`fake_tools.calls`): the name, the parameters, and the call
+     count (one batched call for the whole package, not one per locale).
 5. **Prove each new test can fail.** Break the production line, watch the named failure,
    restore from a scratch copy, then `cmp` it. Never restore with git.
-6. **Run** `scripts/preflight.sh` (planned) and read the test count from its output file.
+6. **Run** `bash scripts/mark-test-gate.sh` for the mark tests (it fails on zero tests or
+   any skip), and `scripts/preflight.sh` for every gate; read the test count from the
+   output.
 
 ### What to pin, by step
 
@@ -163,7 +171,12 @@ Update this table in the same change that adds or renames a support module.
 | score | blocker beats incomplete beats warning; missing or malformed review (JSON string accepted, prose or fence -> `not_checked`); echoed locale or checksum mismatch -> `check_incomplete`; `unsupported_locale` -> `check_incomplete`; all clean -> `ready` |
 | report | one template per mode with literal expected text; "Checked against market rules v..." line; fixes re-checked with one call and marked; canvas called with `name`, `content`, `mime_type`; unique canvas name per run; Markdown table characters escaped; email only to an allow-listed `notify_email` |
 | needs_info | every problem with its suggestion; link to the template; no canvas |
-| `_shared` | `call_tool` maps both response shapes; `run_safely` turns an exception into `internal_error` and prints nothing; `facts_checksum` is order-independent for keys |
+| helpers: `_shared` (`test_call_tool.py`, `test_run_safely.py`, `test_fake.py`) | `call_tool`: our tool's token passes through, the body only with `ok`; an error envelope, a non-dict result, an SDK exception, a body `status_code` >= 400 or an unknown token is `unavailable`; tool parameters called `name` or `tool` pass. `run_safely`: an exception, `SystemExit` or a result Mark can't return gives the fallback (default: the templated "re-run" needs-info output), printing nothing |
+| helpers: `_platform`, `_address`, `_url` (`test_platform_tools.py`, `test_csv_attachment.py`, `test_allowed_recipient.py`, `test_address.py`, `test_template_url.py`) | `send_email` counts only `sent` and never calls for a recipient off the allow-list or a subject that isn't one line; `create_canvas` needs an `artifact_url`; `read_csv_attachment` checks the shape before any call and tells each failure status apart; address, domain and template URL rules at their length limits |
+| helpers: `_checksum` (`test_checksum.py`) | the sender fixture's canonical bytes and SHA-256 reproduced; `facts_checksum` is the first 16 hex, ignores key order and normalizes nothing; `None` (never a raise) for data that isn't plain JSON; `json_size` |
+| helpers: `_run_folder` (`test_run_folder.py`, `test_run_binding.py`) | written data reads back with its checksum; a bad run key, file name or data touches nothing; a broken, changed or missing file is `not_checked`; the depth limit never raises or half-writes; `read_verified` and `read_review` fail closed |
+| helpers: `_config` (`test_config.py`) | exactly the keys steps use; the private file's resolution order; each wrong shape raises with its exact message, naming no value |
+| all helpers (`test_import_graph.py`, `test_inlining.py`) | imports: allow-listed standard library, `opal_tms_sdk` and other helpers only, nothing dynamic, no cycle; each module-level name bound in one helper only (the build inlines them into one namespace) |
 | build.py | generated JSON has no local imports, no `print(`, every node positioned, no overlaps, code byte-identical to the built source; `--example` builds without private values |
 
 ### Design rules
