@@ -40,8 +40,10 @@ def test_the_expected_back_translation_has_its_own_cap():
     def master(size):
         return [{"id": "L1", "text": "x" * size}]
 
-    assert size_problems([an_item()], master(29_993)) == []
-    assert problems_of(size_problems([an_item()], master(29_994))) == TOO_LARGE
+    # "[L1] " + text as JSON is the text plus 7; the cap is save_review's budget (58,000)
+    # less the largest review the schema admits (29,720) and 200 for its small keys: 28,080.
+    assert size_problems([an_item()], master(28_073)) == []
+    assert problems_of(size_problems([an_item()], master(28_074))) == TOO_LARGE
 
 
 def test_all_items_together_fit_the_return():

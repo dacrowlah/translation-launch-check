@@ -104,6 +104,18 @@ def test_schema_errors_accepts_a_matching_value():
     assert schema_errors({"fixes": [fix]}, _schema(FIX)) == []
 
 
+TOO_LONG = "longer than the schema allows"
+
+
+def test_schema_errors_enforces_max_items_and_max_length():
+    fix = {"locale": "de-DE", "line_id": "L1", "suggested_text": "x", "fits": True, "note": "n"}
+    long = {**fix, "suggested_text": "x" * 1001}
+    assert schema_errors({"fixes": [long]}, _schema(FIX)) == [
+        f"$.fixes[0].suggested_text: {TOO_LONG}"
+    ]
+    assert schema_errors({"fixes": [fix] * 61}, _schema(FIX)) == [f"$.fixes: {TOO_LONG}"]
+
+
 def test_schema_errors_names_each_mismatch():
     finding = {"line_id": "L1", "check": "style", "severity": "info", "detail": "d", "evidence": 1}
     value = {"locale": "de-DE", "findings": [finding], "rule_checks": [], "extra": True}

@@ -2,8 +2,11 @@
 master lines and, per locale, its lines, flat rule findings and check statuses, plus the
 locale checksum its review must echo. A rule finding that needs a second opinion from
 Translation Review (an unsure finding, or a blocker on a value the tool reads per locale)
-gets a ref: R1, R2, ... per locale. Nothing here raises."""
+gets a ref: R1, R2, ... per locale, for at most as many as the review's schema admits answers
+for (unsure findings first). The rest get no second opinion but still count, as unsent checks.
+Nothing here raises."""
 
+from _budgets import REVIEW_BOUNDS
 from _checksum import locale_checksum
 from _config import PRIVATE
 from _text_problems import header_problem, problem, shown, where_row
@@ -18,10 +21,21 @@ def needs_second_opinion(finding):
     return unsure or (finding["severity"] == "blocker" and finding["check"] in VALUE_CHECKS)
 
 
-def _with_refs(findings):
+def _sent_indexes(findings):
+    """The indexes of the findings sent for a second opinion, in line order."""
     flagged = [index for index, finding in enumerate(findings) if needs_second_opinion(finding)]
-    refs = {index: f"R{number}" for number, index in enumerate(flagged, 1)}
+    ranked = sorted(flagged, key=lambda index: findings[index]["confidence"] != "unsure")
+    return sorted(ranked[: REVIEW_BOUNDS["rule_checks"]])
+
+
+def _with_refs(findings):
+    refs = {index: f"R{number}" for number, index in enumerate(_sent_indexes(findings), 1)}
     return [{**finding, "ref": refs.get(index)} for index, finding in enumerate(findings)]
+
+
+def unsent_checks(findings):
+    """How many findings needed a second opinion but weren't sent for one."""
+    return sum(needs_second_opinion(finding) and not finding["ref"] for finding in findings)
 
 
 def master_lines(pkg):
@@ -39,12 +53,17 @@ def _locale_line(line, locale, tool_line):
     return {"id": line["id"], "text": line["texts"][locale], **found}
 
 
+def _rule_facts(report):
+    findings = _with_refs(flat_findings(report))
+    return {"rule_findings": findings, "unsent_checks": unsent_checks(findings)}
+
+
 def locale_facts(report, pkg):
     locale, by_id = report["locale"], {line["id"]: line for line in report["lines"]}
     lines = [_locale_line(line, locale, by_id.get(line["id"], {})) for line in pkg["lines"]]
-    findings = _with_refs(flat_findings(report))
-    facts = dict(locale=locale, status=report["status"], lines=lines, checks=report["checks"])
-    return dict(facts, rule_findings=findings, checksum=locale_checksum(locale, lines, findings))
+    found = _rule_facts(report)
+    head = dict(locale=locale, status=report["status"], lines=lines, checks=report["checks"])
+    return dict(head, **found, checksum=locale_checksum(locale, lines, found["rule_findings"]))
 
 
 def check_facts(pkg, body, source):

@@ -20,7 +20,8 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "mark" / "code_steps"))
 
-from _checksum import sha256_hex  # noqa: E402
+from _budgets import input_budget  # noqa: E402
+from _checksum import json_size, sha256_hex  # noqa: E402
 from _csv_package import parse_csv  # noqa: E402
 
 CONFIG_FILE = REPO / "mark" / "local.config.json"
@@ -34,6 +35,11 @@ NO_WEBHOOK = (
     "auth_key to mark/local.config.json, as in mark/local.config.example.json. Nothing was sent."
 )
 NO_ANSWER = "No answer from the webhook (network error). Check the run log before sending again."
+# "Read and check the file" gets the payload as its input, and Mark fails a run whose code
+# plus input is too large before any code runs, silently for a webhook: refuse here instead.
+MAX_PAYLOAD_BYTES = input_budget("read_and_check") - 200  # trigger_name and the input's keys
+TOO_LARGE = "The package is {size} bytes as JSON; a webhook run takes at most {limit}. "
+TOO_LARGE += "Split the file by rows. Nothing was sent."
 
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
@@ -121,14 +127,28 @@ def _deliver(payload, config_path, opener):
     return _sent(post(payload, hook, opener))
 
 
+def _too_large(payload):
+    """The refusal for a payload over MAX_PAYLOAD_BYTES (escaped JSON, as the limit is
+    measured), or None."""
+    size, limit = json_size(payload), MAX_PAYLOAD_BYTES
+    return TOO_LARGE.format(size=size, limit=limit) if size > limit else None
+
+
+def _sendable(payload, args, config_path, opener):
+    refusal = _too_large(payload)
+    if refusal:
+        _say(refusal)
+        return 1
+    return _dry_run(payload) if args.dry_run else _deliver(payload, config_path, opener)
+
+
 def send(args, config_path, opener):
-    """Exit code: 0 accepted (HTTP 2xx) or a dry run, 1 the file has problems, 2 no usable
-    webhook config, no answer, or an error or redirect status."""
+    """Exit code: 0 accepted (HTTP 2xx) or a dry run, 1 the file has problems or is too large
+    for a webhook run, 2 no usable webhook config, no answer, or an error or redirect status."""
     package, problems = read_package(args.csv)
     if problems:
         return _rejected(problems)
-    payload = webhook_payload(package)
-    return _dry_run(payload) if args.dry_run else _deliver(payload, config_path, opener)
+    return _sendable(webhook_payload(package), args, config_path, opener)
 
 
 def _parser():

@@ -11,6 +11,7 @@ FILL_IN = "Fill in every cell, or delete the row."
 
 SHOWN_CHARS = 40  # a value from the file is echoed at most this long
 MAX_SHOWN_PROBLEMS = 25  # problems handed to "Ask for a corrected file"; the rest are counted
+PROBLEM_FIELD_CHARS = 300  # each field of a problem handed on, at most
 PROBLEM_WHERE = {"file": "file", "header": "header", "row": "row {number}"}
 PROBLEM_LABELS = {"row": "Row {number}", "campaign": "The campaign name"}
 

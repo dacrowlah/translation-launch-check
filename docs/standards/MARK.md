@@ -37,6 +37,8 @@ mark/                                      the Agent Platform source
   code_steps/_tool_report.py               the tool's report: shape check, flat findings
   code_steps/_check_facts.py               check.json: lines, rule findings, refs, checksums
   code_steps/_loop_items.py                loop items: review and back-translation inputs
+  code_steps/_finding_text.py              "28 of 30 ads_chars", " Expected: ... Found: ..."
+  code_steps/_budgets.py                   code ceilings and code-step input budgets
   code_steps/_review.py                    Translation Review's answer: parsed and bound
   code_steps/_model_output.py              JSON as object or text; model text, shortened
   code_steps/_markdown.py                  md_text(): untrusted text shown as text
@@ -59,13 +61,15 @@ mark/                                      the Agent Platform source
                                            test_*.py (section 5)
 ```
 
-Planned, created as the build proceeds:
+The agents, skills, workflow and build:
 ```
 mark/
-  README.md                                setup (section 3) and the demo cases (section 5)
-  workflow/workflow.json                   steps, triggers, conditions (code by file reference)
-  workflow/layout.json                     canvas node positions (section 4)
-  build.py  _build/{inline,workflow,layout}.py
+  README.md                                setup (section 3) and the demo cases (section 5); planned
+  workflow/workflow.json                   steps, triggers, conditions, canvas positions
+                                           (code steps by code_file; section 4)
+  build.py                                 python mark/build.py [--example] [--out DIR]
+  _build/inline.py  names.py               a step and its helpers as one file; name clashes
+  _build/workflow.py                       the importable workflow; our agents bundled
   dist/                                    generated, importable, gitignored (never hand-edited)
 ```
 
@@ -113,7 +117,16 @@ The platform contract (verified; the evidence and more facts are in the
   classes, so a call can raise too.
 - **Limits:**
   - a code step's input event is at most 75,776 bytes as Mark wraps it; over that, the step
-    fails, is retried 3 times, and the run fails before the code starts;
+    fails, is retried 3 times, and the run fails before the code starts. **The step's own
+    code counts toward that cap** (2026-11, tiny input: 68,200 and 70,700 bytes of code ran;
+    73,200 and more failed with exit_code=-1 and no message). Rule: the JSON-escaped built
+    code plus the escaped input (`json_size`) stays at most 68,000, about 5 KB under the cap.
+    `_budgets.py` holds each step's code ceiling (escaped) and `input_budget(step)` =
+    68,000 - ceiling. The caps derive from the budgets: the back-translation cap is Save the
+    review's budget less the largest review the agent schema admits; the fixer cap keeps
+    the lines' expected fixes (each bounded by the fixer schema) within the report step's
+    budget; problems leave the read step at most 25 (plus a count), each field at most 300
+    characters. The webhook sender refuses a package over Read and check the file's budget;
   - a return is at most 256 KB, and a bigger one silently becomes `null` (docs);
   - the timeout is set per step: default 30 s, at most 300 s (docs).
 - **Loops:** the step after a loop that takes the loop output receives each iteration's full
@@ -201,10 +214,28 @@ Rules:
   listed exactly, or whose domain is exactly a listed domain (case-insensitive; no
   subdomains). Never only in a prompt.
 
-**Build-time inlining** (`build.py`, planned):
+**Build-time inlining** (`build.py`, `_build/inline.py`):
 - A module whose name starts with `_` is never a step.
-- The build inlines every `from _x import a, b` line it finds, recursively and each module
-  once, so the step is one self-contained file.
+- The build inlines every helper a step imports with `from _x import a, b` (one line or a
+  parenthesized multi-line import), transitively, each module once, dependencies first, so
+  the step is one self-contained file.
+- It refuses what would make the built step differ from the tested sources: `import _x`, an
+  aliased or star import of a helper, a helper import inside a function, a relative import,
+  `from __future__`, and a module-level name bound in two of the inlined modules
+  (`_build/names.py`, the same walker `test_inlining.py` and `test_step_names.py` use).
+- It shrinks the built code without changing it: docstrings, comments and blank lines go
+  (an AST round trip; helper imports are dropped from the tree, never by line), indents
+  become one space, non-ASCII is escaped, and the result must parse to the same tree.
+- It also relies on lint rules the gate enforces: E402 (imports at the top, so moving them
+  can't reorder side effects) and A001/A004 (no helper shadows a builtin, which would change
+  it for every inlined module).
+- `build.py` refuses a built step whose JSON-escaped code is over its ceiling
+  (`CODE_CEILINGS`, never above `MAX_CODE_BYTES`, 60,000), so the input budgets hold for the
+  code that ships. It also refuses a webhook trigger whose name differs from the private
+  `webhook_trigger_name`, when the config names one.
+- A real build reads exactly `mark/local.config.json`, never the example and never
+  `TLC_CONFIG`; a missing or incomplete file stops it (exit 2) with a message naming no
+  value. `--example` uses `local.config.example.json`.
 - `_config` is special: the build replaces it with literal `RULES = {...}` and
   `PRIVATE = {...}`. In dev and tests the module reads files:
   - `RULES`: the keys of `tool/config/rules.json` the steps use (`limits`, `master_locale`,
@@ -257,6 +288,11 @@ The authoring format, export fields and import steps: the
 
   The prebuilt Content Translation agent (`translation`) is reused for the back-translation;
   it must be installed and Active (set up in `mark/README.md`).
+- **Agent answers that feed a code step are bounded in their output schemas** (`maxItems`,
+  `maxLength`), and `_budgets.py` holds the same bounds (`REVIEW_BOUNDS`, `FIX_BOUNDS`;
+  `test_budgets.py` pins them equal), because the platform fails a code step whose input is
+  too large before any code runs. Whether Mark enforces `maxItems` and `maxLength` (it
+  enforced keys and enums) is a Task 22 check.
 - **Every agent:**
   - has one job;
   - has a strict JSON output schema;
@@ -320,20 +356,27 @@ The workflow's export format, loops, conditions, triggers and canvas layout: the
     `read_review`, which accepts a review only if it names its locale and echoes that
     locale's checksum;
   - facts handed across steps carry a checksum (section 2).
-- **Pretty canvas: owner requirement.** `mark/workflow/layout.json` gives every node an
-  explicit position:
+- **Pretty canvas: owner requirement.** `agent_metadata.nodes` in `mark/workflow/workflow.json`
+  gives every node an explicit position, hard-coded by this recipe (R118 cut the layout
+  table and its overlap tests):
   - **Main flow** runs top to bottom in one column at `x = 0`, 220 px between rows.
-  - **Branches** fan out horizontally, 360 px between columns, centred under their parent.
+  - **Branches** go to the side: a second column at `x = 440`, so nothing comes closer
+    than 80 px to the loop container (320 px wide).
   - **Loop containers** are sized to fit their children with 40 px padding. Children are
     laid out inside on the same grid.
   - Edges never cross nodes. No two nodes overlap, and no node is closer than 80 px to
     another.
   - Every node has the short, human name from the table above.
   - **Verify visually** after each import: a screenshot of the canvas is checked (kept
-    with the submission materials, outside this repo).
-- **Triggers:** Chat, Webhook and Email. The email trigger's sender filter is set to approved
-  senders only; the webhook has its auth key enabled. Webhook URLs and auth keys are never
-  committed.
+    with the submission materials, outside this repo; Task 22).
+- **Triggers:** Chat and Webhook (Email is deferred, K4). `auth_key` is null in the source
+  and the platform makes the URL. **Set the webhook's auth key in the import dialog's
+  trigger step, before the workflow is activated:** the platform docs say the key can't be
+  edited after the trigger is saved. Then check that a POST without the header is refused.
+  If the key can't be set there, recreate the webhook trigger with its key before
+  activating. Webhook URLs and auth keys are never committed.
+- **The loop's `max_iterations`** comes from `RULES["limits"]["max_targets"]` at build, the
+  same cap "Read and check the file" enforces, so the two can't drift.
 
 ## 5. Testing
 
@@ -357,12 +400,14 @@ The how-to is the [writing-tests skill](../../.claude/skills/writing-tests/SKILL
 - **Literal expectations.** Each new test is proven able to fail: mutate the production line,
   watch it go red, restore from a scratch copy, byte-compare.
 - **Helper structure is pinned:** the import graph and duplicate names (section 2).
-- **`test_build.py` (planned) pins that the generated workflow JSON:**
-  - imports nothing local;
-  - contains no `print(`;
-  - has every node positioned;
-  - has no overlapping nodes;
-  - has every step's code byte-identical to the built source.
+- **The build is pinned** by `test_inline.py` (order, each helper once, multi-line imports,
+  `_config` literals, every refused form), `test_build.py` (the eleven step names, routing
+  on the whole route tokens after code steps, the loop cap, triggers without secrets, every
+  node positioned, loop children relative, code byte-identical to `inline()`, each step's
+  inputs equal to what its code or agent reads, our agents bundled) and
+  `test_built_steps.py` (the CLI, valid Python with a handler, no local imports, no print,
+  only allow-listed imports, the example config injected, no real private value in a
+  tracked file, and the five built steps run end to end on the fake SDK).
 - **End-to-end runs in the instance are the integration test.** Each demo case
   (`mark/README.md`, planned) is run, and the outcome checked in the run log, not only in
   chat text. The run budget is in the plan.
@@ -378,12 +423,15 @@ once with `python3.12 -m venv .venv && .venv/bin/pip install -r mark/requirement
   `max-args = 4`, line length 100, target Python 3.12.
 - `bash scripts/mark-test-gate.sh`: pytest over `mark/`, green only when at least one test
   passed and none was skipped, deselected or xfailed.
-- `python mark/build.py --example` (planned): builds from `local.config.example.json` into a
-  temp directory, so the build is proven without private values. `test_build.py` pins the
+- `python mark/build.py --example`: builds from `local.config.example.json` into a new temp
+  directory, so the build is proven without private values. The tests above pin the
   generated output. `mark/dist/` is not committed, so there is nothing to diff.
-- `scripts/preflight.sh` runs all of the above after the `tool/` gates (the build gate once
-  `build.py` exists). `.githooks/pre-commit` runs `ruff check` and `ruff format --check` on
-  staged `mark/` Python files.
+- `mark/pyproject.toml` sets ruff's `exclude` to ruff 0.17.5's default list minus `_build`:
+  the default silently skipped `mark/_build/`. A prove-gates plant (a `print` in
+  `mark/_build/`) keeps it so.
+- `scripts/preflight.sh` runs all of the above after the `tool/` gates.
+  `.githooks/pre-commit` runs `ruff check` and `ruff format --check` on staged `mark/` Python
+  files.
 - Each gate is proven with a planted violation in `scripts/prove-gates.sh` (a print, five
   parameters, unformatted code, a skipped test), with a no-op control plant
   ([README.md](README.md) section 5).

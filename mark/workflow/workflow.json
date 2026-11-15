@@ -1,0 +1,456 @@
+{
+  "schema_version": "1.3",
+  "agent_type": "workflow",
+  "agent_id": "translation_launch_check",
+  "name": "Translation Launch Check",
+  "description": "Checks a localization CSV (Mark chat) or package (webhook) before launch: every rule check in code via localization_check, a back-translation and a review per language, verdicts computed in code, suggested fixes re-checked, and a templated report with a canvas. A screening aid, not linguistic or legal sign-off.",
+  "version": "",
+  "objective": "",
+  "plan": "",
+  "is_active": true,
+  "is_deleted": false,
+  "internal_version": 1,
+  "workflow_type": "deterministic",
+  "agent_choice": null,
+  "max_iterations": 10,
+  "enable_personal_context": false,
+  "cwd": null,
+  "private_executions": false,
+  "roi_amount": null,
+  "roi_unit": null,
+  "roi_label": null,
+  "triggers": [
+    {
+      "trigger_id": "trigger-chat",
+      "trigger_type": "message",
+      "name": "Chat",
+      "description": "Attach the localization CSV and send @translation_launch_check check this",
+      "is_active": true
+    },
+    {
+      "trigger_id": "trigger-webhook",
+      "trigger_type": "webhook",
+      "name": "Translation Launch Check webhook",
+      "description": "A CMP or scripts/send_package.py posts the package as JSON with its package_sha256",
+      "is_active": true,
+      "priority": "background",
+      "auth_key": null,
+      "auth_header_name": "X-Api-Key",
+      "auth_header_format": "{token}",
+      "payload_content_type": "application/json"
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "step-read",
+      "step_type": "code",
+      "name": "Read and check the file",
+      "description": "Reads the CSV (chat attachment) or the webhook package, checks every rule, runs localization_check once and writes the run folder.",
+      "code_file": "read_and_check.py",
+      "parameters_schema": {
+        "trigger_name": {
+          "type": "predicted",
+          "value": null,
+          "required": true,
+          "value_type": "string",
+          "description": "trigger_context.trigger_name, unchanged"
+        },
+        "webhook_payload": {
+          "type": "predicted",
+          "value": null,
+          "required": false,
+          "value_type": "object",
+          "description": "trigger_context.webhook_payload, unchanged; absent for chat runs; used only on the configured webhook trigger and only when its package_sha256 verifies"
+        }
+      },
+      "next_step_id": "step-usable",
+      "timeout_seconds": 120
+    },
+    {
+      "step_id": "step-usable",
+      "step_type": "condition",
+      "name": "Is the file usable?",
+      "description": "",
+      "conditions": [
+        {
+          "matching_condition": "\\btlc_route_needs_info\\b",
+          "match_type": "regex",
+          "target_step_id": "step-needs-info",
+          "priority": 0,
+          "case_sensitive": true
+        },
+        {
+          "matching_condition": "",
+          "match_type": "else",
+          "target_step_id": "step-loop",
+          "priority": 0,
+          "case_sensitive": false
+        }
+      ],
+      "next_step_id": null,
+      "timeout_seconds": null
+    },
+    {
+      "step_id": "step-needs-info",
+      "step_type": "code",
+      "name": "Ask for a corrected file",
+      "description": "Lists every problem with its suggestion and links the CSV template.",
+      "code_file": "needs_info.py",
+      "parameters_schema": {
+        "problems": {
+          "type": "predicted",
+          "value": null,
+          "required": true,
+          "value_type": "array",
+          "description": "The problems field of the step 'Read and check the file', copied exactly"
+        }
+      },
+      "next_step_id": null,
+      "timeout_seconds": 30
+    },
+    {
+      "step_id": "step-loop",
+      "step_type": "for_loop",
+      "name": "For each language",
+      "description": "Back-translates and reviews each language, then saves the review",
+      "items_source": "locales",
+      "item_name": "locale_item",
+      "max_iterations": null,
+      "parallel": true,
+      "child_steps": [
+        {
+          "step_id": "step-bt",
+          "step_type": "specialized",
+          "name": "Back-translate to English",
+          "description": "",
+          "agent_id": "translation",
+          "parameters_schema": {
+            "content": {
+              "type": "predicted",
+              "value": null,
+              "required": true,
+              "value_type": "string",
+              "description": "The back_translation_input field of the current locale_item, copied exactly, character for character"
+            },
+            "language": {
+              "type": "predicted",
+              "value": null,
+              "required": true,
+              "value_type": "string",
+              "description": "Always exactly the word English."
+            }
+          },
+          "next_step_id": "step-review",
+          "timeout_seconds": 900,
+          "is_interactive": false
+        },
+        {
+          "step_id": "step-review",
+          "step_type": "specialized",
+          "name": "Review the translation",
+          "description": "",
+          "agent_id": "translation_review",
+          "parameters_schema": {
+            "locale": {
+              "type": "predicted",
+              "value": null,
+              "required": true,
+              "value_type": "string",
+              "description": "The locale field of the current locale_item, copied exactly"
+            },
+            "review_input": {
+              "type": "predicted",
+              "value": null,
+              "required": true,
+              "value_type": "string",
+              "description": "The review_input field of the current locale_item, copied exactly, character for character"
+            },
+            "back_translation": {
+              "type": "predicted",
+              "value": null,
+              "required": true,
+              "value_type": "string",
+              "description": "The whole output of the step 'Back-translate to English' for this locale_item, unchanged"
+            },
+            "checksum": {
+              "type": "predicted",
+              "value": null,
+              "required": true,
+              "value_type": "string",
+              "description": "The checksum field of the current locale_item, copied exactly"
+            }
+          },
+          "next_step_id": "step-save",
+          "timeout_seconds": 900,
+          "is_interactive": false
+        },
+        {
+          "step_id": "step-save",
+          "step_type": "code",
+          "name": "Save the review",
+          "description": "Writes this language's two answers to the run folder; never fails.",
+          "code_file": "save_review.py",
+          "parameters_schema": {
+            "run_key": {
+              "type": "predicted",
+              "value": null,
+              "required": true,
+              "value_type": "string",
+              "description": "The run_key field of the step 'Read and check the file', copied exactly"
+            },
+            "locale": {
+              "type": "predicted",
+              "value": null,
+              "required": true,
+              "value_type": "string",
+              "description": "The locale field of the current locale_item, copied exactly"
+            },
+            "checksum": {
+              "type": "predicted",
+              "value": null,
+              "required": true,
+              "value_type": "string",
+              "description": "The checksum field of the current locale_item, copied exactly"
+            },
+            "review": {
+              "type": "predicted",
+              "value": null,
+              "required": true,
+              "value_type": "object",
+              "description": "The whole output of the step 'Review the translation' for this locale_item, unchanged"
+            },
+            "back_translation": {
+              "type": "predicted",
+              "value": null,
+              "required": true,
+              "value_type": "string",
+              "description": "The whole output of the step 'Back-translate to English' for this locale_item, unchanged"
+            }
+          },
+          "next_step_id": null,
+          "timeout_seconds": 60
+        }
+      ],
+      "next_step_id": "step-score",
+      "timeout_seconds": 3600
+    },
+    {
+      "step_id": "step-score",
+      "step_type": "code",
+      "name": "Score each language",
+      "description": "Reads the run folder, binds each review to its language and computes every verdict in code.",
+      "code_file": "score.py",
+      "parameters_schema": {
+        "run_key": {
+          "type": "predicted",
+          "value": null,
+          "required": true,
+          "value_type": "string",
+          "description": "The run_key field of the step 'Read and check the file', copied exactly"
+        },
+        "check_checksum": {
+          "type": "predicted",
+          "value": null,
+          "required": true,
+          "value_type": "string",
+          "description": "The check_checksum field of the step 'Read and check the file', copied exactly"
+        }
+      },
+      "next_step_id": "step-anything",
+      "timeout_seconds": 120
+    },
+    {
+      "step_id": "step-anything",
+      "step_type": "condition",
+      "name": "Anything to fix?",
+      "description": "",
+      "conditions": [
+        {
+          "matching_condition": "\\btlc_route_fix\\b",
+          "match_type": "regex",
+          "target_step_id": "step-fix",
+          "priority": 0,
+          "case_sensitive": true
+        },
+        {
+          "matching_condition": "",
+          "match_type": "else",
+          "target_step_id": "step-report",
+          "priority": 0,
+          "case_sensitive": false
+        }
+      ],
+      "next_step_id": null,
+      "timeout_seconds": null
+    },
+    {
+      "step_id": "step-fix",
+      "step_type": "specialized",
+      "name": "Suggest fixes",
+      "description": "",
+      "agent_id": "translation_fix_suggestions",
+      "parameters_schema": {
+        "fix_input": {
+          "type": "predicted",
+          "value": null,
+          "required": true,
+          "value_type": "string",
+          "description": "The fix_input field of the step 'Score each language', copied exactly, character for character"
+        }
+      },
+      "next_step_id": "step-report",
+      "timeout_seconds": 900,
+      "is_interactive": false
+    },
+    {
+      "step_id": "step-report",
+      "step_type": "code",
+      "name": "Write and send the report",
+      "description": "Reached from both branches (branch join). Re-checks the fixes, saves the canvas, emails the QA inbox on webhook runs, and gives the final answer.",
+      "code_file": "report.py",
+      "parameters_schema": {
+        "run_key": {
+          "type": "predicted",
+          "value": null,
+          "required": false,
+          "value_type": "string",
+          "description": "The run_key field of the step 'Score each language', copied exactly; null or absent when Score could not finish"
+        },
+        "verdict_checksum": {
+          "type": "predicted",
+          "value": null,
+          "required": false,
+          "value_type": "string",
+          "description": "The verdict_checksum field of the step 'Score each language', copied exactly; null or absent when Score could not finish"
+        },
+        "fixes": {
+          "type": "predicted",
+          "value": null,
+          "required": false,
+          "value_type": "object",
+          "description": "The whole output of the step 'Suggest fixes' if it ran in this run, unchanged; absent otherwise"
+        }
+      },
+      "next_step_id": null,
+      "timeout_seconds": 180
+    }
+  ],
+  "specialized_agents": [],
+  "specialized_agents_required": [],
+  "agent_metadata": {
+    "nodes": [
+      {
+        "id": "trigger-chat",
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "id": "trigger-webhook",
+        "position": {
+          "x": 440,
+          "y": 0
+        }
+      },
+      {
+        "id": "step-read",
+        "position": {
+          "x": 0,
+          "y": 220
+        }
+      },
+      {
+        "id": "step-usable",
+        "position": {
+          "x": 0,
+          "y": 440
+        }
+      },
+      {
+        "id": "step-needs-info",
+        "position": {
+          "x": 440,
+          "y": 660
+        }
+      },
+      {
+        "id": "step-loop",
+        "width": 320,
+        "height": 508,
+        "position": {
+          "x": 0,
+          "y": 660
+        }
+      },
+      {
+        "id": "step-bt",
+        "parentId": "step-loop",
+        "position": {
+          "x": 40,
+          "y": 80
+        }
+      },
+      {
+        "id": "step-review",
+        "parentId": "step-loop",
+        "position": {
+          "x": 40,
+          "y": 240
+        }
+      },
+      {
+        "id": "step-save",
+        "parentId": "step-loop",
+        "position": {
+          "x": 40,
+          "y": 400
+        }
+      },
+      {
+        "id": "step-score",
+        "position": {
+          "x": 0,
+          "y": 1388
+        }
+      },
+      {
+        "id": "step-anything",
+        "position": {
+          "x": 0,
+          "y": 1608
+        }
+      },
+      {
+        "id": "step-fix",
+        "position": {
+          "x": 440,
+          "y": 1828
+        }
+      },
+      {
+        "id": "step-report",
+        "position": {
+          "x": 0,
+          "y": 2048
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "trigger-chat-step-read",
+        "source": "trigger-chat",
+        "target": "step-read",
+        "sourceHandle": "source-right",
+        "targetHandle": "target-body"
+      },
+      {
+        "id": "trigger-webhook-step-read",
+        "source": "trigger-webhook",
+        "target": "step-read",
+        "sourceHandle": "source-right",
+        "targetHandle": "target-body"
+      }
+    ]
+  }
+}

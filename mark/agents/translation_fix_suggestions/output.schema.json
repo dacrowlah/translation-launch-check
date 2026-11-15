@@ -22,19 +22,27 @@
             "type": "string"
           },
           "line_id": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 40,
+            "description": "The line id from the input block, e.g. L4. At most 40 characters."
           },
           "suggested_text": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 1000,
+            "description": "The corrected line in the target language. At most 1000 characters."
           },
           "fits": {
             "type": "boolean"
           },
           "note": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 240,
+            "description": "What you changed and why, in one or two sentences. At most 240 characters."
           }
         }
-      }
+      },
+      "maxItems": 60,
+      "description": "One fix per line you were given, at most 60."
     }
   }
 }

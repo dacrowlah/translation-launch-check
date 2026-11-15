@@ -71,3 +71,9 @@ def test_a_tool_failure_is_summarised_as_our_side(fake_tools, tmp_path):
     fake_tools.respond("localization_check", error(500))
     out = run(attach(tmp_path, "bf.csv", a_csv()), trigger_name="Chat")
     assert out["summary"] == "The checks couldn't run."
+
+
+def test_problem_fields_are_shortened_before_they_leave_the_read_step():
+    long = {"where": "w" * 400, "message": "m" * 400, "suggestion": "s" * 400}
+    shown = read_and_check.needs_info_route([long], "Sale")["problems"][0]
+    assert shown == {"where": "w" * 300, "message": "m" * 300, "suggestion": "s" * 300}

@@ -41,10 +41,11 @@ binding docs rather than repeating them.
 
 ## Helpers and the build
 
-- `code_steps/_*.py` are helper modules, never steps. The build (`build.py`, planned;
-  MARK.md section 1) will inline every `from _x import ...` into each step, each module
-  once, so a step is one file (local imports fail in Mark), and will replace `_config` with
-  literal `RULES` and `PRIVATE`.
+- `code_steps/_*.py` are helper modules, never steps. The build (`python mark/build.py
+  [--example] [--out DIR]`; MARK.md sections 1 and 2) inlines every `from _x import ...`
+  into each step, transitively and each module once, so a step is one file (local imports
+  fail in Mark), and replaces `_config` with literal `RULES` and `PRIVATE`. It refuses
+  aliased or plain helper imports and any name bound twice.
 - Because of that, a helper or step imports only the allow-listed standard library modules
   (no network or process module; `os` only in `_config`, which the build replaces),
   `opal_tms_sdk` and other helpers, and each module-level name is bound in one helper only.

@@ -177,20 +177,23 @@ def test_the_verdict_checksum_binds_the_scores_file(fake_tools, tmp_path):
     )
 
 
+INCOMPLETE = {
+    "route": "tlc_route_report",
+    "outcome": "check_incomplete",
+    "run_key": None,
+    "verdict_checksum": None,
+    "fix_input": "",
+    "found": [],
+    "found_total": 0,
+    "summary": "Scored: check_incomplete.",
+}
+
+
 def test_unreadable_facts_report_check_incomplete(fake_tools, tmp_path):
     ctx = a_ctx(tmp_path)
     checked = a_checked_run(fake_tools, ctx)
     out = score.handler({"run_key": checked["run_key"], "check_checksum": "0" * 16}, ctx)
-    assert out == {
-        "route": "tlc_route_report",
-        "outcome": "check_incomplete",
-        "run_key": None,
-        "verdict_checksum": None,
-        "fix_input": "",
-        "found": [],
-        "found_total": 0,
-        "summary": "Scored: check_incomplete.",
-    }
+    assert out == INCOMPLETE
 
 
 def test_the_step_never_fails(tmp_path):

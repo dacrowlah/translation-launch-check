@@ -21,7 +21,7 @@ from _routes import ROUTE_CHECK, ROUTE_NEEDS_INFO, defused
 from _run_folder import CHECK_FILE, new_run_key, run_root, write_run_file
 from _shared import call_tool, run_safely
 from _text import TEXT
-from _text_problems import MAX_SHOWN_PROBLEMS, file_problem, our_side
+from _text_problems import MAX_SHOWN_PROBLEMS, PROBLEM_FIELD_CHARS, file_problem, our_side
 from _tool_report import usable_report
 from _webhook_package import from_webhook
 
@@ -32,10 +32,15 @@ def _summary(problems):
     return TEXT["summary_needs_info"].format(count=len(problems))
 
 
+def _short(problem):
+    return {key: value[:PROBLEM_FIELD_CHARS] for key, value in problem.items()}
+
+
 def needs_info_route(problems, campaign):
-    """At most MAX_SHOWN_PROBLEMS problems and a count of the rest (the needs-info step's
-    input stays small). The campaign is defused: the condition reads this output."""
-    shown = problems[:MAX_SHOWN_PROBLEMS]
+    """At most MAX_SHOWN_PROBLEMS problems, each field at most PROBLEM_FIELD_CHARS, and a
+    count of the rest: the needs-info step's input stays within its budget. The campaign is
+    defused: the condition reads this output."""
+    shown = [_short(problem) for problem in problems[:MAX_SHOWN_PROBLEMS]]
     more = len(problems) - len(shown)
     shown += [file_problem("more_problems", count=more)] if more else []
     head = {"route": ROUTE_NEEDS_INFO, "problems": shown, "campaign": defused(campaign)}

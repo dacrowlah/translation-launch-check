@@ -1,7 +1,8 @@
 import pytest
 
 import read_and_check
-from _fix_input import within_cap
+from _budgets import FIX_BOUNDS
+from _fix_input import expected_fix_bytes, within_cap
 from step_builders import (
     a_checked_run,
     a_ctx,
@@ -126,3 +127,16 @@ def an_entry(master_size):
 def test_fix_input_is_capped_at_the_leading_lines_that_fit():
     entries = [an_entry(20_000), an_entry(20_000), an_entry(20_000), an_entry(10)]
     assert within_cap(entries) == entries[:2]
+
+
+def test_the_fixer_gets_no_more_lines_than_its_schema_admits():
+    # 63 short lines fit both byte caps; the schema admits 60 fixes
+    entries = [an_entry(10) for _ in range(FIX_BOUNDS["fixes"] + 3)]
+    assert within_cap(entries) == entries[: FIX_BOUNDS["fixes"]]
+
+
+def test_a_lines_expected_fix_grows_a_fifth_but_never_past_the_schema_bound():
+    # a 100-character start: a 121-character draft (123 as JSON) plus note, id and keys (400)
+    assert expected_fix_bytes({"start_text": "x" * 100}) == 523
+    # a 1,000-character start: the draft stops at suggested_text's bound of 1,000 characters
+    assert expected_fix_bytes({"start_text": "x" * 1000}) == 1402

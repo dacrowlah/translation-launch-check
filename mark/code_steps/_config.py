@@ -68,10 +68,16 @@ def _checked(private):
     return private
 
 
-def _private(mark_dir=_MARK):
-    full = _load(_private_path(mark_dir))
+def private_values(path):
+    """The checked private values of one file. A missing required key raises KeyError
+    naming the key, never a value; the build uses this on mark/local.config.json."""
+    full = _load(path)
     optional = {key: full.get(key) for key in _OPTIONAL_KEYS}
     return _checked({**{key: full[key] for key in _PRIVATE_KEYS}, **optional})
+
+
+def _private(mark_dir=_MARK):
+    return private_values(_private_path(mark_dir))
 
 
 RULES = _rules()

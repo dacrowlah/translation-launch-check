@@ -11,6 +11,7 @@ import urllib.error
 import pytest
 from send_package import (
     DEMO,
+    MAX_PAYLOAD_BYTES,
     NO_ANSWER,
     NO_WEBHOOK,
     main,
@@ -187,3 +188,29 @@ def test_a_dry_run_prints_the_payload_and_sends_nothing(tmp_path, capsys):
     code = send(tmp_path, opener, [ERRORS_CSV, "--dry-run"])
     printed = json.loads(capsys.readouterr().out)
     assert (code, printed, opener.requests) == (0, webhook_payload(errors_package()), [])
+
+
+def a_large_csv(tmp_path, rows):
+    """A valid CSV of `rows` email bodies with long German text."""
+    lines = [
+        "id,channel,field,en-US,de-DE",
+        *(f"L{n},email,body,Hi,{'Hallo ' * 150}" for n in range(rows)),
+    ]
+    path = tmp_path / "large.csv"
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return str(path)
+
+
+def test_a_package_over_the_webhook_budget_is_refused_and_nothing_sent(tmp_path, capsys):
+    opener = RecordingOpener()
+    code = send(tmp_path, opener, [a_large_csv(tmp_path, 40)])
+    out = capsys.readouterr().out
+    assert (code, opener.requests) == (1, []) and out.startswith("The package is ")
+    tail = f"a webhook run takes at most {MAX_PAYLOAD_BYTES}. Split the file by rows."
+    assert out.endswith(tail + " Nothing was sent.\n")
+
+
+def test_a_package_within_the_budget_is_sent(tmp_path, capsys):
+    opener = RecordingOpener()
+    assert send(tmp_path, opener, [a_large_csv(tmp_path, 20)]) == 0 and len(opener.requests) == 1
+    assert MAX_PAYLOAD_BYTES == 27_800

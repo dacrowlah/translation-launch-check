@@ -50,7 +50,7 @@ SKIPPED=0
 # A gate whose input does not exist yet is reported as skipped, never as passed.
 mark_build() {
   if [ -f "$ROOT/mark/build.py" ]; then
-    run_mark mark-build "$VENV/python" "$ROOT/mark/build.py" --example
+    run_mark mark-build "$VENV/python" "$ROOT/mark/build.py" --example --out "$LOGS/build"
   else
     echo "SKIP mark-build (mark/build.py does not exist)"
     SKIPPED=$((SKIPPED + 1))

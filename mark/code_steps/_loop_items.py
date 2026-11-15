@@ -3,41 +3,25 @@ The review input holds each line's master and translation and the rule findings 
 double-check; the back-translation input is one labelled line per entry. Nothing here
 raises."""
 
+from _budgets import input_budget, review_allowance
 from _checksum import json_size
+from _finding_text import length_text, values_text
 from _text_problems import file_problem
 
 # Caps in json_size bytes (escaped JSON, the largest form, as the platform may count it).
 MAX_AGENT_INPUT_BYTES = 66_000  # one agent step's input; verified intact to about 72 KB
-MAX_ENGLISH_BYTES = 30_000  # the back-translation, into "Save the review" next to the review
+# The back-translation goes into "Save the review" next to the review: what that step's
+# budget leaves after the largest review the schema admits and its small keys (run_key,
+# locale, checksum).
+MAX_ENGLISH_BYTES = input_budget("save_review") - review_allowance() - 200
 MAX_ITEMS_BYTES = 240_000  # this step's return: 256 KB, and run_safely refuses over 250,000
 DOUBLE_CHECK_HEADING = "Rule findings to double-check:"
-
-
-def length_value(length):
-    """ "28 of 30 ads_chars", "12 chars", or "" when the tool gave no length."""
-    if not isinstance(length, dict):
-        return ""
-    limit = length.get("limit")
-    return f"{length.get('value')}{'' if limit is None else f' of {limit}'} {length.get('unit')}"
-
-
-def length_text(length):
-    value = length_value(length)
-    return f"\nLength: {value}" if value else ""
 
 
 def _line_block(master, line):
     head = f"[{master['id']}] {master['channel']}/{master['field']}"
     body = f"\nMaster: {master['text']}\nTranslation: {line['text']}"
     return head + body + length_text(line["length"])
-
-
-def values_text(finding):
-    expected, found = finding["expected"], finding["found"]
-    parts = ([f"Expected: {expected}."] if expected else []) + (
-        [f"Found: {found}."] if found else []
-    )
-    return "".join(" " + part for part in parts)
 
 
 def _double_check_line(finding):

@@ -60,6 +60,10 @@ def _fixes_section(fixes, unfixed):
     return top + ([REPORT["unfixed"].format(count=unfixed)] if unfixed else [])
 
 
+def _unsent_section(count):
+    return [REPORT["unsent"].format(count=count)] if count else []
+
+
 def canvas_line(canvas):
     if not canvas["url"]:
         return REPORT["canvas_failed"]
@@ -99,6 +103,7 @@ def _joined(sections):
 def message(scores, fixes, canvas):
     """Sections separated by blank lines, so Markdown keeps them apart."""
     head = [[overall_line(scores)], [locale_line(scored) for scored in scores["locales"]]]
-    links = [_fixes_section(fixes, scores["unfixed_lines"]), [canvas_line(canvas)]]
+    fixed = _fixes_section(fixes, scores["unfixed_lines"])
+    links = [_unsent_section(scores["unsent_checks"]), fixed, [canvas_line(canvas)]]
     humans = [human_block(scored) for scored in scores["locales"]]
     return _joined([*head, *links, *humans, *([line] for line in closing_lines(scores))])

@@ -6,8 +6,8 @@ import ast
 
 import pytest
 
+from _build.names import clashes
 from builders import CODE_STEPS, a_module_file
-from test_inlining import clashes
 
 STEPS = sorted(path for path in CODE_STEPS.glob("*.py") if not path.name.startswith("_"))
 

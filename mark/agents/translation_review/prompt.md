@@ -101,10 +101,12 @@ section says "none.", `rule_checks` is [].
 # Output
 Return only the JSON object the output schema defines.
 - Copy `locale` and `checksum` exactly: locale [[locale]], checksum [[checksum]].
-- `findings`: one entry per problem, in line order. `line_id` is the block's id ("L3"); a
-  problem that spans lines goes once, on the first line that shows it. `detail` is one or two
-  plain English sentences for a marketer: what changed and why it matters. `evidence` quotes
-  both sides: Master: "..." / Translation: "...".
+- `findings`: one entry per problem. Report at most 20 findings, most severe first
+  (blockers, then warnings, then info), in line order within a severity. `line_id` is the
+  block's id ("L3"); a problem that spans lines goes once, on the first line that shows it.
+  `detail` is one or two plain English sentences for a marketer (at most 240 characters):
+  what changed and why it matters. `evidence` quotes both sides (at most 120 characters):
+  Master: "..." / Translation: "...".
 - No problems: `findings` is []. That means "no issues found by this review", never
   "approved".
 - Never output a verdict, a score or a launch recommendation: code decides those.

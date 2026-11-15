@@ -11,6 +11,8 @@ FAILED=0
 
 mkdir "$SCRATCH/base"
 rsync -a --exclude .vitest.json --exclude .vitest-perf.json "$ROOT/tool/" "$SCRATCH/base/tool/"
+# The demo test reads demo/*.answers.json beside tool/ (Task 21).
+rsync -a "$ROOT/demo/" "$SCRATCH/base/demo/"
 
 # plant <label> <gate script> <expected output regex> <file> <content> [<file 2> <content 2>]
 plant() {
@@ -215,6 +217,11 @@ VENV="$ROOT/.venv/bin"
 mkdir -p "$SCRATCH/mbase/tool"
 rsync -a --exclude __pycache__ "$ROOT/mark/" "$SCRATCH/mbase/mark/"
 rsync -a "$ROOT/tool/config/" "$SCRATCH/mbase/tool/config/"
+# The mark tests import scripts/ (send_package, catch_rate) and read demo/ and the tool's
+# demo fixtures (Task 21).
+rsync -a --exclude __pycache__ "$ROOT/scripts/" "$SCRATCH/mbase/scripts/"
+rsync -a "$ROOT/demo/" "$SCRATCH/mbase/demo/"
+rsync -a "$ROOT/tool/test/fixtures/demo/" "$SCRATCH/mbase/tool/test/fixtures/demo/"
 
 # mark_plant <label> <gate: lint|format|test> <expected output regex> <file under mark/> <content>
 mark_plant() {
@@ -262,6 +269,8 @@ mark_plant mark-print-in-step lint 'T201' code_steps/printing.py \
   'def handler(input, ctx):
     print("hello")
     return {}'
+# The build code too: ruff's default exclude list contains _build (mark/pyproject.toml).
+mark_plant mark-print-in-build lint 'T201' _build/printing.py 'print("x")'
 mark_plant mark-five-params lint 'PLR0913' code_steps/wide.py \
   'def wide(a, b, c, d, e):
     return a'

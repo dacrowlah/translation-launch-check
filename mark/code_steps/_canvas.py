@@ -5,7 +5,7 @@ or a model goes through cell(), which builds on md_text(): Markdown and HTML ren
 "|" can't break a table, and format and control characters are removed. Nothing here
 raises."""
 
-from _loop_items import length_value
+from _finding_text import length_value
 from _markdown import md_text
 from _report_view import (
     closing_lines,

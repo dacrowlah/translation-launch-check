@@ -28,7 +28,9 @@
         ],
         "properties": {
           "line_id": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 40,
+            "description": "The line id from the review input, e.g. L3. At most 40 characters."
           },
           "check": {
             "type": "string",
@@ -49,13 +51,19 @@
             ]
           },
           "detail": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 240,
+            "description": "Plain English for a marketer: what changed and why it matters. At most 240 characters."
           },
           "evidence": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 120,
+            "description": "Short quotes of the master and the translation. At most 120 characters."
           }
         }
-      }
+      },
+      "maxItems": 20,
+      "description": "At most 20 findings: the most important first."
     },
     "rule_checks": {
       "type": "array",
@@ -69,7 +77,9 @@
         ],
         "properties": {
           "finding_id": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 40,
+            "description": "The listed id, e.g. R1. At most 40 characters."
           },
           "opinion": {
             "type": "string",
@@ -80,10 +90,14 @@
             ]
           },
           "reason": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 200,
+            "description": "Why, in one or two sentences. At most 200 characters."
           }
         }
-      }
+      },
+      "maxItems": 20,
+      "description": "One per listed rule finding, at most 20."
     }
   }
 }

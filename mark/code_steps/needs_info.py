@@ -9,18 +9,17 @@ Returns {message, summary}.
 from _config import PRIVATE
 from _report_view import safe
 from _shared import run_safely
-from _text_problems import MAX_SHOWN_PROBLEMS, our_side
+from _text_problems import MAX_SHOWN_PROBLEMS, PROBLEM_FIELD_CHARS, our_side
 from _text_report import NEEDS_INFO
 
 MAX_PROBLEMS = MAX_SHOWN_PROBLEMS + 1  # and the line counting the rest
-MAX_FIELD = 300
 NOT_RUN = {"message": NEEDS_INFO["not_run"], "summary": NEEDS_INFO["not_run_summary"]}
 
 
 def _field(problem, key):
     """One field as shown: one short line, Markdown escaped (it may echo the file)."""
     value = problem.get(key)
-    return safe(value, MAX_FIELD) if isinstance(value, str) else ""
+    return safe(value, PROBLEM_FIELD_CHARS) if isinstance(value, str) else ""
 
 
 def _problem_line(problem):

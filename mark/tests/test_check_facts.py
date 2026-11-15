@@ -1,4 +1,5 @@
 import read_and_check
+from _budgets import REVIEW_BOUNDS
 from _checksum import json_size, locale_checksum
 from _loop_items import review_input
 from _run_folder import read_verified, run_root
@@ -66,6 +67,15 @@ def test_rule_findings_are_flat_and_carry_their_refs(fake_tools, tmp_path):
         ("L1", "numbers", "certain", "R2"),
         ("L2", "formality", "certain", None),
     ]
+
+
+def test_refs_stop_at_the_reviews_bound_unsure_findings_first(fake_tools, tmp_path):
+    bound, unsure = REVIEW_BOUNDS["rule_checks"], a_finding("currency_code", "warning", "unsure")
+    many = {("de-DE", "L1"): [NUMBERS] * (bound + 1), ("de-DE", "L2"): [unsure, FORMALITY]}
+    locale = checked(fake_tools, tmp_path, many)[1]["locales"][0]
+    refs = [finding["ref"] for finding in locale["rule_findings"]]
+    assert refs == [f"R{n}" for n in range(1, bound)] + [None, None, f"R{bound}", None]
+    assert locale["unsent_checks"] == 2
 
 
 def test_a_finding_without_confidence_is_certain(fake_tools, tmp_path):

@@ -2,6 +2,15 @@
 target-version = "py312"
 line-length = 100
 src = [".", "code_steps", "tests"]  # first-party for isort (with _build); fakes stay third-party
+# ruff 0.17.5's default exclude list (ruff check --show-settings), minus "_build": the
+# default would skip mark/_build/ (the build code) without a word. "dist" stays: mark/dist/
+# is generated.
+exclude = [
+  ".bzr", ".direnv", ".eggs", ".git", ".git-rewrite", ".hg", ".ipynb_checkpoints",
+  ".mypy_cache", ".nox", ".pants.d", ".pyenv", ".pytest_cache", ".pytype", ".ruff_cache",
+  ".svn", ".tox", ".venv", ".vscode", "__pypackages__", "buck-out", "dist", "node_modules",
+  "site-packages", "venv",
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "S", "T10", "T20", "A", "PLR0913"]

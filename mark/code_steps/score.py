@@ -53,7 +53,8 @@ def scores_of(check, place):
     locales = [_scored_locale(facts, check, place) for facts in check["locales"]]
     outcome = overall([scored["verdict"] for scored in locales])
     copied = {key: check[key] for key in COPIED}
-    return {**copied, "outcome": outcome, "locales": locales, **_fix_plan(locales)}
+    unsent = {"unsent_checks": sum(facts["unsent_checks"] for facts in check["locales"])}
+    return {**copied, **unsent, "outcome": outcome, "locales": locales, **_fix_plan(locales)}
 
 
 def _scored_output(scores, checksum, run_key):

@@ -1,4 +1,5 @@
 import report
+from _budgets import REVIEW_BOUNDS
 from builders import error
 from report_support import CANVAS_URL, fixed_now, names, write
 from step_builders import (
@@ -60,6 +61,14 @@ def test_the_whole_message_for_one_fixed_language(fake_tools, tmp_path):
     name = f"{CANVAS_NAME} - {scored['run_key'][:6]}"
     message = write(fake_tools, ctx, scored, {"fixes": [a_fix()]})["message"]
     assert message == WHOLE_MESSAGE.format(name=name, url=CANVAS_URL)
+
+
+def test_findings_past_the_second_opinion_bound_are_counted(fake_tools, tmp_path):
+    ctx = a_ctx(tmp_path)
+    many = {("de-DE", "L1"): [NUMBERS] * (REVIEW_BOUNDS["rule_checks"] + 2)}
+    message = write(fake_tools, ctx, a_scored_run(fake_tools, ctx, many))["message"]
+    note = "2 more findings weren't sent for a second opinion (too many for one run)."
+    assert f"\n\n{note}\n\n" in message
 
 
 def test_ready_is_never_called_approved(fake_tools, tmp_path):

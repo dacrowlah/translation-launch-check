@@ -41,6 +41,7 @@ REPORT = {
     "unmatched_one": ", 1 reviewer note couldn't be matched to a line",
     "unmatched": ", {count} reviewer notes couldn't be matched to a line",
     "unfixed": "{count} more lines need a fix but got no suggestion (too many for one run).",
+    "unsent": "{count} more findings weren't sent for a second opinion (too many for one run).",
     "human_more": "- ...and {count} more in the detailed report.",
     "top_fixes": "Top fixes:",
     "fix": "- {locale} {line}: {text} ({status})",

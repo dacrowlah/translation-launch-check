@@ -95,15 +95,21 @@ _JSON_TYPES = {"object": dict, "array": list, "string": str, "boolean": bool}
 def schema_errors(value, schema, path="$"):
     """Where a value breaks an output schema, as "<path>: <problem>" lines; [] when it fits.
     Covers the keywords our agent schemas use: type, properties, required,
-    additionalProperties false, items and enum."""
+    additionalProperties false, items, enum, maxItems and maxLength."""
     kind = schema["type"]
     if not isinstance(value, _JSON_TYPES[kind]):
         return [f"{path}: expected {kind}"]
     if "enum" in schema and value not in schema["enum"]:
         return [f"{path}: {value!r} not in enum"]
+    if isinstance(value, list | str) and len(value) > _max_size(schema):
+        return [f"{path}: longer than the schema allows"]
     if kind == "array":
         return _array_errors(value, schema["items"], path)
     return _object_errors(value, schema, path) if kind == "object" else []
+
+
+def _max_size(schema):
+    return schema.get("maxItems", schema.get("maxLength", float("inf")))
 
 
 def _array_errors(items, item_schema, path):

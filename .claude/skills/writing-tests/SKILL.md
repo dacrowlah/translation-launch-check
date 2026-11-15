@@ -177,7 +177,7 @@ Update this table in the same change that adds or renames a support module.
 | helpers: `_run_folder` (`test_run_folder.py`, `test_run_binding.py`) | written data reads back with its checksum; a bad run key, file name or data touches nothing; a broken, changed or missing file is `not_checked`; the depth limit never raises or half-writes; `read_verified` and `read_review` fail closed |
 | helpers: `_config` (`test_config.py`) | exactly the keys steps use; the private file's resolution order; each wrong shape raises with its exact message, naming no value |
 | all helpers (`test_import_graph.py`, `test_inlining.py`) | imports: allow-listed standard library, `opal_tms_sdk` and other helpers only, nothing dynamic, no cycle; each module-level name bound in one helper only (the build inlines them into one namespace) |
-| build.py | generated JSON has no local imports, no `print(`, every node positioned, no overlaps, code byte-identical to the built source; `--example` builds without private values |
+| build.py | generated JSON has no local imports, no `print(`, every node positioned, code byte-identical to the built source, each step under its code ceiling, the conditions routing real outputs; `--example` builds without private values; a real build stops without a complete `local.config.json` |
 
 ### Design rules
 
