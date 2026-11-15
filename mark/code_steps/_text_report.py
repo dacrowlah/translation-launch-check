@@ -1,5 +1,5 @@
-"""Templates for the report: the chat reply (also the QA-inbox email), the canvas, and the
-corrected-file request. Pure string formatting; values from the file are only ever
+"""Templates for the report: the chat reply and the QA-inbox email (one wording, two styles)
+and the canvas. Pure string formatting; values from the file are only ever
 format arguments. A pass is never called "approved" or "ready to launch"."""
 
 LABELS = {
@@ -46,10 +46,13 @@ REPORT = {
     "top_fixes": "Top fixes:",
     "fix": "- {locale} {line}: {text} ({status})",
     "spelling_fix": "- {locale} {line}: {text} (spelling fix, {status})",
-    "canvas_link": "Detailed report: [{name}]({url})",
+    "markdown_link": "{label}: [{text}]({url})",
+    "plain_link": "{label}: {url}",
+    "canvas_label": "Detailed report",
     "canvas_failed": "The detailed report couldn't be saved; re-run the check to get it.",
-    "corrected_one": "Corrected file (1 fix applied, re-checked): [Download]({url})",
-    "corrected": "Corrected file ({count} fixes applied, re-checked): [Download]({url})",
+    "corrected_one": "Corrected file (1 fix applied, re-checked)",
+    "corrected": "Corrected file ({count} fixes applied, re-checked)",
+    "download": "Download",
     "corrected_failed": "The corrected file couldn't be saved; apply the fixes above by hand.",
     "open_one": "1 line still needs a person.",
     "open": "{count} lines still need a person.",
@@ -92,15 +95,4 @@ CANVAS = {
     "lines_rule": "|---|---|---|---|---|---|---|",
     "back_translation": "### Back-translation",
     "no_back_translation": "No back-translation.",
-}
-
-NEEDS_INFO = {
-    "intro": "Your file needs a few changes before it can be checked:",
-    "problem": "- {where}: {message} {suggestion}",
-    "problem_nowhere": "- {message} {suggestion}",
-    "none": "Your file couldn't be checked. Compare it with the template.",
-    "template": "Template: [CSV template]({url})",
-    "summary": "Asked for a corrected file; problems listed: {count}.",
-    "not_run": "We couldn't check your file right now; please try again.",
-    "not_run_summary": "The checks couldn't run.",
 }

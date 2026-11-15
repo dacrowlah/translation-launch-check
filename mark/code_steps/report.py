@@ -16,7 +16,7 @@ from _campaign import clean_campaign
 from _canvas import render
 from _corrected_file import corrected_file
 from _fixes import rechecked, suggested_fixes
-from _message import message
+from _message import MARKDOWN, PLAIN, message
 from _platform import allowed_recipient, create_canvas, send_email
 from _report_view import label
 from _run_folder import SCORES_FILE, read_verified, run_root
@@ -63,12 +63,18 @@ def _emailed(scores, text):
     return send_email(recipient, _subject(scores), text) if allowed else False
 
 
+def _links(scores, fixes, place):
+    corrected = corrected_file(scores, fixes, place["run_key"])
+    return {"canvas": _canvas(scores, fixes, place), "corrected": corrected}
+
+
 def _delivered(scores, fixes, place):
-    canvas = _canvas(scores, fixes, place)
-    text = message(scores, fixes, canvas, corrected_file(scores, fixes, place["run_key"]))
-    emailed = _emailed(scores, text)
+    """The chat reply in Markdown; the QA-inbox email in plain text, from the same assembly."""
+    links = _links(scores, fixes, place)
+    text = message(scores, fixes, links, MARKDOWN)
+    emailed = _emailed(scores, message(scores, fixes, links, PLAIN))
     note = "\n\n" + REPORT["email_failed"] if scores["notify_email"] and not emailed else ""
-    return _answer(text + note, canvas["url"], emailed, scores["outcome"])
+    return _answer(text + note, links["canvas"]["url"], emailed, scores["outcome"])
 
 
 def _scores(input_, ctx):

@@ -70,10 +70,22 @@ def test_copy_drafts_and_reasons_render_as_text_in_chat_canvas_and_email(fake_to
     fake_tools.respond("localization_check", ok_body(a_tool_report(EVIL["pkg"])))
     out = deliver(fake_tools, ctx, scored, {"fixes": [a_fix(text=EVIL_FIX)]})
     outputs = [out["message"], sent(fake_tools, "create_canvas", "content")]
-    assert [
-        LIVE.findall(shown) for shown in [*outputs, sent(fake_tools, "send_email", "body")]
-    ] == [[], [], []]
+    assert [LIVE.findall(shown) for shown in outputs] == [[], []]
     assert "Jetzt \\[hier klicken\\]\\(https://evil.example/fix\\) gnilleps" in out["message"]
+
+
+def test_hostile_copy_reaches_the_plain_email_as_inert_text(fake_tools, tmp_path):
+    """A plain-text email renders no Markdown: the copy arrives as written, unescaped, with
+    its bidi override removed."""
+    ctx = a_ctx(tmp_path)
+    scored = run(fake_tools, ctx, EVIL)
+    fake_tools.respond("localization_check", ok_body(a_tool_report(EVIL["pkg"])))
+    deliver(fake_tools, ctx, scored, {"fixes": [a_fix(text=EVIL_FIX)]})
+    body = sent(fake_tools, "send_email", "body")
+    assert RLO not in body and "\\" not in body
+    assert "- de-DE L1: Jetzt [hier klicken](https://evil.example/fix) gnilleps (" in body
+    translation = EVIL_COPY.replace(RLO, "")
+    assert f"  - Translation: {translation}" in body and "**fett**" in body
 
 
 def test_unmatched_reviewer_notes_are_said(fake_tools, tmp_path):

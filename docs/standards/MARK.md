@@ -23,7 +23,8 @@ mark/                                      the Agent Platform source
   code_steps/_shared.py                    call_tool, call_platform, run_safely
   code_steps/_routes.py                    route tokens; has_route_word, defused (stdlib only)
   code_steps/_platform.py                  platform-tool helpers: send_email (allow-list),
-                                           create_canvas, write_file, read_csv_attachment
+                                           create_canvas, write_file
+  code_steps/_csv_attachment.py            read_csv_attachment (create_csv_canvas; no step uses it)
   code_steps/_address.py                   email address and allow-list rules
   code_steps/_url.py                       the template URL rule
   code_steps/_checksum.py                  canonical JSON, sha256_hex, facts_checksum,
@@ -43,16 +44,19 @@ mark/                                      the Agent Platform source
   code_steps/_review.py                    Translation Review's answer: parsed and bound
   code_steps/_model_output.py              JSON as object or text; model text, shortened
   code_steps/_agent_output.py              an agent's answer, even inside its execution record
-  code_steps/_markdown.py                  md_text(): untrusted text shown as text
+  code_steps/_markdown.py                  untrusted text shown as text: safe() (Markdown),
+                                           plain() (the email), one_line()
   code_steps/_verdict.py                   verdict_for, overall (code decides every verdict)
   code_steps/_scoring.py                   one language's score
   code_steps/_fixable.py                   which findings a fix addresses; prices never
   code_steps/_fix_input.py                 lines to fix and the fixer's input text
   code_steps/_fixes.py                     suggested fixes and their one re-check call
-  code_steps/_report_view.py  _message.py  the chat reply (also the QA-inbox email)
+  code_steps/_report_view.py  _message.py  the chat reply (Markdown) and the QA-inbox email
+                                           (plain text): one assembly, two styles
   code_steps/_corrected_file.py            the corrected CSV: passing fixes applied, no prices
   code_steps/_canvas.py                    the canvas markdown
-  code_steps/_text.py  _text_problems.py  _text_report.py   every user-facing template
+  code_steps/_text.py  _text_problems.py  _text_report.py  _text_needs_info.py
+                                           every user-facing template
   agents/<agent_id>/                       agent.json, prompt.md, output.schema.json
                                            (translation_review, translation_fix_suggestions)
   skills/market-rules-glossary.template.md the rubric; its <!-- RULES --> marker is rendered
@@ -165,7 +169,7 @@ Rules:
     the same failure shapes. The helpers in `_platform.py` then check that tool's own
     fields: `send_email` counts only `status == "sent"`, `create_canvas` needs an
     `artifact_url`, `write_file` needs `file_metadata.download_link` (not under `data`), and
-    `read_csv_attachment` returns a status with the text.
+    `read_csv_attachment` (`_csv_attachment.py`) returns a status with the text.
   - Never branch on an error's own keys: they differ between tools.
 - **Never raise for expected problems.** Return a status or a route.
   - Each step's handler calls `run_safely(impl, input_, ctx, fallback=None)` from
@@ -183,15 +187,16 @@ Rules:
   (tested).
 - **Return only what downstream needs, as a plain-JSON dict, plus a one-line user-safe
   `summary`.** No diagnostics. Technical detail stays in the tool's own server log.
-- **User-facing text comes only from the templates** in `_text.py`, `_text_problems.py` and
-  `_text_report.py`. Each template is pure string formatting; the report and canvas code
+- **User-facing text comes only from the templates** in `_text.py`, `_text_problems.py`,
+  `_text_report.py` and `_text_needs_info.py`. Each template is pure string formatting; the report and canvas code
   never write prose.
 - **Untrusted text is shown as text.** Copy, the campaign name, the tool's details and the
-  agents' drafts, reasons and notes reach the chat reply, the email and the canvas only
-  through `md_text()` (`_markdown.py`; `safe()` and `cell()` build on it). It escapes
-  Markdown and HTML syntax (links, images, emphasis, headings, tables, tags), removes control
-  and format characters (bidi overrides, zero-width characters), and defuses the route
-  prefix. Every echo of user or model text into a step output goes through `defused()`
+  agents' drafts, reasons and notes reach the chat reply and the canvas only through
+  `md_text()` (`_markdown.py`; `safe()` and `cell()` build on it). It escapes Markdown and
+  HTML syntax (links, images, emphasis, headings, tables, tags), removes control and format
+  characters (bidi overrides, zero-width characters), and defuses the route prefix. The
+  QA-inbox email is plain text, so it gets the same text through `plain_text()` (`plain()`):
+  the controls removed and the route prefix defused, nothing escaped, links as "Label: url". Every echo of user or model text into a step output goes through `defused()`
   (`_routes.py`), so no copy or model text can form a route token.
 - **The parse chain runs outside Mark.** `_csv_package`, `_webhook_package` and `_checksum`,
   and every helper they import, use the standard library only: no `opal_tms_sdk`, no
@@ -259,8 +264,8 @@ Rules:
     the example file. Script-only values (the webhook section) never reach a step;
   - the values are checked at import (section 7). A missing key or a wrong shape raises, with
     a message that names no value.
-- User-facing templates live in `_text.py`, `_text_problems.py` and `_text_report.py`,
-  inlined like any other module.
+- User-facing templates live in `_text.py`, `_text_problems.py`, `_text_report.py` and
+  `_text_needs_info.py`, inlined like any other module.
 - **Tests pin what inlining relies on:**
   - the import graph (`test_import_graph.py`): a helper or step imports only allow-listed
     standard library modules (`csv`, `datetime`, `hashlib`, `io`, `json`, `pathlib`, `re`,
@@ -491,8 +496,9 @@ once with `python3.12 -m venv .venv && .venv/bin/pip install -r mark/requirement
 - The email recipient allow-list is enforced in code (`send_email`, section 2), never only in
   a prompt. File contents are data: an address inside a file is never a recipient.
 - Code steps hold no credentials. Tool auth is configured on the registry, not in steps.
-- Chat, email and canvas output show untrusted text as text (`md_text`, section 2), so a
-  planted link, image or tag can't render and a cell can't break the report layout.
+- Chat and canvas output show untrusted text as text (`md_text`, section 2), and the email
+  is plain text (`plain_text`), so a planted link, image or tag can't render and a cell
+  can't break the report layout.
 - Agents have no side-effecting tools, and verdicts are computed in code.
 - A security review against this section and [TOOL.md](TOOL.md) section 3 runs before
   submission.

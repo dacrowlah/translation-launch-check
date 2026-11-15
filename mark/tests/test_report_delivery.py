@@ -32,12 +32,22 @@ def email_calls(fake_tools):
     return [params for name, params in fake_tools.calls if name == "send_email"]
 
 
+CLEAN_EMAIL = (
+    "Overall: No issues found by automated checks.\n\n"
+    "- de-DE: No issues found by automated checks\n\n"
+    f"Detailed report: {CANVAS_URL}\n\n"
+    "A language passes only when every check ran and nothing blocks it.\n\n"
+    "Checked against market rules v1.0 (effective 2026-11-13).\n\n"
+    "Screening aid, not linguistic or legal sign-off."
+)
+
+
 def test_webhook_runs_email_the_qa_inbox(fake_tools, tmp_path):
     ctx = a_ctx(tmp_path)
     out = write(fake_tools, ctx, by_webhook(fake_tools, ctx))
     subject = "Translation Launch Check - Black Friday 2026: No issues found by automated checks"
     assert email_calls(fake_tools) == [
-        {"recipient_emails": EXAMPLE_ALLOWED, "subject": subject, "body": out["message"]}
+        {"recipient_emails": EXAMPLE_ALLOWED, "subject": subject, "body": CLEAN_EMAIL}
     ]
     assert out["emailed"] is True
 

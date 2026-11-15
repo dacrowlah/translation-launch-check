@@ -28,8 +28,9 @@ binding docs rather than repeating them.
   failure (`unavailable` when the call itself failed). Platform tools only through the
   helpers in `_platform.py`; email only through `send_email`, which enforces the allow-list.
 - **User-facing text only from the templates** (`_text.py`, `_text_problems.py`,
-  `_text_report.py`). Never exception text, tool messages or JSON. Untrusted text (copy,
-  model output) reaches chat, email and canvas only through `md_text()` (`_markdown.py`).
+  `_text_report.py`, `_text_needs_info.py`). Never exception text, tool messages or JSON.
+  Untrusted text (copy, model output) reaches chat and canvas only through `md_text()` and the
+  plain-text email only through `plain_text()` (`_markdown.py`).
 - Return only routes, the run key, checksums and small plain-JSON values; large data goes
   to the run folder (`_run_folder.py`): `check.json` and `scores.json`, each read back only
   against the checksum the step that wrote it handed on, and `reviews/<locale>.json`, read

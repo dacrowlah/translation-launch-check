@@ -4,8 +4,8 @@ import pytest
 
 from _agent_output import agent_answer, agent_text
 from _fix_input import within_cap
+from _markdown import one_line
 from _model_output import model_text
-from _report_view import one_line
 from builders import an_execution_record
 
 
