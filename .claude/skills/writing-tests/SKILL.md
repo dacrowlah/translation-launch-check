@@ -42,12 +42,12 @@ names its fix. Use part 1 for `tool/`, part 2 for `mark/`.
    - Never restore with `git checkout`, `git stash` or `git reset`: they discard
      uncommitted work, and a green run afterwards looks identical.
    - Confirm the mutation landed on code, not a comment.
-6. **Run the gates:** `scripts/preflight.sh` (planned). Read the test count in its output.
+6. **Run the gates:** `scripts/preflight.sh`. Read the test count in its output.
 
 ### Design rules for tests
 
 - **Fakes over mocks.** Use `FakeLanguageDetector`, `FakeClock`,
-  `RecordingLogger` (planned names) instead of `vi.mock` on our own modules.
+  `RecordingLogger` instead of `vi.mock` on our own modules.
   `vi.mock` is allowed only for a third-party module that cannot run in tests, with a
   one-line comment saying why.
 - **One behaviour per test**, named for it: `reports_unsupported_locale_without_findings`.
@@ -75,6 +75,17 @@ names its fix. Use part 1 for `tool/`, part 2 for `mark/`.
 - **Never pipe a gate into `tail` or `grep` to judge success:** the pipe reports the last
   command's status. Redirect to a file and read the gate's own exit status.
 - A skipped test is a failure in `pnpm test:gate`. Never add a skip guard that stays on.
+- `pnpm test:gate` and `pnpm test:perf` run under a wall-clock limit (`scripts/time-limit.mjs`;
+  900 s and 600 s, `TEST_GATE_LIMIT_S` / `TEST_PERF_LIMIT_S`): Vitest cannot stop a test that
+  hangs in synchronous work, so a hang fails the gate instead of stalling it.
+- A test that times work (a scaling test) goes in `tool/test/perf/`. The unit suite leaves
+  that folder out; `pnpm test:perf` runs it one test at a time, as its own preflight gate.
+- A reproduction from a review becomes a row in `tool/test/fixtures/regression/`, in the
+  area and behaviour group it belongs to; a ruled cost goes in a `known_limitation_` group.
+  A `..._has_no_finding` group holds only `[]` rows and a `..._finding` group only rows
+  with a finding (`corpus.test.ts` checks it). Measure a use-case scaling cell from the
+  contract's cell bound up (number-like cells from twice the bound), so fixed per-package work
+  does not hide a quadratic stage. A row's copy appears once in the whole corpus.
 - **Before naming the cause of a failure:** read the exact error, reproduce it, run it
   alone, then read the file's history.
 
@@ -82,11 +93,14 @@ names its fix. Use part 1 for `tool/`, part 2 for `mark/`.
 
 | Path | Provides | Use when |
 |---|---|---|
-| `tool/test/support/rules.ts` | `rawRules()` (parsed real `rules.json`), `testRules()` (`parseRules(rawRules())`) | any test needing rules |
-| (planned) `tool/test/support/clock.ts` | `FAKE_NOW`, `FakeClock` | anything date-dependent (weekday vs date) |
-| (planned) `tool/test/support/language.ts` | `FakeLanguageDetector` (scripted answers, including null) | language check tests |
-| (planned) `tool/test/support/logger.ts` | `RecordingLogger` | asserting what is logged, and that no copy is |
-| (planned) `tool/test/support/builders.ts` | `aPackage`, `aLine` | any test needing inputs |
+| `tool/test/support/rules.ts` | `rawRules()` (parsed real `rules.json`), `testRules()` (one memoized `parseRules(rawRules())` instance, as in production), `testLocale(code)` | any test needing rules; copy (`{ ...testRules() }`) for a test that needs its own pattern cache |
+| `tool/test/support/rows.ts` | `rows(result)`: a check result's findings as `[expected, found]` rows; `numberRows(master, target, locale)`, `dateRows(...)` (dates, numbers and weekday_date_match rows of a pair), `urlRows(...)` (url_params and url_path rows) and `valueRows(...)` (numbers, currency_amount and currency_code rows) | asserting exactly which values a check flagged |
+| `tool/test/support/clock.ts` | `FAKE_NOW`, `FakeClock` | anything date-dependent (weekday vs date) |
+| `tool/test/support/language-detector.ts` | `FakeLanguageDetector` (scripted answers, including null) | language check tests |
+| `tool/test/support/logger.ts` | `RecordingLogger` | asserting what is logged, and that no copy is |
+| `tool/test/support/builders.ts` | `aPackage`, `aLine`, `aPair` (both sides tokenized and resolved, as the use case does), `ctx`, `aDeps(answers)` (the use case's dependencies: real rules, `FakeClock`, scripted `FakeLanguageDetector`), `aDate({ month, day })` (a date token, yearless, no weekday unless given), `tokensOf(locale, text)` (one text, unresolved), `inLocale(extract)(locale, text)` (any extractor in a locale of the real rules), `timesIn(locale, text)` (definite times, candidates, then two-way twelves by default, read as the tokenizer reads it: production's `readable` and `usualTimes`), `linksIn(text)` (links as written), `visibleIn(text)` (`visibleText` under the real rules), `respelled(text, rules?)` (`rewriteVisible` with a fixed word table, so span tests never restate spelling) | any test needing inputs, tokens, a use-case run or span rewriting |
+| `tool/test/support/scaling.ts` | `growth(run, n)` (median CPU time of 4n over n, 5 runs each), `LINEAR_GROWTH` (8; linear is about 4, quadratic 16), `SCALING_TIMEOUT` (60 s), `cpuMs(run)` (CPU time of one run) | proving an operation is linear without a wall-clock bound; such tests live in `tool/test/perf/` and run alone in `pnpm test:perf` |
+| `tool/test/support/corpus.ts` | `valueFindings(locale, master, target)` (one line through `checkLocalization`: the value checks' findings as `[check, expected, found]`, plus the line's `spelling_fix`; throws for a locale that is no target locale, so a row never checks nothing), `corpusAreas()` (the rows of `tool/test/fixtures/regression/*.json`; a file with an empty group, or a group or row written twice, throws), `rowKeys(groups)` (each row's locale, master and target), `corpusGroupsOf(text)` (one file's groups) | the regression corpus: every reproduction a review found, one literal row each |
 
 Update this table in the same change that adds or renames a support module.
 

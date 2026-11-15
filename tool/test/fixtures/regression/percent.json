@@ -1,0 +1,98 @@
+{
+  "a_percentage_kept_by_the_translation_has_no_finding": [
+    ["fr-FR", "Save 20% today!", "\u00c9conomisez 20&nbsp;% aujourd'hui", []],
+    [
+      "de-DE",
+      "<p style=\"margin:0 0 16px 0\">Save 20% on everything&nbsp;&ndash; ends Sunday, Nov 29!</p>",
+      "<p style=\"margin:0 0 16px 0\">Sparen Sie 20&nbsp;% auf alles&nbsp;&ndash; endet am Sonntag, 29. November!</p>",
+      []
+    ],
+    ["de-CH", "Save 20% today", "Sparen Sie heute 20&nbsp;%", []],
+    ["fr-FR", "Save 20% today", "\u00c9conomisez 20&#8239;% aujourd'hui", []],
+    ["de-DE", "Top 5 100% cotton tees", "Top 5 T-Shirts aus 100 % Baumwolle", []],
+    ["de-DE", "Save 30% today", "Sparen Sie heute 30 Prozent", []],
+    ["de-DE", "Save 30 percent today", "Sparen Sie heute 30 %", []],
+    ["ja-JP", "Save 30% today", "\u672c\u65e530\u30d1\u30fc\u30bb\u30f3\u30c8\u30aa\u30d5", []],
+    ["fr-FR", "Save 30% today", "\u00c9conomisez 30 pour cent aujourd'hui", []],
+    ["de-DE", "Save 30 Percent Today", "Sparen Sie heute 30 %", []],
+    ["de-DE", "SAVE 30 PERCENT", "30 % SPAREN", []],
+    ["de-DE", "Save 30%", "SPARE 30 PROZENT", []],
+    ["de-DE", "Get a 20% voucher", "Holen Sie sich einen 20-Prozent-Gutschein", []],
+    ["de-DE", "20% discount", "20-prozentiger Rabatt", []],
+    ["de-DE", "20% discount", "20-%-Rabatt", []],
+    ["de-DE", "Save 20% to 50%", "Sparen Sie 20 bis 50 %", []],
+    ["de-DE", "Save 20%-50%", "Sparen Sie 20-50 %", []],
+    ["de-DE", "Save 20% to 50%", "Sparen Sie 20 bis 50 Prozent", []],
+    ["fr-FR", "Save 20% to 50% off", "\u00c9conomisez de 20 \u00e0 50 %", []],
+    ["ja-JP", "20% to 50% off", "20\uff5e50%\u30aa\u30d5", []],
+    ["en-GB", "20% to 50% off", "20 to 50% off", []],
+    ["de-DE", "Save 20-50%", "Sparen Sie 20 % bis 50 %", []],
+    ["fr-FR", "Save 20-50%", "\u00c9conomisez de 20 % \u00e0 50 %", []],
+    ["ja-JP", "Save 20-50%", "20%\uff5e50%\u30aa\u30d5", []],
+    ["de-DE", "Buy 2 and save 20%", "Kaufen Sie 2 und 20 % sparen", []],
+    ["en-GB", "Buy 2 and 20% off", "Buy 2 and 20% off", []],
+    ["fr-FR", "Buy 2, get 50% off", "Achetez-en 2 - 50 % sur le second", []],
+    ["de-DE", "between 20% and 50%", "zwischen 20 und 50 %", []],
+    ["de-DE", "Cyber Monday 2026: 30% off", "Cyber Monday 2026 \u2013 30 % Rabatt", []],
+    ["fr-FR", "Cyber Monday 2026 \u2013 30% off", "Cyber Monday 2026 : 30 % de remise", []],
+    ["de-DE", "Top 5 deals: 50% off", "Top 5 \u2013 50 % Rabatt", []],
+    ["fr-FR", "Pack of 3: 30% off", "Lot de 3 -30 %", []],
+    ["de-DE", "Day 1: 20% off", "Tag 1 \u2013 20 % Rabatt", []],
+    ["de-DE", "Sizes 36 to 42: 20% off", "Gr\u00f6\u00dfen 36 bis 42 \u2013 20 % Rabatt", []],
+    ["fr-FR", "Pack of 3: 30% off", "Lot de 3 - 30 %", []],
+    ["de-DE", "2 for 20% off", "2 und 20 % Rabatt", []],
+    ["de-DE", "Model 3: 20% off", "Modell 3 - 20 % Rabatt", []],
+    ["de-DE", "Save 20% to 50%", "20 bis 50 % Rabatt", []],
+    ["de-DE", "Between 20% and 50% off", "Zwischen 20 und 50 % Rabatt", []],
+    ["de-DE", "between 20% and 50% off", "zwischen 20 und 50 % Rabatt", []],
+    ["ja-JP", "Over 1,000 items 20% off", "1\u5343\u70b9\u4ee5\u4e0a20%\u30aa\u30d5", []]
+  ],
+  "a_changed_percentage_is_a_finding": [
+    [
+      "fr-FR",
+      "Save 20% today!",
+      "\u00c9conomisez 25&nbsp;% aujourd'hui",
+      [["numbers", "20%", "25%"]]
+    ],
+    ["de-DE", "Save 30% today", "Sparen Sie heute 30 Rabatt", [["numbers", "30%", "30"]]],
+    ["de-DE", "20% discount", "20-Rabatt", [["numbers", "20%", "20"]]],
+    [
+      "de-DE",
+      "Save 20% to 50%",
+      "Sparen Sie 20 bis 50 Rabatt",
+      [
+        ["numbers", "20%", "20"],
+        ["numbers", "50%", "50"]
+      ]
+    ],
+    ["de-DE", "Top 5 \u2013 50 %", "Top 5 \u2013 40 %", [["numbers", "50%", "40%"]]],
+    [
+      "de-DE",
+      "Save 20% to 50%",
+      "20 bis 50 Rabatt",
+      [
+        ["numbers", "20%", "20"],
+        ["numbers", "50%", "50"]
+      ]
+    ]
+  ],
+  "known_limitation_a_number_inside_markup_loses_its_percent_sign": [
+    ["fr-FR", "Save 20%", "\u00c9conomisez <strong>20</strong>&nbsp;%", [["numbers", "20%", "20"]]],
+    ["de-DE", "<span>20%</span> off", "<span>20</span> % Rabatt", [["numbers", "20%", "20"]]]
+  ],
+  "known_limitation_a_japanese_wari_percentage_reads_as_its_digit": [
+    ["ja-JP", "Save 20%", "2\u5272\u5f15\u304d", [["numbers", "20%", "2"]]]
+  ],
+  "known_limitation_a_spaced_range_dash_carries_no_sign": [
+    ["de-DE", "Save 20-50%", "Sparen Sie 20 \u2013 50 %", [["numbers", "20%", "20"]]],
+    ["fr-FR", "Save 20-50%", "\u00c9conomisez 20 - 50 %", [["numbers", "20%", "20"]]],
+    ["de-DE", "Save 20 - 50%", "Sparen Sie 20-50 %", [["numbers", "20", "20%"]]],
+    ["de-DE", "Save 20-50%", "20 \u2013 50 % sparen", [["numbers", "20%", "20"]]],
+    ["de-DE", "Save 20 - 50%", "20\u201350 % sparen", [["numbers", "20", "20%"]]]
+  ],
+  "known_limitation_a_number_before_a_to_word_and_a_discount_takes_its_sign": [
+    ["fr-FR", "2 at 50% off", "2 \u00e0 50 %", [["numbers", "2", "2%"]]],
+    ["de-DE", "From 3, 20% off", "Ab 3 bis 20 % Rabatt", [["numbers", "3", "3%"]]],
+    ["fr-FR", "Buy 1, get 1 at 50% off", "1 achet\u00e9 = 1 \u00e0 50 %", [["numbers", "1", "1%"]]]
+  ]
+}

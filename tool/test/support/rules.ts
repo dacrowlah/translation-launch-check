@@ -8,7 +8,10 @@ const RULES_PATH = new URL("../../config/rules.json", import.meta.url);
 export const rawRules = (): Record<string, unknown> =>
   JSON.parse(readFileSync(RULES_PATH, "utf8")) as Record<string, unknown>;
 
-export const testRules = (): Rules => parseRules(rawRules());
+let parsed: Rules | undefined;
+
+/** One parsed instance for every test, as in production. */
+export const testRules = (): Rules => (parsed ??= parseRules(rawRules()));
 
 /** One locale's rule from the real rules file; throws on an unknown code. */
 export const testLocale = (code: string): LocaleRule => {

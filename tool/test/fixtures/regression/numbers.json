@@ -1,0 +1,78 @@
+{
+  "a_number_kept_by_the_translation_has_no_finding": [
+    ["fr-FR", "Delivery in the south of France", "Livraison dans le Midi", []],
+    ["en-GB", "Only 9.30 left", "Only 9.30 left", []],
+    ["de-DE", "Get 2 100-piece puzzles", "2 Puzzles mit je 100 Teilen", []],
+    ["de-DE", "Pack of 6 250ml bottles", "6 Flaschen \u00e0 250 ml", []],
+    ["de-DE", "Call 0800 123 456", "Rufen Sie 0800-123-456 an", []],
+    [
+      "ja-JP",
+      "Call 0800 123 456",
+      "0800-123-456\u3078\u304a\u96fb\u8a71\u304f\u3060\u3055\u3044",
+      []
+    ],
+    ["fr-FR", "Over 10,000 happy customers", "Plus de 10\u00a0000 clients satisfaits", []],
+    ["fr-FR", "Over 10,000 happy customers", "Plus de 10&nbsp;000 clients satisfaits", []],
+    ["fr-FR", "Over 10,000 happy customers", "Plus de 10&#8239;000 clients satisfaits", []],
+    ["fr-FR", "Over 10,000 happy customers", "Plus de 10\u202f000 clients satisfaits", []],
+    ["de-DE", "Over 10,000 customers", "\u00dcber 10\u00a0000 Kunden", []],
+    ["fr-FR", "Over 10,000 happy customers", "Plus de 10 000 clients satisfaits", []],
+    ["fr-FR", "1,299 pieces in stock", "1 299 pi\u00e8ces en stock", []],
+    ["fr-FR", "Earn 2,500 points", "Gagnez 2 500 points", []],
+    ["de-DE", "Over 10,000 customers", "\u00dcber 10 000 Kunden", []],
+    ["en-GB", "Visit Shop.Example.COM/colors today", "Visit Shop.Example.COM/colors today", []],
+    ["fr-FR", "Win 1,000,000 points", "Gagnez 1\u00a0000 000 points", []],
+    ["de-DE", "20 to 50 off", "20 bis 50 Rabatt", []],
+    ["fr-FR", "1,000,000 points", "1\u00a0000 000 points", []],
+    ["ja-JP", "Up to 10,000 points", "\u6700\u59271\u4e07\u30dd\u30a4\u30f3\u30c8", []],
+    ["ja-JP", "First 10,000 customers", "\u5148\u77401\u4e07\u540d\u69d8", []],
+    ["ja-JP", "10,000 people joined", "1\u4e07\u4eba\u304c\u53c2\u52a0", []],
+    ["ja-JP", "Up to 10,000 points", "\u6700\u59271\u4e07\u30dd\u30a4\u30f3\u30c8\u9084\u5143", []],
+    ["ja-JP", "10,000 people", "1\u4e07\u4eba", []],
+    ["ja-JP", "First 1,000 customers", "\u5148\u77401\u5343\u540d\u69d8", []],
+    [
+      "ja-JP",
+      "Up to 10,000 points, order 123456789012345678901234",
+      "\u6700\u59271\u4e07\u30dd\u30a4\u30f3\u30c8\u3001\u6ce8\u6587123456789012345678901234",
+      []
+    ],
+    [
+      "ja-JP",
+      "Up to 10,000 points",
+      "\u6700\u59271\u4e07000000000000000000000000\u30dd\u30a4\u30f3\u30c8",
+      []
+    ],
+    ["ja-JP", "Up to 100,000,000 points", "\u6700\u59271\u5104\u30dd\u30a4\u30f3\u30c8", []],
+    ["ja-JP", "Our Chiba store", "\u5343\u8449\u5e97", []]
+  ],
+  "a_changed_number_is_a_finding": [
+    ["de-DE", "Save 30 Percent Today", "Sparen Sie heute 30 Rabatt", [["numbers", "30%", "30"]]],
+    [
+      "fr-FR",
+      "Over 10,000 happy customers",
+      "Plus de 10\u00a0500 clients satisfaits",
+      [["numbers", "10000", "10500"]]
+    ],
+    [
+      "fr-FR",
+      "Over 10,000 happy customers",
+      "Plus de 10 500 clients satisfaits",
+      [["numbers", "10000", "10500"]]
+    ],
+    ["fr-FR", "Over 10,000 customers", "Plus de 10 500 clients", [["numbers", "10000", "10500"]]],
+    [
+      "ja-JP",
+      "Up to 10,000 points",
+      "\u6700\u59272\u4e07\u30dd\u30a4\u30f3\u30c8",
+      [["numbers", "10000", "20000"]]
+    ]
+  ],
+  "a_full_width_promo_code_is_a_missing_code_finding": [
+    [
+      "ja-JP",
+      "Code BF26",
+      "\u30b3\u30fc\u30c9\uff22\uff26\uff12\uff16",
+      [["promo_codes", "BF26", null]]
+    ]
+  ]
+}

@@ -12,3 +12,4 @@ mark/local.config.json
 mark/dist/
 .preflight/
 tool/.vitest.json
+tool/.vitest-perf.json

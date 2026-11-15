@@ -1,6 +1,6 @@
 import { makeFinding } from "../finding";
 import type { LanguageDetector } from "../ports/language-detector";
-import type { Rules } from "../rules";
+import type { LocaleRule, Rules } from "../rules";
 import type { Tokens } from "../tokens/tokenize";
 import type { CheckId, CheckResult, Finding, PackageLine } from "../types";
 
@@ -14,6 +14,10 @@ export interface LinePair {
 }
 export interface LocaleContext {
   readonly locale: string;
+  /** The rule of `locale`, resolved once the locale is known to be supported. */
+  readonly rule: LocaleRule;
+  /** The rule of the master locale. */
+  readonly masterRule: LocaleRule;
   readonly rules: Rules;
   readonly today: string;
   readonly detector: LanguageDetector;

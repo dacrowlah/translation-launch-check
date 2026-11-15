@@ -21,11 +21,6 @@ describe("dates", () => {
     expect(r.weekday_date_match?.findings).toEqual([]);
     expect(r.dates?.findings).toEqual([]);
   });
-  it("slash_dates_without_a_year_are_numbers_not_dates", () => {
-    expect(checkDates(aPair("Ends 11/29", "Endet 29/11"), ctx("fr-FR")).dates?.findings).toEqual(
-      [],
-    );
-  });
   it("reordered_tokens_are_not_findings", () => {
     const p = aPair(
       "{{a}} then {{b}}: https://e.com/x on Nov 29 and https://e.com/y on Nov 30",

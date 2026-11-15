@@ -1,5 +1,5 @@
 import type { CheckResult } from "../types";
-import { nextOccurrence, weekdayOf } from "../tokens/calendar";
+import { isoDate, nextOccurrence, weekdayOf } from "../tokens/calendar";
 import type { DateToken } from "../tokens/dates";
 import type { Tokens } from "../tokens/tokenize";
 import {
@@ -11,6 +11,7 @@ import {
   type Row,
   type Spec,
 } from "./compare";
+import { resolvedSides } from "./sides";
 import { tokensWithoutTerms } from "./terms";
 
 export const DATES_DETAIL = "A date or weekday differs from the master.";
@@ -29,16 +30,13 @@ const labels = (tokens: Tokens): string[] => [
   ...tokens.weekdays.map(name),
 ];
 
-const pad = (n: number): string => String(n).padStart(2, "0");
-
-const isoOf = (date: DateToken, today: string): string | null => {
-  if (date.year === null) return nextOccurrence(date.month, date.day, today);
-  const real = new Date(Date.UTC(date.year, date.month - 1, date.day)).getUTCDate() === date.day;
-  return real ? `${date.year}-${pad(date.month)}-${pad(date.day)}` : null;
-};
+const isoDateOf = (date: DateToken, today: string): string | null =>
+  date.year === null
+    ? nextOccurrence(date.month, date.day, today)
+    : isoDate(date.year, date.month, date.day);
 
 const mismatch = (date: DateToken, today: string): Row[] => {
-  const iso = isoOf(date, today);
+  const iso = isoDateOf(date, today);
   const real = iso === null ? date.weekday : weekdayOf(iso);
   return real === date.weekday || real === null ? [] : [[label(date, real), label(date)]];
 };
@@ -57,10 +55,8 @@ const differ = (a: readonly string[], b: readonly string[]): boolean => diffRows
 const datesDiffer = (m: Tokens, t: Tokens): boolean =>
   differ(monthDays(m), monthDays(t)) || (days(m).length > 0 && differ(days(m), days(t)));
 
-const sides = (pair: LinePair, ctx: LocaleContext): [Tokens, Tokens] => [
-  tokensWithoutTerms(pair.masterText, ctx.rules.master_locale, ctx.rules),
-  tokensWithoutTerms(pair.targetText, pair.locale, ctx.rules),
-];
+const sides = (pair: LinePair, ctx: LocaleContext): [Tokens, Tokens] =>
+  resolvedSides(pair.masterText, pair.targetText, ctx, tokensWithoutTerms);
 
 const datesResult = (m: Tokens, t: Tokens, ctx: LocaleContext): CheckResult => {
   const [a, b] = [labels(m), labels(t)];

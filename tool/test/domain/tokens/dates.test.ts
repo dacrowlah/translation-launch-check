@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { extractDates } from "../../../src/domain/tokens/dates";
-import { testLocale, testRules } from "../../support/rules";
+import { extractDates, extractWeekdays } from "../../../src/domain/tokens/dates";
+import { aDate, inLocale } from "../../support/builders";
 
-const read = (locale: string, text: string) => extractDates(text, testLocale(locale), testRules());
-const nov29 = { month: 11, day: 29, year: null, weekday: null };
+const read = inLocale(extractDates);
+const weekdays = (locale: string, text: string) => inLocale(extractWeekdays)(locale, text).weekdays;
+const nov29 = aDate({ month: 11, day: 29 });
 
 describe("extractDates", () => {
   it.each([
@@ -16,7 +17,7 @@ describe("extractDates", () => {
     ["de-CH", "29.11."],
     ["fr-FR", "29 novembre"],
     ["ja-JP", "11\u670829\u65e5"],
-  ])("reads_every_written_form %s %s", (locale, text) => {
+  ])("reads_every_written_form_%#", (locale, text) => {
     expect(read(locale, text).dates).toEqual([nov29]);
   });
 
@@ -35,7 +36,7 @@ describe("extractDates", () => {
     ["en-GB", "29/11/2026"],
     ["fr-FR", "29/11/2026"],
     ["de-DE", "bis 29.11.2026"],
-  ])("reads_a_numeric_date_with_a_year %s %s", (locale, text) => {
+  ])("reads_a_numeric_date_with_a_year_%#", (locale, text) => {
     expect(read(locale, text).dates).toEqual([{ ...nov29, year: 2026 }]);
   });
 
@@ -45,14 +46,20 @@ describe("extractDates", () => {
   });
 
   it.each([
-    ["en-US", "Sale ends 11/29"],
-    ["en-GB", "ends 29/11"],
-    ["en-US", "24/7"],
-    ["fr-FR", "24/7"],
+    ["en-US", "Sale ends 11/29", ["11", "29"]],
+    ["en-GB", "ends 29/11", ["29", "11"]],
+    ["en-US", "24/7", ["24", "7"]],
+    ["fr-FR", "24/7", ["24", "7"]],
+  ])("keeps_a_yearless_slash_form_for_the_pair_%#", (locale, text, numbers) => {
+    const found = read(locale, text);
+    expect([found.dates, found.slashes.map((s) => s.numbers)]).toEqual([[], [numbers]]);
+  });
+
+  it.each([
     ["en-GB", "29.11."],
     ["fr-FR", "29.11."],
-  ])("never_reads_a_date_without_a_year_except_dotted_german %s %s", (locale, text) => {
-    expect(read(locale, text)).toEqual({ dates: [], rest: text });
+  ])("reads_a_dotted_date_only_in_german_%#", (locale, text) => {
+    expect(read(locale, text)).toEqual({ dates: [], slashes: [], rest: text });
   });
 
   it("reads_a_dotted_german_date_in_a_sentence", () => {
@@ -68,8 +75,8 @@ describe("extractDates", () => {
     ["en-GB", "11/29/2026"],
     ["de-DE", "11.29."],
     ["en-US", "32 November"],
-  ])("leaves_an_impossible_numeric_date_alone %s %s", (locale, text) => {
-    expect(read(locale, text)).toEqual({ dates: [], rest: text });
+  ])("leaves_an_impossible_numeric_date_alone_%#", (locale, text) => {
+    expect(read(locale, text)).toEqual({ dates: [], slashes: [], rest: text });
   });
 
   it("does_not_read_may_as_a_date_without_a_day", () => {
@@ -89,7 +96,7 @@ describe("extractDates", () => {
     ["de-DE", "Sonntag, den 29. November"],
     ["en-US", "Sunday the 29th of November"],
     ["fr-FR", "dimanche le 29 novembre"],
-  ])("allows_one_article_after_a_full_weekday %s %s", (locale, text) => {
+  ])("allows_one_article_after_a_full_weekday_%#", (locale, text) => {
     expect(read(locale, text).dates).toEqual([{ ...nov29, weekday: 6 }]);
   });
 
@@ -101,11 +108,47 @@ describe("extractDates", () => {
     "11\u670829\u65e5 \u65e5\u66dc\u65e5",
     "11\u670829\u65e5(\u65e5\u66dc\u65e5)",
     "11\u670829\u65e5\uff08\u65e5\uff09",
-  ])("reads_the_japanese_weekday_suffix %s", (text) => {
+  ])("reads_the_japanese_weekday_suffix_%#", (text) => {
     expect(read("ja-JP", text).dates).toEqual([{ ...nov29, weekday: 6 }]);
   });
 
   it("replaces_each_date_with_one_space", () => {
     expect(read("en-US", "Ends Sunday, Nov 29: sale").rest).toBe("Ends  : sale");
+  });
+});
+
+describe("calendar names: full names stand alone, short forms only touch a date", () => {
+  it.each(["Tues special", "Thurs deals", "Thur only"])(
+    "a_short_form_alone_is_no_weekday_%#",
+    (t) => {
+      expect(weekdays("en-US", t)).toEqual([]);
+    },
+  );
+
+  it("a_full_name_alone_is_a_weekday", () => {
+    expect(weekdays("en-US", "Tuesday special")).toEqual([1]);
+  });
+
+  it("a_short_form_before_a_date_names_its_weekday", () => {
+    expect(read("en-US", "Tues, Nov 24").dates[0]?.weekday).toBe(1);
+    expect(read("de-DE", "Sa, 28.11.").dates[0]?.weekday).toBe(5);
+  });
+
+  it("sonnabend_is_a_full_name_for_saturday", () => {
+    expect(weekdays("de-DE", "Sonnabend ge\u00f6ffnet")).toEqual([5]);
+  });
+});
+
+describe("known limitations", () => {
+  it("known_limitation_top_10_may_deals_reads_as_may_10", () => {
+    expect(read("en-US", "Top 10 May deals").dates).toEqual([
+      { month: 5, day: 10, year: null, weekday: null },
+    ]);
+  });
+
+  it("the_day_first_form_that_limitation_keeps_reads_as_may_10", () => {
+    expect(read("en-GB", "Ends 10 May").dates).toEqual([
+      { month: 5, day: 10, year: null, weekday: null },
+    ]);
   });
 });

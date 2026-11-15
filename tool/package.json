@@ -29,6 +29,7 @@
     "typecheck": "tsc --noEmit",
     "dup": "jscpd",
     "test": "vitest run",
-    "test:gate": "vitest run --reporter=json --outputFile=.vitest.json && node scripts/check-test-report.mjs"
+    "test:gate": "node scripts/time-limit.mjs ${TEST_GATE_LIMIT_S:-900} vitest run --reporter=json --outputFile=.vitest.json && node scripts/check-test-report.mjs",
+    "test:perf": "node scripts/time-limit.mjs ${TEST_PERF_LIMIT_S:-600} vitest run --config vitest.perf.config.ts --reporter=default --reporter=json --outputFile.json=.vitest-perf.json && node scripts/check-test-report.mjs .vitest-perf.json"
   }
 }

@@ -8,7 +8,11 @@ export const CURRENCY_CODE_DETAIL =
 const AMOUNT: Spec = { check: "currency_amount", detail: CURRENCY_AMOUNT_DETAIL };
 const CODE: Spec = { check: "currency_code", detail: CURRENCY_CODE_DETAIL };
 
-const show = (money: Money): string => `${(money.minor / 100).toFixed(2)} ${money.currency}`;
+/** "50" shows as "50.00 USD"; "1.299" keeps its third decimal place. */
+const show = ({ amount, currency }: Money): string => {
+  const [whole, fraction = ""] = amount.split(".");
+  return `${whole}.${fraction.padEnd(2, "0")} ${currency}`;
+};
 
 const codesOf = (moneys: readonly Money[]): string[] => [...new Set(moneys.map((m) => m.currency))];
 const amountsIn = (moneys: readonly Money[], code: string): string[] =>

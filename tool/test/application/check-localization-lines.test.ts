@@ -1,20 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { checkLocalization, type CheckDeps } from "../../src/application/check-localization";
+import { checkLocalization } from "../../src/application/check-localization";
 import type { LocalizationPackage, LocaleReport } from "../../src/domain/types";
-import { aLine, aPackage } from "../support/builders";
-import { FakeClock } from "../support/clock";
-import { FakeLanguageDetector } from "../support/language-detector";
-import { testRules } from "../support/rules";
+import { aDeps, aLine, aPackage } from "../support/builders";
 
-const deps = (): CheckDeps => ({
-  rules: testRules(),
-  clock: new FakeClock(),
-  detector: new FakeLanguageDetector({}),
-});
 const line = (id: string, en: string, de: string) =>
   aLine({ id, texts: { "en-US": en, "de-DE": de } });
 const de = (lines: LocalizationPackage["lines"]): LocaleReport =>
-  checkLocalization(aPackage({ lines }), deps()).locales[0]!;
+  checkLocalization(aPackage({ lines }), aDeps()).locales[0]!;
 
 describe("checkLocalization lines", () => {
   it("plants_a_defect_on_the_second_line_and_finds_only_it", () => {
@@ -56,7 +48,7 @@ describe("checkLocalization lines", () => {
   it("spelling_fix_is_null_when_nothing_changes", () => {
     const texts = { "en-US": "Great sale", "en-GB": "Great sale" };
     const lines = [aLine({ texts })];
-    const report = checkLocalization(aPackage({ locales: ["en-GB"], lines }), deps());
+    const report = checkLocalization(aPackage({ locales: ["en-GB"], lines }), aDeps());
     expect(report.locales[0]!.lines[0]!.spelling_fix).toBe(null);
   });
 });

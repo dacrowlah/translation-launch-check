@@ -1,5 +1,6 @@
 import type { Rules } from "../rules";
-import { dntTerms, termsPattern } from "./terms";
+import { promoPattern } from "../tokens/promo-codes";
+import { dntPattern } from "./terms";
 import { withoutSpans } from "./spans";
 
 const JAPANESE = /[\u3040-\u30ff\u3400-\u9fff\uff66-\uff9f]/gu;
@@ -12,8 +13,8 @@ const wordsOnly = (text: string): string =>
 export const stripForLanguage = (text: string, rules: Rules): string =>
   wordsOnly(
     withoutSpans(text.normalize("NFKC"), rules)
-      .replace(new RegExp(rules.promo_code_pattern, "gu"), " ")
-      .replace(termsPattern(dntTerms(rules)), " "),
+      .replace(promoPattern(rules), " ")
+      .replace(dntPattern(rules), " "),
   );
 
 const count = (text: string, pattern: RegExp): number => (text.match(pattern) ?? []).length;

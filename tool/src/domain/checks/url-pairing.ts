@@ -1,14 +1,14 @@
-import type { Url } from "../tokens/urls";
+import { params, type Url } from "../tokens/urls";
 
 export type UrlPair = [Url | undefined, Url | undefined];
 type Same = (a: Url, b: Url) => boolean;
 interface State {
-  readonly masters: Url[];
-  readonly targets: Url[];
-  readonly pairs: [Url, Url][];
+  readonly masters: readonly Url[];
+  readonly targets: readonly Url[];
+  readonly pairs: readonly (readonly [Url, Url])[];
 }
 
-const queryKey = (url: Url): string => JSON.stringify(Object.entries(url.query).sort());
+const queryKey = (url: Url): string => JSON.stringify(params(url).sort());
 const samePath = (a: Url, b: Url): boolean => a.host === b.host && a.path === b.path;
 
 /** Strongest match first; the last pass pairs whatever is left in order of appearance. */
@@ -19,24 +19,27 @@ const PASSES: readonly Same[] = [
   () => true,
 ];
 
-/** Moves the first target that matches into pairs; false when none does. */
-const claim = (state: State, master: Url, same: Same): boolean => {
-  const at = state.targets.findIndex((target) => same(master, target));
-  const [target] = at < 0 ? [] : state.targets.splice(at, 1);
-  if (target) state.pairs.push([master, target]);
-  return target !== undefined;
-};
+/** The state with this master paired to the first target that matches, or kept unpaired. */
+const claim =
+  (same: Same) =>
+  (state: State, master: Url): State => {
+    const target = state.targets.find((t) => same(master, t));
+    if (target === undefined) return { ...state, masters: [...state.masters, master] };
+    const targets = state.targets.filter((t) => t !== target);
+    return { masters: state.masters, targets, pairs: [...state.pairs, [master, target]] };
+  };
 
-const pass = (state: State, same: Same): State => ({
-  ...state,
-  masters: state.masters.filter((master) => !claim(state, master, same)),
-});
+const pass = (state: State, same: Same): State =>
+  state.masters.reduce(claim(same), { ...state, masters: [] });
+
+const leftovers = (end: State): UrlPair[] => [
+  ...end.masters.map((m): UrlPair => [m, undefined]),
+  ...end.targets.map((t): UrlPair => [undefined, t]),
+];
 
 /** Pairs links in passes (exact, same page and query, same page, then in order). */
 export const pairUrls = (masters: readonly Url[], targets: readonly Url[]): UrlPair[] => {
-  const end = PASSES.reduce(pass, { masters: [...masters], targets: [...targets], pairs: [] });
-  const matched = end.pairs.sort((a, b) => masters.indexOf(a[0]) - masters.indexOf(b[0]));
-  return [...matched, ...end.masters.map((m): UrlPair => [m, undefined])].concat(
-    end.targets.map((t): UrlPair => [undefined, t]),
-  );
+  const end = PASSES.reduce(pass, { masters, targets, pairs: [] });
+  const matched = [...end.pairs].sort((a, b) => masters.indexOf(a[0]) - masters.indexOf(b[0]));
+  return [...matched.map(([m, t]): UrlPair => [m, t]), ...leftovers(end)];
 };

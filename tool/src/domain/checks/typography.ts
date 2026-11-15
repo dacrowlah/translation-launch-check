@@ -7,7 +7,8 @@ export const TYPOGRAPHY_DETAIL = "French spacing is missing before ; : ! ? or in
 
 const TYPOGRAPHY: Spec = { check: "typography", detail: TYPOGRAPHY_DETAIL };
 const NARROW = String.fromCodePoint(0x202f);
-const GAP = "\\s\\u00a0\\u202f";
+/** Whitespace, which includes the no-break and narrow no-break spaces. */
+const GAP = "\\s";
 
 const OPENING = new RegExp(`(\\u00ab)([^${GAP}])`, "gu");
 const CLOSING = new RegExp(`([^${GAP}])(\\u00bb)`, "gu");
@@ -28,7 +29,7 @@ const rowsOf = (text: string, rule: NonNullable<LocaleRule["typography"]>): Row[
 ];
 
 export const checkTypography: LineCheck = (pair, ctx) => {
-  const rule = ctx.rules.locales[pair.locale]?.typography;
+  const rule = ctx.rule.typography;
   const text = withoutSpans(pair.targetText, ctx.rules).replace(/\d{1,2}:\d{2}/gu, " ");
   return resultOf(ctx.rules, TYPOGRAPHY, rule !== undefined, rule ? rowsOf(text, rule) : []);
 };

@@ -111,7 +111,10 @@ use case in `src/application/`.
 Binding rules; the how-to is the `writing-tests` skill
 ([../../.claude/skills/writing-tests/SKILL.md](../../.claude/skills/writing-tests/SKILL.md), part 1).
 
-- **Runner:** Vitest. Test files are `test/**/*.test.ts`, mirroring `src/`.
+- **Runner:** Vitest. Test files are `test/**/*.test.ts`, mirroring `src/`. Two exceptions:
+  scaling tests (they time CPU work) live in `test/perf/` and run only in `pnpm test:perf`;
+  the regression corpus (every reproduction from a review, one row each) is
+  `test/application/regression-corpus.test.ts` over `test/fixtures/regression/*.json`.
 - **Search before you create** a fake, builder, harness or test constant
   (`test/support/`).
 - **Touch it, fix it:** any test file a change modifies is brought up to these rules in the
@@ -151,15 +154,16 @@ the SDK declares `typescript ^5.1.6` and `@types/node ^20`; we use TypeScript 6.
 
 Gates, each proven by a planted violation that turns it red for its named reason:
 
-| Gate              | Command                                            | Catches                                                                                                       |
-| ----------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| Format            | `pnpm format:check`                                | unformatted code (counted lines assume Prettier output)                                                       |
-| Lint              | `pnpm lint`                                        | Metz limits, `no-restricted-imports` per layer, LoD selector, `no-explicit-any`, `Date.now` outside the clock |
-| Waiver directives | `pnpm lint:directives` (`metz-check-directives .`) | waivers without a reason, block disables                                                                      |
-| Typecheck         | `pnpm typecheck`                                   | type errors                                                                                                   |
-| Architecture test | part of `pnpm test` (`test/architecture.test.ts`)  | any import that breaks section 1, in every form (`import`, `import type`, `export from`, dynamic `import()`)  |
-| Duplicates        | `pnpm dup`                                         | large copied blocks fail; small ones are reported for review                                                  |
-| Tests + count     | `pnpm test:gate`                                   | failures, zero tests, skips                                                                                   |
+| Gate              | Command                                            | Catches                                                                                                                               |
+| ----------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Format            | `pnpm format:check`                                | unformatted code (counted lines assume Prettier output)                                                                               |
+| Lint              | `pnpm lint`                                        | Metz limits, `no-restricted-imports` per layer, LoD selector, `no-explicit-any`, `Date.now` outside the clock                         |
+| Waiver directives | `pnpm lint:directives` (`metz-check-directives .`) | waivers without a reason, block disables                                                                                              |
+| Typecheck         | `pnpm typecheck`                                   | type errors                                                                                                                           |
+| Architecture test | part of `pnpm test` (`test/architecture.test.ts`)  | any import that breaks section 1, in every form (`import`, `import type`, `export from`, dynamic `import()`)                          |
+| Duplicates        | `pnpm dup`                                         | large copied blocks fail; small ones are reported for review                                                                          |
+| Tests + count     | `pnpm test:gate`                                   | failures, zero tests, skips; a run over its wall-clock limit (900 s, `scripts/time-limit.mjs`)                                        |
+| Scaling tests     | `pnpm test:perf` (`vitest.perf.config.ts`)         | an operation that grows faster than linearly: time(4n) / time(n) of 8 or more; runs alone, one test at a time; wall-clock limit 600 s |
 
 All commands run inside `tool/`. The root `scripts/preflight.sh` runs them, and the root
 `.githooks/pre-commit` runs format and lint on staged `tool/` files (see

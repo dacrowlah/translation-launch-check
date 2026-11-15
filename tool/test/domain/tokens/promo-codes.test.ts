@@ -4,7 +4,7 @@ import { testRules } from "../../support/rules";
 
 describe("extractPromoCodes", () => {
   it("finds_promo_codes_but_not_words", () => {
-    expect(extractPromoCodes("Code BF30 or CYBER25, not Sale", testRules()).codes).toEqual([
+    expect(extractPromoCodes("Code BF30 or CYBER25, not Sale", testRules()).promoCodes).toEqual([
       "BF30",
       "CYBER25",
     ]);
@@ -15,6 +15,6 @@ describe("extractPromoCodes", () => {
   });
 
   it("ignores_uppercase_words_without_digits", () => {
-    expect(extractPromoCodes("SALE and BF30", testRules()).codes).toEqual(["BF30"]);
+    expect(extractPromoCodes("SALE and BF30", testRules()).promoCodes).toEqual(["BF30"]);
   });
 });

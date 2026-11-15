@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 
-const REPORT = ".vitest.json";
+/** The Vitest JSON report to read: the unit suite's by default, or the one named. */
+const REPORT = process.argv[2] ?? ".vitest.json";
 
 function counts(report) {
   const { numTotalTests, numPassedTests, numFailedTests } = report;

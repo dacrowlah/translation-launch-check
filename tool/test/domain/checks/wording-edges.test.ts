@@ -38,7 +38,7 @@ describe("wording edge cases", () => {
     const base = ctx("fr-FR");
     const rules = { ...base.rules, locales: { ...base.rules.locales, "fr-FR": rule } };
     const pair = aPair("Say hi", "Dites \u00abbonjour\u00bb", "fr-FR");
-    expect(checkTypography(pair, { ...base, rules }).findings).toEqual([]);
+    expect(checkTypography(pair, { ...base, rule, rules }).findings).toEqual([]);
   });
   it("lower_case_zone_codes_do_not_count", () => {
     const pair = aPair("x", "Endet um 23:59 Uhr cet");

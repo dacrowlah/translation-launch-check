@@ -1,107 +1,65 @@
 import type { LocaleRule, Rules } from "../rules";
+import { allNames, fullNames, rangeConnectors, weekdayNames, type Entries } from "./calendar-names";
+import { dotted, SLASHES, weekdayAfter, WEEKDAY_END, written } from "./date-forms";
+import { rangeForms } from "./date-ranges";
+import { listOf, nameKey } from "./per-language";
 import { alternation } from "./regex";
 
-const DAY = String.raw`(?<d>\d{1,2})(?!\d)`;
-const YEAR = String.raw`(?<y>(?:19|20)\d\d)(?!\d)`;
-const SLASHED = String.raw`(?<n1>\d{1,2})/(?<n2>\d{1,2})/${YEAR}(?![/\d])`;
-const DOTTED = String.raw`(?<n1>\d{1,2})\.(?<n2>\d{1,2})\.(?:\s?${YEAR})?(?!\d)`;
-const ARTICLES: Readonly<Record<string, readonly string[]>> = {
-  en: ["the"],
-  de: ["den", "dem"],
-  fr: ["le"],
-};
-const FORMS: Readonly<Record<string, (month: string) => string[]>> = {
-  en: (m) => [
-    String.raw`${m}\.?\s+${DAY}(?:st|nd|rd|th)?(?:,?\s+${YEAR})?`,
-    String.raw`${DAY}(?:st|nd|rd|th)?\s+(?:of\s+)?${m}\.?(?:,?\s+${YEAR})?`,
-  ],
-  de: (m) => [String.raw`${DAY}\.\s*${m}\.?(?:\s+${YEAR})?`],
-  fr: (m) => [String.raw`${DAY}(?:er)?\s+${m}\.?(?:\s+${YEAR})?`],
-  ja: () => [String.raw`(?:${YEAR}\u5e74)?(?<mi>\d{1,2})\u6708${DAY}\u65e5`],
-};
-
-/** Everything tokenizing needs for one language, compiled once from the rules. */
-export interface Compiled {
+/** The date and weekday patterns and name tables of one locale. */
+export interface CalendarPatterns {
   readonly date: RegExp;
   readonly bare: RegExp;
   readonly months: ReadonlyMap<string, number>;
   readonly weekdays: ReadonlyMap<string, number>;
 }
 
-const lookup = (groups: readonly (readonly string[])[], first: number): Map<string, number> =>
-  new Map(
-    groups.flatMap((names, i) => names.map((n) => [n.normalize("NFKC").toLowerCase(), i + first])),
-  );
+const lookup = (entries: Entries, first: number): Map<string, number> =>
+  new Map(entries.flatMap((e, i) => allNames([e]).map((n) => [nameKey(n), i + first])));
 
-const monthPart = (names: readonly string[]): string => `(?<mn>${alternation(names)})(?!\\p{L})`;
+/** A date never starts inside a Latin word or a number; kana or kanji may touch it. */
+const LEAD = String.raw`(?<![\p{Script=Latin}\d])`;
 
-const flat = (table: Readonly<Record<string, readonly (readonly string[])[]>>, l: LocaleRule) =>
-  (table[l.language] ?? []).flat();
-
-const japanese = (locale: LocaleRule): boolean => locale.script === "japanese";
-
-const lead = (locale: LocaleRule): string =>
-  japanese(locale) ? String.raw`(?<!\d)` : String.raw`(?<![\p{L}\d])`;
-
-/** A full name may be followed by one article ("Sonntag, den 29."); a short form must touch the date. */
-const prefix = (names: readonly string[], articles: readonly string[]): string => {
-  const full = alternation(names.filter((n) => n.length > 3));
-  const article = `(?:(?:${alternation(articles)})\\s+)?`;
-  const short = alternation(names.filter((n) => n.length <= 3));
-  return String.raw`(?:(?<wd>${full})(?!\p{L})\.?,?\s+${article}|(?<wd>${short})(?!\p{L})\.?,?\s+)?`;
+/** "Sat-Sun, Nov 28-29": a second weekday, given to the last day of the range. */
+const secondWeekday = (locale: LocaleRule, rules: Rules): string => {
+  const [to, names] = [rangeConnectors(locale, rules), weekdayNames(locale, rules)];
+  return String.raw`(?:\.?\s*(?:${to})\s*(?<w2>${names})(?!\p{L}))?`;
 };
 
-const JA_DAY = String.raw`\u66dc\u65e5`;
+const articleOf = (locale: LocaleRule, rules: Rules): string =>
+  `(?:(?:${alternation(listOf(rules.calendar.articles, locale))})\\s+)?`;
 
-const suffix = (names: readonly string[]): string => {
-  const kanji = names.join("|");
-  return String.raw`(?:\s?(?:[(\uff08](?<ws>${kanji})(?:${JA_DAY})?[)\uff09]|(?<ws>${kanji})${JA_DAY}))?`;
+/** A full name may take one article ("Sonntag, den 29."); a short form must touch the date. */
+const prefix = (locale: LocaleRule, rules: Rules): string => {
+  const days = listOf(rules.calendar.weekdays, locale);
+  const end = `${secondWeekday(locale, rules)}${WEEKDAY_END}`;
+  const full = `(?<wd>${alternation(fullNames(days))})${end}${articleOf(locale, rules)}`;
+  return `(?:${full}|(?<wd>${alternation(days.flatMap((e) => e.short))})${end})?`;
 };
 
-/** Numeric dates: dotted only in German; where "." is the decimal, none may follow a currency. */
-const numeric = (locale: LocaleRule, rules: Rules): string[] => {
-  const currency = alternation(Object.keys(rules.currencies));
-  const forms = locale.language === "de" ? [DOTTED, SLASHED] : [SLASHED];
-  const guard = locale.decimal === "." ? String.raw`(?<!(?:${currency})[ \u00a0\u202f]?)` : "";
-  return forms.map((form) => `${guard}${form}`);
+/** Ranges first, so a range wins over its first date. */
+const dateForms = (locale: LocaleRule, rules: Rules): string => {
+  const forms = [...rangeForms(locale, rules), ...written(locale, rules)];
+  return [...forms, ...dotted(locale, rules), ...SLASHES].join("|");
 };
 
-const forms = (locale: LocaleRule, rules: Rules): string =>
-  [
-    ...(FORMS[locale.language]?.(monthPart(flat(rules.calendar.months, locale))) ?? []),
-    ...numeric(locale, rules),
-  ].join("|");
-
+/** A weekday before the date, or after it where the language writes it there ("(\u65e5)"). */
 const dateSource = (locale: LocaleRule, rules: Rules): string => {
-  const names = flat(rules.calendar.weekdays, locale);
-  const articles = ARTICLES[locale.language] ?? [];
-  const [before, after] = japanese(locale) ? ["", suffix(names)] : [prefix(names, articles), ""];
-  return `${lead(locale)}${before}(?:${forms(locale, rules)})${after}`;
+  const after = weekdayAfter(locale, rules, "ws");
+  const [before, suffix] =
+    after === null ? [prefix(locale, rules), ""] : ["", `(?:\\s?(?:${after}))?`];
+  return `${LEAD}${before}(?:${dateForms(locale, rules)})${suffix}`;
 };
 
+/** A weekday standing alone: a full name only, never a short form like "So" or "Tues". */
 const bareSource = (locale: LocaleRule, rules: Rules): string => {
-  const names = flat(rules.calendar.weekdays, locale);
-  const kanji = names.join("|");
-  if (japanese(locale)) {
-    return String.raw`[(\uff08](?<w>${kanji})(?:${JA_DAY})?[)\uff09]|(?<w>${kanji})${JA_DAY}`;
-  }
-  return String.raw`(?<!\p{L})(?<w>${alternation(names.filter((n) => n.length > 3))})(?!\p{L})`;
+  const days = listOf(rules.calendar.weekdays, locale);
+  const full = String.raw`(?<!\p{L})(?<w>${alternation(fullNames(days))})(?!\p{L})`;
+  return weekdayAfter(locale, rules, "w") ?? full;
 };
 
-const build = (locale: LocaleRule, rules: Rules): Compiled => ({
-  date: new RegExp(dateSource(locale, rules), "giu"),
+export const calendarPatterns = (locale: LocaleRule, rules: Rules): CalendarPatterns => ({
+  date: new RegExp(dateSource(locale, rules), "giud"),
   bare: new RegExp(bareSource(locale, rules), "giu"),
-  months: lookup(rules.calendar.months[locale.language] ?? [], 1),
-  weekdays: lookup(rules.calendar.weekdays[locale.language] ?? [], 0),
+  months: lookup(listOf(rules.calendar.months, locale), 1),
+  weekdays: lookup(listOf(rules.calendar.weekdays, locale), 0),
 });
-
-const cache = new WeakMap<Rules, Map<string, Compiled>>();
-
-/** The compiled patterns and name tables of the locale's language (one build per language). */
-export const compile = (locale: LocaleRule, rules: Rules): Compiled => {
-  const byLanguage = cache.get(rules) ?? new Map<string, Compiled>();
-  cache.set(rules, byLanguage);
-  const compiled = byLanguage.get(locale.language) ?? build(locale, rules);
-  byLanguage.set(locale.language, compiled);
-  return compiled;
-};

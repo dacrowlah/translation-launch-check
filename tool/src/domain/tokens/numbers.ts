@@ -1,28 +1,51 @@
-import type { LocaleRule } from "../rules";
-import { escape, escapeInClass } from "./regex";
+import type { LocaleRule, Rules } from "../rules";
+import { compile } from "./compiled";
+import { normalizeGrouped, normalizeNumber, plainParts, readAmount } from "./number-patterns";
+import { takeWith } from "./take";
 
-const SPACES = "[ \\u00a0\\u202f]";
+/** "10 000": the whole number, or its parts, as the other side of the line decides. */
+export interface Spaced {
+  readonly joined: string;
+  readonly parts: readonly string[];
+}
+type Found = string | Spaced;
 
-/** The digits of one number in the locale: grouped by 3 or plain, optional decimals. */
-export const numberPattern = (locale: LocaleRule, dash = false): string => {
-  const group = `[${locale.group.map(escapeInClass).join("")}]`;
-  const decimals = `(?:${escape(locale.decimal)}(?:\\d+${dash ? "|-" : ""}))?`;
-  return `(?:\\d{1,3}(?:${group}\\d{3})+(?!\\d)|\\d+)${decimals}`;
+/** The range a number starts runs upwards ("20 bis 50 %", never "50 bis 20 %"). */
+const upwards = (m: RegExpExecArray, locale: LocaleRule): boolean => {
+  const [from, to] = [m.groups?.n, m.groups?.rpEnd].map((n) => normalizeNumber(n ?? "", locale));
+  return m.groups?.rp !== undefined && Number(from) <= Number(to);
 };
 
-/** "1.299,00" in de becomes "1299"; ",-" counts as ",00"; trailing fractional zeros are dropped. */
-export const normalizeNumber = (raw: string, locale: LocaleRule): string => {
-  const plain = [...raw].filter((char) => !locale.group.includes(char)).join("");
-  const dotted = plain.replace(locale.decimal, ".").replace(/\.-$/u, ".00");
-  return dotted.replace(/(\.\d*?)0+$/u, "$1").replace(/\.$/u, "");
+/** A sign after the number, or after the end of the range it starts ("20 bis 50 %"). */
+const percentOf = (m: RegExpExecArray, locale: LocaleRule): string =>
+  m.groups?.pct !== undefined || upwards(m, locale) ? "%" : "";
+
+/** The percent sign goes with the whole number and with its last part ("5 100%"). */
+const withPercent = (parts: readonly string[], percent: string): string[] =>
+  parts.map((part, i) => (i === parts.length - 1 ? `${part}${percent}` : part));
+
+const spacedOf = (raw: string, m: RegExpExecArray, locale: LocaleRule): Spaced => {
+  const percent = percentOf(m, locale);
+  const parts = plainParts(raw).map((part) => normalizeNumber(part, locale));
+  const joined = `${normalizeGrouped(raw, locale)}${percent}`;
+  return { joined, parts: withPercent(parts, percent) };
 };
 
-/** Finds numbers (percent signs dropped, never signed); each becomes one space in rest. */
+const foundOf = (m: RegExpExecArray, locale: LocaleRule, rules: Rules): Found => {
+  const spaced = m.groups?.sp;
+  if (spaced !== undefined) return spacedOf(spaced, m, locale);
+  const n = readAmount(m.groups?.n ?? "", m.groups?.x, locale, rules);
+  return `${n}${percentOf(m, locale)}`;
+};
+
+/** Finds numbers ("30%" keeps its sign, without a space; never signed); each becomes a space. */
 export const extractNumbers = (
   text: string,
   locale: LocaleRule,
-): { numbers: string[]; rest: string } => {
-  const pattern = new RegExp(`(${numberPattern(locale)})(?:${SPACES}?%)?`, "gu");
-  const numbers = [...text.matchAll(pattern)].map((m) => normalizeNumber(m[1] ?? "", locale));
-  return { numbers, rest: text.replace(pattern, " ") };
+  rules: Rules,
+): { numbers: string[]; spaced: Spaced[]; rest: string } => {
+  const read = (m: RegExpExecArray) => foundOf(m, locale, rules);
+  const { items, rest } = takeWith(text, compile(locale, rules).numbers, read);
+  const spaced = items.filter((item): item is Spaced => typeof item !== "string");
+  return { numbers: items.filter((item) => typeof item === "string"), spaced, rest };
 };

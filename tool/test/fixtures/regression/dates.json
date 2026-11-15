@@ -1,0 +1,81 @@
+{
+  "a_changed_date_is_a_finding": [
+    [
+      "de-DE",
+      "3/4 sleeves until 11/29",
+      "3/4-\u00c4rmel bis 30.11.",
+      [["dates", "11/29", "11/30"]]
+    ],
+    [
+      "de-DE",
+      "Get 1/2 off. Ends Nov 29",
+      "1/2 Rabatt. Endet 30. Nov.",
+      [["dates", "11/29", "11/30"]]
+    ],
+    [
+      "de-DE",
+      "3/4 sleeves, Nov 27 and Nov 29",
+      "3/4-\u00c4rmel, 29. November",
+      [["dates", "11/27", null]]
+    ],
+    [
+      "de-DE",
+      "Sizes 10/12 - ends Nov 29",
+      "Gr\u00f6\u00dfen 10/12 - endet am 30. November",
+      [["dates", "11/29", "11/30"]]
+    ],
+    [
+      "ja-JP",
+      "Nov 27-30",
+      "11\u670827\u65e5\uff08\u91d1\uff09\uff5e29\u65e5\uff08\u65e5\uff09",
+      [
+        ["dates", "11/27", "11/27 Fri"],
+        ["dates", "11/30", "11/29 Sun"]
+      ]
+    ],
+    ["fr-FR", "Valid May 1-3", "Valable du 1er au 4 mai", [["dates", "5/3", "5/4"]]]
+  ],
+  "a_date_kept_by_the_translation_has_no_finding": [
+    [
+      "ja-JP",
+      "Nov 27-30",
+      "11\u670827\u65e5\uff08\u91d1\uff09\uff5e30\u65e5\uff08\u6708\uff09",
+      []
+    ],
+    [
+      "ja-JP",
+      "For 30 days from Nov 27",
+      "11\u670827\u65e5\u304b\u308930\u65e5\u9593\u9650\u5b9a",
+      []
+    ],
+    [
+      "ja-JP",
+      "7 days only from Nov 27",
+      "11\u670827\u65e5\u304b\u30897\u65e5\u9593\u9650\u5b9a",
+      []
+    ],
+    ["fr-FR", "Rated 4.5/5 by customers", "Not\u00e9 4,5 sur 5 par nos clients", []],
+    ["de-DE", "Rated 4.5/5 by customers", "Mit 4,5 von 5 bewertet", []],
+    ["fr-FR", "Valid May 1-3", "Valable du 1er au 3 mai", []],
+    ["de-DE", "Offer valid Nov 27th-30th", "G\u00fcltig vom 27. bis 30. November", []],
+    ["ja-JP", "Valid Nov 27-30", "11/27\uff5e30\u6709\u52b9", []],
+    ["de-DE", "Valid 11/27-30", "G\u00fcltig vom 27. bis 30. November", []],
+    ["fr-FR", "Nov 27-30", "du 27 au 30/11", []],
+    ["de-DE", "Sat, Nov 28 - Sun, Nov 29", "Sa., 28. - So., 29. November", []],
+    ["de-DE", "Sat-Sun, Nov 28-29", "Sa.-So., 28.-29. November", []],
+    ["de-DE", "Valid 11/27,11/29", "G\u00fcltig 27.11., 29.11.", []],
+    ["de-DE", "Sale.11/29 only", "Sale. Nur 29.11.", []],
+    ["ja-JP", "Valid Fri, Nov 27 - Mon, Nov 30", "11/27(\u91d1)\uff5e30(\u6708)", []]
+  ],
+  "known_limitation_a_cross_month_japanese_range_with_weekdays_is_unread": [
+    [
+      "ja-JP",
+      "Fri, Nov 27 - Thu, Dec 3",
+      "11\u670827\u65e5(\u91d1)\uff5e3\u65e5(\u6728)",
+      [
+        ["numbers", null, "3"],
+        ["dates", "12/3 Thu", "Thu"]
+      ]
+    ]
+  ]
+}

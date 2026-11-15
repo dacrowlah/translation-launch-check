@@ -13,7 +13,7 @@
       "language": "en",
       "script": "latin",
       "decimal": ".",
-      "group": [","],
+      "group": [",", "\u00a0", "\u202f"],
       "formality": "not_applicable",
       "date_order": "mdy"
     },
@@ -21,15 +21,16 @@
       "language": "de",
       "script": "latin",
       "decimal": ",",
-      "group": [".", " ", "\u00a0", "\u202f"],
+      "group": [".", "\u00a0", "\u202f"],
       "formality": "formal",
+      "dotted_dates": true,
       "length_ratio_max": 1.35
     },
     "fr-FR": {
       "language": "fr",
       "script": "latin",
       "decimal": ",",
-      "group": [" ", "\u00a0", "\u202f", "."],
+      "group": ["\u00a0", "\u202f", "."],
       "formality": "formal",
       "length_ratio_max": 1.3,
       "typography": {
@@ -41,7 +42,7 @@
       "language": "ja",
       "script": "japanese",
       "decimal": ".",
-      "group": [","],
+      "group": [",", "\u00a0", "\u202f"],
       "formality": "not_applicable",
       "date_order": "mdy"
     },
@@ -49,7 +50,7 @@
       "language": "en",
       "script": "latin",
       "decimal": ".",
-      "group": [","],
+      "group": [",", "\u00a0", "\u202f"],
       "formality": "not_applicable",
       "date_order": "dmy",
       "length_ratio_max": 1.15
@@ -58,10 +59,12 @@
       "language": "de",
       "script": "latin",
       "decimal": ".",
-      "group": ["'", "\u2019"],
+      "group": ["'", "\u2019", "\u00a0", "\u202f"],
       "formality": "formal",
+      "dotted_dates": true,
       "date_order": "dmy",
-      "length_ratio_max": 1.35
+      "length_ratio_max": 1.35,
+      "currencies": { "Fr.": "CHF" }
     }
   },
   "locale_aliases": {
@@ -301,6 +304,90 @@
     ],
     "ja": ["\\d{1,2}\\u6642", "\\d{1,2}:\\d{2}", "\\u672c\\u65e5\\u9650\\u308a", "\\u6df1\\u591c"]
   },
+  "percent_words": {
+    "en": ["per\\s?cent"],
+    "de": ["Prozent", "prozentig\\p{L}*"],
+    "fr": ["pour\\s?cent"],
+    "ja": ["\\u30d1\\u30fc\\u30bb\\u30f3\\u30c8"]
+  },
+  "percent_range_connectors": {
+    "en": ["[-\\u2013]", "\\s+to\\s+", "(?<=between\\s+\\d+(?:[.,]\\d+)?)\\s+and\\s+"],
+    "de": ["[-\\u2013]", "\\s+bis\\s+", "(?<=zwischen\\s+\\d+(?:[.,]\\d+)?)\\s+und\\s+"],
+    "fr": ["[-\\u2013]", "\\s+\\u00e0\\s+", "(?<=entre\\s+\\d+(?:[.,]\\d+)?)\\s+et\\s+"],
+    "ja": ["[-\\u2013]", "\\s*[~\\u301c]\\s*", "\\s*\\u304b\\u3089\\s*"]
+  },
+  "time_formats": {
+    "en": [
+      "(?<h>\\d{1,2})(?:[:.](?<m>\\d{2}))?\\s?(?:(?<am>a\\.?m\\.?)|(?<pm>p\\.?m\\.?))(?!\\p{L})",
+      "(?<h>\\d{1,2}):(?<m>\\d{2})"
+    ],
+    "de": [
+      "(?<h>\\d{1,2})[:.](?<m>\\d{2})\\s?Uhr(?!\\p{L})",
+      "(?<h>\\d{1,2}):(?<m>\\d{2})",
+      { "pattern": "(?<h>\\d{1,2})\\s?Uhr(?!\\p{L})", "candidate": true }
+    ],
+    "fr": [
+      "(?<h>\\d{1,2})\\s?h\\s?(?<m>\\d{2})(?!\\d)",
+      "(?<h>\\d{1,2}):(?<m>\\d{2})",
+      { "pattern": "(?<h>\\d{1,2})\\s?h(?!\\p{L})", "candidate": true }
+    ],
+    "ja": [
+      "(?:(?<am>\\u5348\\u524d)|(?<pm>\\u5348\\u5f8c))\\s?(?<h>\\d{1,2})\\u6642(?!\\u9593)(?:(?<m>\\d{1,2})\\u5206|(?<half>\\u534a))?",
+      "(?<h>\\d{1,2})\\u6642(?!\\u9593)(?:(?<m>\\d{1,2})\\u5206|(?<half>\\u534a))",
+      "(?<h>\\d{1,2}):(?<m>\\d{2})",
+      { "pattern": "(?<h>\\d{1,2})\\u6642(?!\\u9593)", "candidate": true }
+    ]
+  },
+  "time_range_connectors": {
+    "en": ["-", "\u2013", "to", "and"],
+    "de": ["-", "\u2013", "bis", "und"],
+    "fr": ["-", "\u2013", "\u00e0", "et"],
+    "ja": ["\uff5e", "\u301c", "-", "\u304b\u3089"]
+  },
+  "time_split_separators": { "en": [","], "de": [","], "fr": [","], "ja": [",", "\u3001"] },
+  "time_minute_separators": {
+    "en": [":", "."],
+    "de": [":", "."],
+    "fr": [":", "."],
+    "ja": [":", "."]
+  },
+  "time_start_prefixes": {
+    "ja": "(?:(?<am>\\u5348\\u524d)|(?<pm>\\u5348\\u5f8c))?\\s?"
+  },
+  "number_multiplier_blockers": {
+    "ja": [
+      "\u3007",
+      "\u4e00",
+      "\u4e8c",
+      "\u4e09",
+      "\u56db",
+      "\u4e94",
+      "\u516d",
+      "\u4e03",
+      "\u516b",
+      "\u4e5d",
+      "\u5341",
+      "\u58f1",
+      "\u5f10",
+      "\u53c2",
+      "\u62fe",
+      "\u6570",
+      "\u4f55",
+      "\u5e7e"
+    ]
+  },
+  "number_multipliers": {
+    "ja": { "\u5104": 100000000, "\u4e07": 10000, "\u5343": 1000, "\u767e": 100 }
+  },
+  "twelve_oclock": {
+    "ja": { "am": [12, 0], "pm": [0, 12] }
+  },
+  "time_words": {
+    "en": { "midnight": "00:00", "noon": "12:00", "midday": "12:00" },
+    "de": { "Mitternacht": "00:00", "Mittag": "12:00" },
+    "fr": { "minuit": "00:00", "midi": "12:00" },
+    "ja": { "\u6b63\u5348": "12:00" }
+  },
   "time_zones": [
     "CET",
     "CEST",
@@ -321,7 +408,7 @@
     "\u65e5\u672c\u6642\u9593"
   ],
   "merge_tag_patterns": ["\\{\\{[^{}]+\\}\\}", "\\*\\|[A-Z0-9_]+\\|\\*", "%%[A-Za-z0-9_]+%%"],
-  "promo_code_pattern": "\\b[A-Z]{2,}[0-9]{1,4}\\b",
+  "promo_code_pattern": "\\b[A-Z]{2,}[0-9]{1,4}\\b(?![:.]\\d)",
   "artifact_patterns": ["\\[\\[[^\\]]*\\]\\]", "\\{skill:"],
   "artifact_phrases": [
     "(at least one needed)",
@@ -330,6 +417,12 @@
     "Here is the translation",
     "Translated text:"
   ],
+  "date_range_connectors": {
+    "en": ["-", "\u2013", "to", "through", "thru"],
+    "de": ["-", "\u2013", "bis", "bis zum"],
+    "fr": ["au", "-", "\u2013"],
+    "ja": ["\uff5e", "\u301c", "-", "\u304b\u3089"]
+  },
   "currencies": {
     "$": "USD",
     "US$": "USD",
@@ -341,84 +434,113 @@
     "\u00a5": "JPY",
     "\uffe5": "JPY",
     "\u5186": "JPY",
+    "\u30c9\u30eb": "USD",
     "JPY": "JPY",
-    "CHF": "CHF",
-    "Fr.": "CHF"
+    "yen": "JPY",
+    "yens": "JPY",
+    "CHF": "CHF"
   },
   "calendar": {
     "months": {
       "en": [
-        ["January", "Jan"],
-        ["February", "Feb"],
-        ["March", "Mar"],
-        ["April", "Apr"],
-        ["May"],
-        ["June", "Jun"],
-        ["July", "Jul"],
-        ["August", "Aug"],
-        ["September", "Sep", "Sept"],
-        ["October", "Oct"],
-        ["November", "Nov"],
-        ["December", "Dec"]
+        { "full": ["January"], "short": ["Jan"] },
+        { "full": ["February"], "short": ["Feb"] },
+        { "full": ["March"], "short": ["Mar"] },
+        { "full": ["April"], "short": ["Apr"] },
+        { "full": ["May"], "short": [] },
+        { "full": ["June"], "short": ["Jun"] },
+        { "full": ["July"], "short": ["Jul"] },
+        { "full": ["August"], "short": ["Aug"] },
+        { "full": ["September"], "short": ["Sep", "Sept"] },
+        { "full": ["October"], "short": ["Oct"] },
+        { "full": ["November"], "short": ["Nov"] },
+        { "full": ["December"], "short": ["Dec"] }
       ],
       "de": [
-        ["Januar", "Jan"],
-        ["Februar", "Feb"],
-        ["M\u00e4rz", "Mrz", "M\u00e4r"],
-        ["April", "Apr"],
-        ["Mai"],
-        ["Juni", "Jun"],
-        ["Juli", "Jul"],
-        ["August", "Aug"],
-        ["September", "Sep", "Sept"],
-        ["Oktober", "Okt"],
-        ["November", "Nov"],
-        ["Dezember", "Dez"]
+        { "full": ["Januar"], "short": ["Jan"] },
+        { "full": ["Februar"], "short": ["Feb"] },
+        { "full": ["M\u00e4rz"], "short": ["Mrz", "M\u00e4r"] },
+        { "full": ["April"], "short": ["Apr"] },
+        { "full": ["Mai"], "short": [] },
+        { "full": ["Juni"], "short": ["Jun"] },
+        { "full": ["Juli"], "short": ["Jul"] },
+        { "full": ["August"], "short": ["Aug"] },
+        { "full": ["September"], "short": ["Sep", "Sept"] },
+        { "full": ["Oktober"], "short": ["Okt"] },
+        { "full": ["November"], "short": ["Nov"] },
+        { "full": ["Dezember"], "short": ["Dez"] }
       ],
       "fr": [
-        ["janvier", "janv"],
-        ["f\u00e9vrier", "f\u00e9vr"],
-        ["mars"],
-        ["avril", "avr"],
-        ["mai"],
-        ["juin"],
-        ["juillet", "juil"],
-        ["ao\u00fbt"],
-        ["septembre", "sept"],
-        ["octobre", "oct"],
-        ["novembre", "nov"],
-        ["d\u00e9cembre", "d\u00e9c"]
+        { "full": ["janvier"], "short": ["janv"] },
+        { "full": ["f\u00e9vrier"], "short": ["f\u00e9vr"] },
+        { "full": ["mars"], "short": [] },
+        { "full": ["avril"], "short": ["avr"] },
+        { "full": ["mai"], "short": [] },
+        { "full": ["juin"], "short": [] },
+        { "full": ["juillet"], "short": ["juil"] },
+        { "full": ["ao\u00fbt"], "short": [] },
+        { "full": ["septembre"], "short": ["sept"] },
+        { "full": ["octobre"], "short": ["oct"] },
+        { "full": ["novembre"], "short": ["nov"] },
+        { "full": ["d\u00e9cembre"], "short": ["d\u00e9c"] }
       ]
+    },
+    "ordinals": { "en": ["st", "nd", "rd", "th"], "fr": ["er"] },
+    "articles": { "en": ["the"], "de": ["den", "dem"], "fr": ["le"] },
+    "date_forms": {
+      "en": [
+        "{month}\\.?\\s+{day}{ordinal}(?:,?\\s+{year})?",
+        "{day}{ordinal}\\s+(?:of\\s+)?{month}\\.?(?:,?\\s+{year})?"
+      ],
+      "de": ["{day}\\.\\s*{month}\\.?(?:\\s+{year})?"],
+      "fr": ["{day}{ordinal}\\s+{month}\\.?(?:\\s+{year})?"],
+      "ja": ["(?:{year}\\u5e74)?{month_number}\\u6708{day}\\u65e5"]
+    },
+    "range_forms": {
+      "ja": [
+        "(?:{year}\\u5e74)?{month_number}\\u6708{first}\\u65e5{first_weekday}{first_end}{first_time}{to}{last}\\u65e5(?!\\u9593)"
+      ]
+    },
+    "weekday_after": {
+      "ja": ["[(\\uff08]{name}(?:\\u66dc\\u65e5)?[)\\uff09]", "{name}\\u66dc\\u65e5"]
     },
     "weekdays": {
       "en": [
-        ["Monday", "Mon"],
-        ["Tuesday", "Tue", "Tues"],
-        ["Wednesday", "Wed"],
-        ["Thursday", "Thu", "Thur", "Thurs"],
-        ["Friday", "Fri"],
-        ["Saturday", "Sat"],
-        ["Sunday", "Sun"]
+        { "full": ["Monday"], "short": ["Mon"] },
+        { "full": ["Tuesday"], "short": ["Tue", "Tues"] },
+        { "full": ["Wednesday"], "short": ["Wed"] },
+        { "full": ["Thursday"], "short": ["Thu", "Thur", "Thurs"] },
+        { "full": ["Friday"], "short": ["Fri"] },
+        { "full": ["Saturday"], "short": ["Sat"] },
+        { "full": ["Sunday"], "short": ["Sun"] }
       ],
       "de": [
-        ["Montag", "Mo"],
-        ["Dienstag", "Di"],
-        ["Mittwoch", "Mi"],
-        ["Donnerstag", "Do"],
-        ["Freitag", "Fr"],
-        ["Samstag", "Sa", "Sonnabend"],
-        ["Sonntag", "So"]
+        { "full": ["Montag"], "short": ["Mo"] },
+        { "full": ["Dienstag"], "short": ["Di"] },
+        { "full": ["Mittwoch"], "short": ["Mi"] },
+        { "full": ["Donnerstag"], "short": ["Do"] },
+        { "full": ["Freitag"], "short": ["Fr"] },
+        { "full": ["Samstag", "Sonnabend"], "short": ["Sa"] },
+        { "full": ["Sonntag"], "short": ["So"] }
       ],
       "fr": [
-        ["lundi", "lun"],
-        ["mardi", "mar"],
-        ["mercredi", "mer"],
-        ["jeudi", "jeu"],
-        ["vendredi", "ven"],
-        ["samedi", "sam"],
-        ["dimanche", "dim"]
+        { "full": ["lundi"], "short": ["lun"] },
+        { "full": ["mardi"], "short": ["mar"] },
+        { "full": ["mercredi"], "short": ["mer"] },
+        { "full": ["jeudi"], "short": ["jeu"] },
+        { "full": ["vendredi"], "short": ["ven"] },
+        { "full": ["samedi"], "short": ["sam"] },
+        { "full": ["dimanche"], "short": ["dim"] }
       ],
-      "ja": [["\u6708"], ["\u706b"], ["\u6c34"], ["\u6728"], ["\u91d1"], ["\u571f"], ["\u65e5"]]
+      "ja": [
+        { "full": ["\u6708"], "short": [] },
+        { "full": ["\u706b"], "short": [] },
+        { "full": ["\u6c34"], "short": [] },
+        { "full": ["\u6728"], "short": [] },
+        { "full": ["\u91d1"], "short": [] },
+        { "full": ["\u571f"], "short": [] },
+        { "full": ["\u65e5"], "short": [] }
+      ]
     }
   },
   "formality_markers": {

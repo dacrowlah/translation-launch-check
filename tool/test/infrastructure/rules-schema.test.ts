@@ -44,18 +44,71 @@ describe("parseRules", () => {
   });
 
   it("rejects_a_calendar_with_eleven_months", () => {
-    const months = { en: Array(11).fill(["May"]) };
+    const months = { en: Array(11).fill({ full: ["May"], short: [] }) };
     expect(() => parseRules(withCalendar({ months }))).toThrow();
   });
 
   it("rejects_a_calendar_with_six_weekdays", () => {
-    const weekdays = { en: Array(6).fill(["Mon"]) };
+    const weekdays = { en: Array(6).fill({ full: ["Monday"], short: ["Mon"] }) };
     expect(() => parseRules(withCalendar({ weekdays }))).toThrow();
   });
 
   it("rejects_an_empty_calendar_name", () => {
-    const months = { en: Array(12).fill([""]) };
+    const months = { en: Array(12).fill({ full: [""], short: [] }) };
     expect(() => parseRules(withCalendar({ months }))).toThrow();
+  });
+
+  it.each(["99:99", "24:00", "7:30"])("rejects_an_impossible_time_word_value_%#", (time) => {
+    expect(() => parseRules({ ...rawRules(), time_words: { en: { midnight: time } } })).toThrow(
+      /time_words/,
+    );
+  });
+
+  it("rejects_an_empty_time_word", () => {
+    const words = { en: { "": "00:00", noon: "12:00" } };
+    expect(() => parseRules({ ...rawRules(), time_words: words })).toThrow(/time_words/);
+  });
+
+  it("rejects_a_date_template_that_is_no_pattern", () => {
+    const forms = { en: ["{day}(\\s+{month}"] };
+    expect(() => parseRules(withCalendar({ date_forms: forms }))).toThrow(/calendar/);
+  });
+
+  it("accepts_a_date_template_with_known_places", () => {
+    const forms = { en: ["{day}{ordinal}\\s+{month}"] };
+    expect(parseRules(withCalendar({ date_forms: forms })).calendar.date_forms).toEqual(forms);
+  });
+
+  it.each([
+    [{ ja: { am: [6], pm: [0] } }],
+    [{ ja: { am: [12, 0, 12], pm: [0] } }],
+    [{ ja: { am: [], pm: [0] } }],
+    [{ ja: { am: [12], pm: [0], noon: [12] } }],
+  ])("rejects_a_twelve_oclock_rule_other_than_one_or_two_readings_of_0_or_12_%#", (twelve) => {
+    expect(() => parseRules({ ...rawRules(), twelve_oclock: twelve })).toThrow(/twelve_oclock/);
+  });
+
+  it("accepts_a_twelve_oclock_rule_with_two_readings", () => {
+    const twelve = { ja: { am: [12, 0], pm: [0, 12] } };
+    expect(parseRules({ ...rawRules(), twelve_oclock: twelve }).twelve_oclock).toEqual(twelve);
+  });
+
+  it("accepts_a_time_word_value_up_to_23_59", () => {
+    const words = { en: { late: "23:59" } };
+    expect(parseRules({ ...rawRules(), time_words: words }).time_words).toEqual(words);
+  });
+
+  it("rejects_a_calendar_entry_without_full_names", () => {
+    const weekdays = { en: Array(7).fill({ short: ["Mon"] }) };
+    expect(() => parseRules(withCalendar({ weekdays }))).toThrow(/calendar/);
+  });
+
+  it("accepts_a_calendar_entry_with_full_and_short_names", () => {
+    const weekdays = { en: Array(7).fill({ full: ["Monday"], short: ["Mon"] }) };
+    expect(parseRules(withCalendar({ weekdays })).calendar.weekdays["en"]?.[0]).toEqual({
+      full: ["Monday"],
+      short: ["Mon"],
+    });
   });
 
   it("rejects_a_master_locale_other_than_en_US", () => {

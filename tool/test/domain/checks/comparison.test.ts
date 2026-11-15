@@ -5,6 +5,7 @@ import { checkNumbers } from "../../../src/domain/checks/numbers";
 import { checkPromoCodes } from "../../../src/domain/checks/promo-codes";
 import { checkUrls } from "../../../src/domain/checks/urls";
 import { aPair, ctx } from "../../support/builders";
+import { numberRows } from "../../support/rows";
 
 describe("numbers, merge tags, promo codes", () => {
   it("flags_a_changed_percentage", () => {
@@ -14,8 +15,8 @@ describe("numbers, merge tags, promo codes", () => {
         check: "numbers",
         severity: "blocker",
         detail: "A number differs from the master.",
-        expected: "30",
-        found: "20",
+        expected: "30%",
+        found: "20%",
       },
     ]);
   });
@@ -94,5 +95,21 @@ describe("currency", () => {
   it("accepts_the_same_price_written_locally", () => {
     const r = checkCurrency(aPair("Only \u20ac1,299.50", "Nur 1.299,50 \u20ac"), ctx());
     expect([r.currency_amount?.findings, r.currency_code?.findings]).toEqual([[], []]);
+  });
+});
+
+describe("numbers rows pair by kind first", () => {
+  it("pairs_a_changed_time_with_a_time_and_a_stray_number_alone", () => {
+    expect(numberRows("Ends 9 PM", "Fin \u00e0 22:00, 24 articles", "fr-FR")).toEqual([
+      ["21:00", "22:00"],
+      [null, "24"],
+    ]);
+  });
+
+  it("pairs_what_each_kind_leaves_over_by_position", () => {
+    expect(numberRows("16:10 display", "\u00e9cran 16/10", "fr-FR")).toEqual([
+      ["16:10", "16"],
+      [null, "10"],
+    ]);
   });
 });

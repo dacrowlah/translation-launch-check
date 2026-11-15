@@ -1,6 +1,6 @@
-import type { Url } from "../tokens/urls";
+import { params, type Url } from "../tokens/urls";
 import { pairUrls, type UrlPair } from "./url-pairing";
-import { resultOf, type MultiCheck, type Row, type Spec } from "./compare";
+import { diffRows, resultOf, type MultiCheck, type Row, type Spec } from "./compare";
 
 export const URL_PARAMS_DETAIL =
   "A link is missing, points elsewhere, or lost a tracking parameter.";
@@ -9,22 +9,8 @@ export const URL_PATH_DETAIL = "A link uses a different (localized) path.";
 const PARAMS: Spec = { check: "url_params", detail: URL_PARAMS_DETAIL };
 const PATH: Spec = { check: "url_path", detail: URL_PATH_DETAIL };
 
-const named = (url: Url, key: string): string => `${key}=${url.query[key]}`;
-
-const changedRows = (master: Url, target: Url): Row[] =>
-  Object.keys(master.query)
-    .filter((key) => target.query[key] !== master.query[key])
-    .map((key): Row => [named(master, key), key in target.query ? named(target, key) : undefined]);
-
-const extraRows = (master: Url, target: Url): Row[] =>
-  Object.keys(target.query)
-    .filter((key) => !(key in master.query))
-    .map((key): Row => [undefined, named(target, key)]);
-
-const queryRows = (master: Url, target: Url): Row[] => [
-  ...changedRows(master, target),
-  ...extraRows(master, target),
-];
+/** Query parameters compared as a multiset of "key=value" strings. */
+const queryRows = (master: Url, target: Url): Row[] => diffRows(params(master), params(target));
 
 const hostRows = (master: Url, target: Url): Row[] =>
   master.host === target.host ? [] : [[master.host, target.host]];

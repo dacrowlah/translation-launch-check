@@ -1,0 +1,504 @@
+{
+  "a_changed_or_dropped_link_parameter_is_a_finding": [
+    [
+      "ja-JP",
+      "Shop https://example.com/sale?utm_source=email",
+      "https://example.jp/\u30bb\u30fc\u30eb?utm_source=email \u3067\u30b7\u30e7\u30c3\u30d4\u30f3\u30b0",
+      [
+        ["url_params", "example.com", "example.jp"],
+        ["url_path", "/sale", "/%E3%82%BB%E3%83%BC%E3%83%AB"]
+      ]
+    ],
+    [
+      "ja-JP",
+      "<a href=\"https://example.jp/\u30bb\u30fc\u30eb?utm_source=email\">Shop</a>",
+      "<a href=\"https://example.jp/\u30bb\u30fc\u30eb?utm_source=mail\">\u30b7\u30e7\u30c3\u30d7</a>",
+      [["url_params", "utm_source=email", "utm_source=mail"]]
+    ],
+    [
+      "ja-JP",
+      "<a href=\"https://example.jp/\u30bb\u30fc\u30eb?utm_source=email\">Shop</a>",
+      "<a href=\"https://example.jp/\u30bb\u30fc\u30eb\">\u30b7\u30e7\u30c3\u30d7</a>",
+      [["url_params", "utm_source=email", null]]
+    ],
+    [
+      "ja-JP",
+      "https://example.jp/\u30bb\u30fc\u30eb?utm_source=email",
+      "https://example.jp/\u30bb\u30fc\u30eb",
+      [["url_params", "utm_source=email", null]]
+    ],
+    [
+      "ja-JP",
+      "https://example.jp/s?q=\u30bb\u30fc\u30eb&utm_source=email",
+      "https://example.jp/s?q=\u30bb\u30fc\u30eb&utm_source=mail",
+      [["url_params", "utm_source=email", "utm_source=mail"]]
+    ],
+    [
+      "ja-JP",
+      "https://example.jp/s?q=\u30bb\u30fc\u30eb",
+      "https://example.jp/s?q=\u30d0\u30c3\u30b0",
+      [["url_params", "q=\u30bb\u30fc\u30eb", "q=\u30d0\u30c3\u30b0"]]
+    ],
+    [
+      "fr-FR",
+      "https://example.fr/\u00e9t\u00e9?utm_source=email",
+      "https://example.fr/\u00e9t\u00e9?utm_source=mail",
+      [["url_params", "utm_source=email", "utm_source=mail"]]
+    ],
+    [
+      "ja-JP",
+      "Search https://example.jp/s?q=\u30bb\u30fc\u30eb now",
+      "https://example.jp/s?q=\u30d0\u30c3\u30b0 \u3067\u691c\u7d22",
+      [["url_params", "q=\u30bb\u30fc\u30eb", "q=\u30d0\u30c3\u30b0"]]
+    ],
+    [
+      "ja-JP",
+      "https://example.jp/s?kw=\u798f\u888b",
+      "https://example.jp/s?kw=\u5927\u798f\u888b",
+      [["url_params", "kw=\u798f\u888b", "kw=\u5927\u798f\u888b"]]
+    ],
+    [
+      "ja-JP",
+      "https://example.jp/?utm_source=email",
+      "https://example.jp/?utm_source=mail\u671f\u9593\u9650\u5b9a",
+      [["url_params", "utm_source=email", "utm_source=mail\u671f\u9593\u9650\u5b9a"]]
+    ],
+    [
+      "ja-JP",
+      "<a href=\"https://example.jp/\u30bb\u30fc\u30eb?utm_source=email\">Shop</a>",
+      "<a href=\"https://example.jp/\u30bb\u30fc\u30eb?utm_source=mail\">x</a>",
+      [["url_params", "utm_source=email", "utm_source=mail"]]
+    ],
+    [
+      "ja-JP",
+      "See https://example.jp/?utm_source=email",
+      "https://example.jp/?utm_source=mail\u8a73\u7d30\u306f\u3053\u3061\u3089",
+      [["url_params", "utm_source=email", "utm_source=mail\u8a73\u7d30"]]
+    ],
+    [
+      "de-DE",
+      "https://example.com/sale\u2013deals?utm_source=email",
+      "<a href=\"https://example.com/sale\u2013deals?utm_source=mail\">Angebote</a>",
+      [["url_params", "utm_source=email", "utm_source=mail"]]
+    ],
+    [
+      "de-DE",
+      "https://example.com/sale\u2013deals?utm_source=email",
+      "https://example.com/sale\u2013deals?utm_source=mail",
+      [["url_params", "utm_source=email", "utm_source=mail"]]
+    ],
+    [
+      "de-DE",
+      "Go https://example.com/sale\u2013deals?utm_source=email",
+      "Los https://example.com/sale\u2013deals?utm_source=mail",
+      [["url_params", "utm_source=email", "utm_source=mail"]]
+    ],
+    [
+      "ja-JP",
+      "https://example.jp/s?kw=\u304a\u305b\u3061",
+      "https://example.jp/s?kw=\u304a\u305b\u3061\u30bb\u30c3\u30c8",
+      [["url_params", "kw=\u304a\u305b\u3061", "kw=\u304a\u305b\u3061\u30bb\u30c3\u30c8"]]
+    ],
+    [
+      "ja-JP",
+      "https://example.jp/s?kw=\u304a\u305b\u3061",
+      "https://example.jp/s?kw=\u798f\u888b",
+      [["url_params", "kw=\u304a\u305b\u3061", "kw=\u798f\u888b"]]
+    ],
+    [
+      "ja-JP",
+      "https://example.jp/s?kw=\u30ae\u30d5\u30c8",
+      "https://example.jp/s?kw=\u3086\u304b\u305f",
+      [["url_params", "kw=\u30ae\u30d5\u30c8", "kw=\u3086\u304b\u305f"]]
+    ],
+    [
+      "ja-JP",
+      "https://example.jp/s?kw=%95%9F%91%DC",
+      "https://example.jp/s?kw=%8F%AC%95%A8",
+      [["url_params", "kw=%95%9F%91%DC", "kw=%8F%AC%95%A8"]]
+    ],
+    [
+      "de-DE",
+      "https://example.com/?utm_campaign=%FCbersicht",
+      "https://example.com/?utm_campaign=%E4bersicht",
+      [["url_params", "utm_campaign=%FCbersicht", "utm_campaign=%E4bersicht"]]
+    ],
+    [
+      "fr-FR",
+      "https://example.fr/?c=%E9t%E9",
+      "https://example.fr/?c=%E8t%E8",
+      [["url_params", "c=%E9t%E9", "c=%E8t%E8"]]
+    ],
+    [
+      "de-DE",
+      "https://example.com/?q=%FF",
+      "https://example.com/?q=%FE",
+      [["url_params", "q=%FF", "q=%FE"]]
+    ],
+    [
+      "ja-JP",
+      "https://example.jp/s?kw=%E3%82",
+      "https://example.jp/s?kw=%E3%83",
+      [["url_params", "kw=%E3%82", "kw=%E3%83"]]
+    ],
+    [
+      "de-DE",
+      "Go https://example.com/sale\u2011deals?utm_source=email",
+      "Los https://example.com/sale\u2011deals?utm_source=mail",
+      [["url_params", "utm_source=email", "utm_source=mail"]]
+    ],
+    [
+      "de-DE",
+      "See https://example.com/deals\u201424/7 support",
+      "https://example.com/deals \u2013 rund um die Uhr",
+      [
+        ["numbers", "24", null],
+        ["numbers", "7", null]
+      ]
+    ],
+    [
+      "de-DE",
+      "Go https://example.com/summer\u2013sale/shoes?utm=email",
+      "Los https://example.com/summer\u2013sale/shoes?utm=mail",
+      [["url_params", "utm=email", "utm=mail"]]
+    ],
+    [
+      "de-DE",
+      "https://example.com/?q=%FCber",
+      "https://example.com/?q=\u00fcber",
+      [["url_params", "q=%FCber", "q=\u00fcber"]]
+    ],
+    [
+      "de-DE",
+      "Go https://example.com/sale\u2013deals/2026?utm=email",
+      "Los https://example.com/sale\u2013deals/2026?utm=mail",
+      [["url_params", "utm=email", "utm=mail"]]
+    ],
+    [
+      "de-DE",
+      "https://example.com/?q=%2541%FF",
+      "https://example.com/?q=%41%FF",
+      [["url_params", "q=%2541%FF", "q=%41%FF"]]
+    ]
+  ],
+  "a_link_kept_by_the_translation_has_no_finding": [
+    [
+      "en-GB",
+      "Shop https://shop.example.co.uk/caf\u00e9/colors now",
+      "Shop https://shop.example.co.uk/caf\u00e9/colors now",
+      []
+    ],
+    [
+      "de-CH",
+      "Visit https://shop.example.ch/stra\u00dfe?utm_source=email now",
+      "Besuchen Sie https://shop.example.ch/stra\u00dfe?utm_source=email jetzt",
+      []
+    ],
+    ["en-GB", "See https://x.com/men's-colors", "See https://x.com/men's-colors", []],
+    [
+      "de-DE",
+      "Shop https://x.com/?utm_source=email&utm_campaign=bf",
+      "<a href=\"https://x.com/?utm_source=email&amp;utm_campaign=bf\">Shop</a>",
+      []
+    ],
+    ["de-DE", "Shop https://x.com/sale", "Shop https://x.com/sale&nbsp;heute", []],
+    ["de-DE", "Shop https://x.com/sale", "Shop &lt;https://x.com/sale&gt;", []],
+    ["en-GB", "Visit example.com/colors", "Visit example.com/colors", []],
+    [
+      "ja-JP",
+      "Visit https://example.jp/ for details",
+      "\u8a73\u3057\u304f\u306fhttps://example.jp/\u3092\u3054\u89a7\u304f\u3060\u3055\u3044",
+      []
+    ],
+    ["ja-JP", "Shop from https://example.jp/sale/", "https://example.jp/sale/\u304b\u3089", []],
+    ["en-GB", "Mail Colors@Shop.COM now", "Mail Colors@Shop.COM now", []],
+    ["de-DE", "Shop https://x.com/?a=1&b=2", "Shop https://x.com/?a=1&#38;b=2", []],
+    ["de-DE", "Shop https://x.com/?a=1&b=2", "Shop https://x.com/?a=1&#x26;b=2", []],
+    [
+      "ja-JP",
+      "Visit https://example.com/",
+      "\u8a73\u3057\u304f\u306fhttps://example.com/\u3092\u3054\u89a7\u304f\u3060\u3055\u3044",
+      []
+    ],
+    [
+      "ja-JP",
+      "Visit https://example.jp/\u30bb\u30fc\u30eb",
+      "\u8a73\u3057\u304f\u306fhttps://example.jp/\u30bb\u30fc\u30eb\u3092\u3054\u89a7\u304f\u3060\u3055\u3044",
+      []
+    ],
+    ["de-DE", "Shop https://x.com/?a=1&b=2", "Shop https://x.com/?a=1&#038;b=2", []],
+    [
+      "ja-JP",
+      "https://example.jp/%E3%82%BB%E3%83%BC%E3%83%AB",
+      "https://example.jp/\u30bb\u30fc\u30eb",
+      []
+    ],
+    [
+      "ja-JP",
+      "https://example.jp/s?q=%E3%82%BB%E3%83%BC%E3%83%AB",
+      "https://example.jp/s?q=\u30bb\u30fc\u30eb",
+      []
+    ],
+    [
+      "de-DE",
+      "Visit https://example.com\u2014our new store",
+      "https://example.com \u2013 unser neuer Shop",
+      []
+    ],
+    [
+      "de-DE",
+      "Shop at https://example.com/sale\u2014today only",
+      "Shop https://example.com/sale \u2013 nur heute",
+      []
+    ],
+    [
+      "de-DE",
+      "www.example.com/sale\u2013ends Sunday",
+      "www.example.com/sale \u2013 endet Sonntag",
+      []
+    ],
+    [
+      "de-DE",
+      "Shop https://example.com/?utm_source=email\u2014today only",
+      "Jetzt https://example.com/?utm_source=email \u2013 nur heute",
+      []
+    ],
+    [
+      "fr-FR",
+      "Shop https://example.com/?utm_source=email\u2014today only",
+      "Achetez https://example.com/?utm_source=email \u2014 aujourd'hui",
+      []
+    ],
+    [
+      "de-DE",
+      "Shop https://example.com/?utm_source=email \u2013 today",
+      "Jetzt https://example.com/?utm_source=email\u2013heute",
+      []
+    ],
+    [
+      "de-DE",
+      "https://example.com/sale\u2014today only",
+      "https://example.com/sale \u2013 nur heute",
+      []
+    ],
+    [
+      "ja-JP",
+      "https://example.com/sale\u2014today only",
+      "https://example.com/sale\u2014\u4eca\u65e5\u3060\u3051",
+      []
+    ],
+    [
+      "ja-JP",
+      "Search https://example.jp/search?q=%E3%82%BB%E3%83%BC%E3%83%AB",
+      "https://example.jp/search?q=\u30bb\u30fc\u30eb",
+      []
+    ],
+    [
+      "ja-JP",
+      "Search https://example.jp/search?q=%E3%82%BB%E3%83%BC%E3%83%AB",
+      "https://example.jp/search?q=\u30bb\u30fc\u30eb \u3067\u691c\u7d22",
+      []
+    ],
+    [
+      "ja-JP",
+      "Search https://example.jp/search?q=%E3%82%BB%E3%83%BC%E3%83%AB",
+      "https://example.jp/search?q=\u30bb\u30fc\u30eb\u3092\u691c\u7d22",
+      []
+    ],
+    [
+      "de-DE",
+      "Go https://example.com/sale\u2013deals?utm_source=email",
+      "Los https://example.com/sale\u2013deals?utm_source=email",
+      []
+    ],
+    [
+      "ja-JP",
+      "https://example.jp/s?kw=%E3%81%8A%E3%81%9B%E3%81%A1",
+      "https://example.jp/s?kw=\u304a\u305b\u3061",
+      []
+    ],
+    [
+      "ja-JP",
+      "https://example.jp/s?kw=%E3%81%B5%E3%82%8B%E3%81%95%E3%81%A8%E7%B4%8D%E7%A8%8E",
+      "https://example.jp/s?kw=\u3075\u308b\u3055\u3068\u7d0d\u7a0e",
+      []
+    ],
+    [
+      "ja-JP",
+      "Search https://example.jp/s?kw=%E3%81%B5%E3%82%8B%E3%81%95%E3%81%A8%E7%B4%8D%E7%A8%8E",
+      "https://example.jp/s?kw=\u3075\u308b\u3055\u3068\u7d0d\u7a0e \u3067\u691c\u7d22",
+      []
+    ],
+    ["de-DE", "https://example.com/?q=a+b", "https://example.com/?q=a%20b", []],
+    ["ja-JP", "https://example.jp/s?kw=%95%9f%91%dc", "https://example.jp/s?kw=%95%9F%91%DC", []],
+    [
+      "de-DE",
+      "Shop https://example.com/sale\u2014today.",
+      "Shop https://example.com/sale \u2013 heute.",
+      []
+    ],
+    [
+      "de-DE",
+      "Visit https://example.com\u201424/7 support",
+      "https://example.com \u2013 24/7 Support",
+      []
+    ],
+    ["de-DE", "Visit www.example.com\u201424/7 support", "www.example.com \u2013 24/7 Support", []],
+    [
+      "de-DE",
+      "Go https://example.com\u2014shop/now",
+      "Los https://example.com \u2013 shop/now",
+      []
+    ],
+    [
+      "de-DE",
+      "See https://example.com/help\u2014Q&A sessions",
+      "https://example.com/help \u2013 Fragestunden",
+      []
+    ],
+    [
+      "de-DE",
+      "Read https://example.com/faq\u2014answers? Yes",
+      "https://example.com/faq \u2013 Antworten? Ja",
+      []
+    ],
+    [
+      "de-DE",
+      "Shop https://example.com/sale\u2013today? Yes",
+      "Shop https://example.com/sale \u2013 heute? Ja",
+      []
+    ],
+    ["de-DE", "https://example.com/?q=a+b%FF", "https://example.com/?q=a%20b%FF", []],
+    [
+      "de-DE",
+      "Shop https://example.com/sale\u2013today?! Yes",
+      "Shop https://example.com/sale \u2013 heute?! Ja",
+      []
+    ],
+    [
+      "de-DE",
+      "(see https://example.com/sale\u2013today?)",
+      "(siehe https://example.com/sale \u2013 heute?)",
+      []
+    ],
+    [
+      "de-DE",
+      "See https://example.com/sale\u2013shop/.",
+      "Siehe https://example.com/sale \u2013 shop/.",
+      []
+    ],
+    ["de-DE", "https://example.com/?q=%2541%FF", "https://example.com/?q=%2541%ff", []]
+  ],
+  "known_limitation_a_changed_fragment_is_no_finding": [
+    ["ja-JP", "https://example.jp/s#\u30bb\u30fc\u30eb", "https://example.jp/s#\u798f\u888b", []]
+  ],
+  "known_limitation_copy_glued_to_a_query_value_joins_the_value": [
+    [
+      "ja-JP",
+      "https://example.jp/?utm_source=email",
+      "https://example.jp/?utm_source=email\u8a73\u7d30\u306f\u3053\u3061\u3089",
+      [["url_params", "utm_source=email", "utm_source=email\u8a73\u7d30"]]
+    ],
+    [
+      "ja-JP",
+      "https://example.jp/?utm_source=email",
+      "https://example.jp/?utm_source=email\u30bb\u30fc\u30eb\u958b\u50ac\u4e2d",
+      [["url_params", "utm_source=email", "utm_source=email\u30bb\u30fc\u30eb\u958b\u50ac\u4e2d"]]
+    ],
+    [
+      "ja-JP",
+      "Shop https://example.jp/sale?utm_source=email now",
+      "\u8a73\u3057\u304f\u306fhttps://example.jp/sale?utm_source=email\u671f\u9593\u9650\u5b9a",
+      [["url_params", "utm_source=email", "utm_source=email\u671f\u9593\u9650\u5b9a"]]
+    ],
+    [
+      "ja-JP",
+      "https://example.com/?shop=osaka",
+      "https://example.com/?shop=osaka\u5e97\u8217\u3078",
+      [["url_params", "shop=osaka", "shop=osaka\u5e97\u8217"]]
+    ],
+    [
+      "ja-JP",
+      "Shop https://example.jp/sale?utm_source=email now",
+      "https://example.jp/sale?utm_source=email\u30bb\u30fc\u30eb\u4f1a\u5834\u3078",
+      [["url_params", "utm_source=email", "utm_source=email\u30bb\u30fc\u30eb\u4f1a\u5834"]]
+    ],
+    [
+      "ja-JP",
+      "Shop https://example.com/?shop=osaka now",
+      "https://example.com/?shop=osaka\u5e97\u8217\u3078",
+      [["url_params", "shop=osaka", "shop=osaka\u5e97\u8217"]]
+    ],
+    [
+      "ja-JP",
+      "See https://example.jp/?utm_source=email",
+      "https://example.jp/?utm_source=email\u8a73\u7d30\u306f\u3053\u3061\u3089",
+      [["url_params", "utm_source=email", "utm_source=email\u8a73\u7d30"]]
+    ],
+    [
+      "ja-JP",
+      "See https://example.jp/?utm_source=email",
+      "https://example.jp/?utm_source=email\u30bb\u30fc\u30eb\u958b\u50ac\u4e2d",
+      [["url_params", "utm_source=email", "utm_source=email\u30bb\u30fc\u30eb\u958b\u50ac\u4e2d"]]
+    ]
+  ],
+  "known_limitation_kanji_glued_after_a_path_join_the_path": [
+    [
+      "ja-JP",
+      "https://example.com/sale",
+      "https://example.com/sale\u5927\u962a\u5e97",
+      [["url_path", "/sale", "/sale%E5%A4%A7%E9%98%AA%E5%BA%97"]]
+    ],
+    [
+      "ja-JP",
+      "Shop https://example.com/sale now",
+      "https://example.com/sale\u5927\u962a\u5e97",
+      [["url_path", "/sale", "/sale%E5%A4%A7%E9%98%AA%E5%BA%97"]]
+    ]
+  ],
+  "known_limitation_a_full_width_question_mark_ends_a_running_text_link": [
+    [
+      "ja-JP",
+      "Go https://example.jp/sale?utm=1",
+      "https://example.jp/sale\uff1futm=2",
+      [
+        ["numbers", null, "2"],
+        ["url_params", "utm=1", null]
+      ]
+    ]
+  ],
+  "the_spelling_fix_of_a_line_leaves_its_link_as_written": [
+    [
+      "en-GB",
+      "Visit example.com/colors for every color",
+      "Visit example.com/colors for every color",
+      [["spelling_fix", null, "Visit example.com/colors for every colour"]]
+    ],
+    [
+      "en-GB",
+      "See https://x.com/men's-colors in color",
+      "See https://x.com/men's-colors in color",
+      [["spelling_fix", null, "See https://x.com/men's-colors in colour"]]
+    ]
+  ],
+  "a_localized_or_changed_path_is_an_info_finding": [
+    [
+      "de-DE",
+      "Shop https://shop.example.com/de/kitchen?utm_source=email",
+      "Shop https://shop.example.com/de/k\u00fcche?utm_source=email",
+      [["url_path", "/de/kitchen", "/de/k%C3%BCche"]]
+    ],
+    [
+      "ja-JP",
+      "Shop https://example.jp/sale?utm_source=email",
+      "https://example.jp/\u30bb\u30fc\u30eb?utm_source=email",
+      [["url_path", "/sale", "/%E3%82%BB%E3%83%BC%E3%83%AB"]]
+    ],
+    [
+      "ja-JP",
+      "https://example.jp/\u30bb\u30fc\u30eb",
+      "https://example.jp/\u798f\u888b",
+      [["url_path", "/%E3%82%BB%E3%83%BC%E3%83%AB", "/%E7%A6%8F%E8%A2%8B"]]
+    ]
+  ]
+}

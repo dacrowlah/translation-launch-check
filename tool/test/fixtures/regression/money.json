@@ -1,0 +1,425 @@
+{
+  "a_price_kept_by_the_translation_has_no_finding": [
+    ["de-DE", "Only $20 100% guaranteed", "Nur 20 $ \u2013 100 % garantiert", []],
+    ["de-CH", "Only CHF 9.50 until 8 PM", "Nur CHF 9.50 bis 20 Uhr", []],
+    ["de-CH", "Today, CHF 9.50 until 8 PM", "Heute, CHF 9.50 bis 20 Uhr", []],
+    ["de-CH", "From 2 pieces, CHF 9.50 until 8 PM", "Ab 2 St\u00fcck, CHF 9.50 bis 20 Uhr", []],
+    ["de-CH", "Size 38, CHF 9.50 until 8 PM", "Gr. 38, CHF 9.50 bis 20 Uhr", []],
+    ["de-DE", "Black Friday 2026. EUR 20 until 9 PM", "Black Friday 2026. EUR 20 bis 21 Uhr", []],
+    [
+      "de-CH",
+      "Sizes 38, 40, CHF 29.90 until 8 PM",
+      "Gr\u00f6ssen 38, 40, Fr. 29.90 bis 20 Uhr",
+      []
+    ],
+    ["de-CH", "Size 38: CHF 9.50 until 8 PM", "Gr. 38: CHF 9.50 bis 20 Uhr", []],
+    ["ja-JP", "Free shipping over \u00a51,000 until 8 PM", "1,000\u5186 20\u6642\u307e\u3067", []],
+    ["fr-FR", "From $50 until 2 PM", "D\u00e8s 50 $ 14 h", []],
+    ["ja-JP", "Only 1,000 Yen", "1,000\u5186\u306e\u307f", []],
+    ["de-CH", "Today only, CHF 9.50 until 8 PM", "Nur heute, CHF 9.50 bis 20 Uhr", []],
+    ["de-CH", "Today only. CHF 9.50 until 8 PM", "Nur heute. CHF 9.50 bis 20 Uhr", []],
+    ["de-CH", "Sale. CHF 20 until 8 PM", "Sale. CHF 20 bis 20 Uhr", []],
+    ["de-CH", "1. CHF 9.50 until 8 PM", "1. CHF 9.50 bis 20 Uhr", []],
+    ["de-CH", "CHF 5.\u2013, CHF 9.50 until 8 PM", "CHF 5.\u2013, CHF 9.50 bis 20 Uhr", []],
+    ["de-DE", "Today only, EUR 9 until 8 PM", "Nur heute, EUR 9 bis 20 Uhr", []],
+    ["de-DE", "Today only, $9 until 8 PM", "Nur heute, $9 bis 20 Uhr", []],
+    ["de-DE", "Prices from 1,000 yen", "Preise ab 1.000 Yen", []],
+    ["fr-FR", "Prices from 1,000 yen", "Prix \u00e0 partir de 1 000 yens", []],
+    ["de-DE", "2 yen", "2 Yen", []],
+    ["ja-JP", "Prices from 1,000 Yen", "1,000\u5186\u304b\u3089", []],
+    ["de-DE", "Mon-Fri 9 AM-6 PM", "Mo.-Fr. 9-18 Uhr", []],
+    ["de-DE", "Fri 8 PM", "Fr. 20 Uhr", []],
+    ["de-DE", "Fri 8 PM", "Fr. 20:00 Uhr", []],
+    ["de-DE", "Fri 8 PM", "Fr. 20.00 Uhr", []],
+    ["de-CH", "Mon-Fri 9 AM-6 PM", "Mo.-Fr. 9-18 Uhr", []],
+    ["de-DE", "Mon-Fri 9am-6pm", "Mo.\u2013Fr. 9\u201318 Uhr", []],
+    ["de-CH", "Mon-Fri 9am-6pm", "Mo.\u2013Fr. 9\u201318 Uhr", []],
+    ["de-DE", "Mon-Fri 9am-6pm, Sat 10am-4pm", "Mo.-Fr. 9-18 Uhr, Sa. 10-16 Uhr", []],
+    ["de-DE", "Mon-Fri 9:00-18:00", "Mo.\u2013Fr. 9:00\u201318:00", []],
+    ["fr-FR", "Fri 9 PM", "Fr. 21 h", []],
+    [
+      "ja-JP",
+      "Free shipping over \u00a55,000 until 9 PM",
+      "5,000\u5186 21\u6642\u307e\u3067\u9001\u6599\u7121\u6599",
+      []
+    ],
+    ["ja-JP", "Free shipping over $50 until 9 PM", "50\u30c9\u30eb 21\u6642\u307e\u3067", []],
+    ["ja-JP", "All items 1,000 yen until 8 PM", "\u5168\u54c11,000\u5186 20\u6642\u307e\u3067", []],
+    ["ja-JP", "All items 1000 yen 8-11 PM", "\u5168\u54c11000\u5186 20\u6642\uff5e23\u6642", []],
+    ["de-CH", "Only CHF 29.99 until 11:59 PM ET", "Fr. 29.99 bis 23:59 Uhr ET", []],
+    [
+      "ja-JP",
+      "Free shipping over $50 until 9 PM",
+      "50\u30c9\u30eb 21\u6642\u307e\u3067\u9001\u6599\u7121\u6599",
+      []
+    ],
+    ["de-DE", "Black Friday - $50 off", "Black Friday \u2013 50 $ Rabatt", []],
+    ["de-DE", "Black Friday - \u20ac50 off", "Black Friday \u2013 50 \u20ac Rabatt", []],
+    ["fr-FR", "Black Friday \u2013 $50 off", "Black Friday : 50 $ de remise", []],
+    ["de-DE", "Cyber Monday - \u20ac20 off", "Cyber Monday \u2013 20 \u20ac Rabatt", []],
+    [
+      "ja-JP",
+      "Black Friday - $50 off",
+      "\u30d6\u30e9\u30c3\u30af\u30d5\u30e9\u30a4\u30c7\u30fc 50\u30c9\u30eb\u30aa\u30d5",
+      []
+    ],
+    ["en-GB", "Black Friday - $50 off", "Black Friday - $50 off", []],
+    ["de-DE", "Black Friday to \u20ac50 off", "Black Friday bis 50 \u20ac Rabatt", []],
+    ["de-DE", "Fri - \u20ac50 off", "Fr. \u2013 50 \u20ac Rabatt", []],
+    ["de-DE", "Black Friday \u2013 \u20ac50 off", "Black Friday \u2013 \u20ac 50 Rabatt", []],
+    ["de-DE", "Black Friday \u2013 \u20ac50 off", "Black Friday \u2013 50 \u20ac Rabatt", []],
+    ["de-DE", "Friday - EUR 50 off", "Freitag \u2013 EUR 50 Rabatt", []],
+    ["fr-FR", "Black Friday - $50 off", "Black Friday - 50 $ de r\u00e9duction", []],
+    ["de-CH", "Fri 8 PM", "Fr. 20 Uhr", []],
+    ["de-CH", "Fri 9am-6pm", "Fr. 9\u201318 Uhr", []],
+    ["de-CH", "Thu 9am-8pm, Fri 9am-6pm", "Do. 9\u201320 Uhr, Fr. 9\u201318 Uhr", []],
+    ["de-CH", "Fri 8 PM", "Fr. 20:00 Uhr", []],
+    ["de-CH", "Mon, Wed and Fri 9am-12pm", "Mo., Mi. und Fr. 9\u201312 Uhr", []],
+    ["de-CH", "Thu/Fri 9am-6pm", "Do./Fr. 9\u201318 Uhr", []],
+    ["de-CH", "Only CHF 29.90 until Fri 8 PM", "Nur Fr. 29.90 bis Fr. 20 Uhr", []],
+    ["ja-JP", "Spend \u00a510,000 until 8 PM", "1\u4e07\u5186 20\u6642\u307e\u3067", []],
+    [
+      "ja-JP",
+      "Spend \u00a510,000 until 8 PM",
+      "1\u4e07\u5186\u4ee5\u4e0a 20\u6642\u307e\u3067",
+      []
+    ],
+    ["de-CH", "Fri 8-10 PM", "Fr. 20\u201322 Uhr", []],
+    ["de-CH", "Fri 8 PM", "Fr. 20.00 Uhr", []],
+    ["de-CH", "Mon-Thu 9am-8pm, Fri 9am-6pm", "Mo.\u2013Do. 9\u201320 Uhr, Fr. 9\u201318 Uhr", []],
+    ["de-CH", "Only CHF 9.50 until 8 PM", "Nur Fr. 9.50 bis 20 Uhr", []],
+    ["de-CH", "Only CHF 20 until 8 PM", "Nur Fr. 20.\u2013 bis 20 Uhr", []],
+    ["de-CH", "Only CHF 29.90", "Nur Fr. 29.90", []],
+    ["ja-JP", "Only \u00a55,000", "5\u5343\u5186\u306e\u307f", []],
+    ["ja-JP", "\u00a510,000 off", "\u00a51\u4e07\u5f15\u304d", []],
+    ["ja-JP", "Only \u00a512,000", "1\u4e072\u5343\u5186\u306e\u307f", []],
+    ["ja-JP", "Only \u00a510,000", "\u00a51\u4e07", []],
+    ["ja-JP", "\u00a510,000,000 prize", "\u8cde\u91d11\u5343\u4e07\u5186", []],
+    ["ja-JP", "\u00a51,000 off", "1,000\u5186OFF", []],
+    ["ja-JP", "\u00a5500 off coupon", "500\u5186OFF\u30af\u30fc\u30dd\u30f3", []],
+    ["ja-JP", "\u00a5500 off coupon", "500\u5186off\u30af\u30fc\u30dd\u30f3", []],
+    ["ja-JP", "\u00a51,000 off!", "1,000\u5186OFF\uff01", []],
+    ["ja-JP", "$10 off", "10\u30c9\u30ebOFF", []],
+    ["de-CH", "Fri 9am to 6pm", "Fr. 9 bis 18 Uhr", []],
+    ["de-CH", "Thu 9am to 8pm, Fri 9am to 6pm", "Do. 9 bis 20 Uhr, Fr. 9 bis 18 Uhr", []],
+    ["de-CH", "Fri 8:30am to 6:30pm", "Fr. 8.30 bis 18.30 Uhr", []],
+    ["de-CH", "Only CHF 9 until 8 PM", "Nur Fr. 9.\u2013 bis 20 Uhr", []],
+    ["de-CH", "CHF 9.50 from 8 PM", "Fr. 9.50 ab 20 Uhr", []],
+    ["de-CH", "Only CHF 10.50-12.50", "Nur Fr. 10.50\u201312.50", []],
+    ["ja-JP", "\u00a55,300", "5\u53433\u767e\u5186", []],
+    ["ja-JP", "\u00a5100,000,000 total", "\u7dcf\u984d1\u5104\u5186", []],
+    ["ja-JP", "\u00a5120,000,000", "1\u51042\u5343\u4e07\u5186", []],
+    ["ja-JP", "\u00a51,000 off", "\u5343\u5186OFF", []],
+    ["ja-JP", "The \u00a5100 shop", "\u767e\u5186\u30b7\u30e7\u30c3\u30d7", []],
+    [
+      "de-CH",
+      "Lunch menu CHF 12.50-14.50, served 11:30am-2pm",
+      "Mittagsmen\u00fc Fr. 12.50\u201314.50, 11.30\u201314 Uhr",
+      []
+    ],
+    ["de-CH", "Menu CHF 18-22, 6-10 PM", "Men\u00fc Fr. 18\u201322, 18\u201322 Uhr", []],
+    ["de-CH", "CHF 10.50-12.50, 2-6 PM", "Fr. 10.50\u201312.50, 14\u201318 Uhr", []],
+    ["ja-JP", "SALE \u00a5500", "SALE\u00a5500", []],
+    ["ja-JP", "\u00a5500 off", "OFF\u00a5500", []],
+    ["ja-JP", "New \u00a51,000", "NEW\uffe51,000", []],
+    ["ja-JP", "Save tens of thousands of yen", "\u6570\u4e07\u5186\u304a\u5f97", []],
+    ["ja-JP", "Save thousands of yen", "\u6570\u5343\u5186\u304a\u5f97", []],
+    ["ja-JP", "Even thousands of yen", "\u4f55\u5343\u5186\u3082", []],
+    ["ja-JP", "\u00a51,000 everything", "\u5168\u54c1\u5343\u5186", []],
+    ["ja-JP", "\u00a51,000,000", "\u767e\u4e07\u5186", []],
+    ["ja-JP", "\u00a510,000-30,000", "1\u4e07\uff5e3\u4e07\u5186", []],
+    ["ja-JP", "\u00a510,000-30,000", "10,000\uff5e30,000\u5186", []],
+    ["de-DE", "Prices \u20ac10\u201330", "Preise 10\u201330 \u20ac", []],
+    ["fr-FR", "From \u20ac10 to \u20ac30", "De 10 \u00e0 30 \u20ac", []],
+    ["de-DE", "Price \u20ac50", "Preis 50,\u2013 \u20ac", []],
+    ["de-DE", "Only \u20ac50", "Nur 50,- \u20ac", []],
+    ["de-DE", "Now \u20ac50", "Jetzt \u20ac 50,\u2013", []],
+    ["de-DE", "Only \u20ac2,000", "Nur \u20ac 2 000", []],
+    ["fr-FR", "Only \u20ac2,000 for 3 items", "Seulement \u20ac 2 000 pour 3 articles", []],
+    ["de-DE", "Between \u20ac10 and \u20ac30", "Zwischen 10 und 30 \u20ac", []],
+    ["fr-FR", "Between \u20ac10 and \u20ac30", "Entre 10 et 30 \u20ac", []],
+    ["de-DE", "Give $20 to 3 friends", "Schenken Sie 3 Freunden je 20 $", []],
+    ["ja-JP", "Budget \u00a510,000-30,000", "\u3054\u4e88\u7b971\uff5e3\u4e07\u5186", []],
+    ["ja-JP", "Budget \u00a5500-10,000", "\u3054\u4e88\u7b97500\uff5e1\u4e07\u5186", []],
+    ["de-CH", "Only CHF 12-15 until 8 PM", "Nur CHF 12\u201315 bis 20 Uhr", []],
+    ["de-CH", "CHF 12-15 until 8 PM", "Fr. 12\u201315 bis 20 Uhr", []],
+    ["de-DE", "Only \u20ac12-15 until 8 PM", "Nur \u20ac 12\u201315 bis 20 Uhr", []]
+  ],
+  "a_changed_price_or_currency_is_a_finding": [
+    [
+      "de-CH",
+      "$29.99 until 11:59 PM ET",
+      "Fr. 29.99 bis 23:59 Uhr ET",
+      [["currency_code", "USD", "CHF"]]
+    ],
+    [
+      "de-CH",
+      "Today, CHF 9.50 until 8 PM",
+      "Heute, CHF 9.50 bis 21 Uhr",
+      [["numbers", "20:00", "21:00"]]
+    ],
+    [
+      "ja-JP",
+      "Free shipping over \u00a51,000 until 8 PM",
+      "1,000\u5186 21\u6642\u307e\u3067",
+      [["numbers", "20:00", "21:00"]]
+    ],
+    ["de-DE", "Fri 8 PM", "Fr. 21 Uhr", [["numbers", "20:00", "21:00"]]],
+    ["de-DE", "Mon-Fri 9am-6pm", "Mo.\u2013Fr. 9\u201317 Uhr", [["numbers", "18:00", "17:00"]]],
+    [
+      "ja-JP",
+      "All items $10 until 8 PM",
+      "\u5168\u54c11,000\u5186 20\u6642\u307e\u3067",
+      [["currency_code", "USD", "JPY"]]
+    ],
+    [
+      "ja-JP",
+      "All items $10 until 8-11 PM",
+      "\u5168\u54c11000\u5186 20\u6642\uff5e23\u6642",
+      [["currency_code", "USD", "JPY"]]
+    ],
+    ["de-CH", "Mon-Fri 9am-6pm", "Mo.\u2013Fr. 9\u201317 Uhr", [["numbers", "18:00", "17:00"]]],
+    [
+      "en-GB",
+      "Black Friday - $50 off",
+      "Black Friday - \u00a340 off",
+      [["currency_code", "USD", "GBP"]]
+    ],
+    [
+      "de-DE",
+      "Black Friday - \u20ac50 off",
+      "Black Friday \u2013 40 \u20ac Rabatt",
+      [["currency_amount", "50.00 EUR", "40.00 EUR"]]
+    ],
+    ["de-CH", "Fri 9am-6pm", "Fr. 9\u201317 Uhr", [["numbers", "18:00", "17:00"]]],
+    ["de-CH", "Fri 8 PM", "Fr. 21 Uhr", [["numbers", "20:00", "21:00"]]],
+    ["de-CH", "Only CHF 19.90", "Nur Fr. 29.90", [["currency_amount", "19.90 CHF", "29.90 CHF"]]],
+    [
+      "ja-JP",
+      "Spend \u00a510,000 until 8 PM",
+      "2\u4e07\u5186 20\u6642\u307e\u3067",
+      [["currency_amount", "10000.00 JPY", "20000.00 JPY"]]
+    ],
+    [
+      "ja-JP",
+      "Spend \u00a510,000 until 8 PM",
+      "1\u4e07\u5186 21\u6642\u307e\u3067",
+      [["numbers", "20:00", "21:00"]]
+    ],
+    [
+      "ja-JP",
+      "Only \u00a520,000",
+      "\u00a51\u4e07",
+      [["currency_amount", "20000.00 JPY", "10000.00 JPY"]]
+    ],
+    [
+      "ja-JP",
+      "Only \u00a512,000",
+      "1\u4e073\u5343\u5186\u306e\u307f",
+      [["currency_amount", "12000.00 JPY", "13000.00 JPY"]]
+    ],
+    [
+      "ja-JP",
+      "\u00a51,000 off",
+      "2,000\u5186OFF",
+      [["currency_amount", "1000.00 JPY", "2000.00 JPY"]]
+    ],
+    ["de-CH", "Fri 9am to 5pm", "Fr. 9 bis 18 Uhr", [["numbers", "17:00", "18:00"]]],
+    [
+      "ja-JP",
+      "\u00a55,300",
+      "5\u53434\u767e\u5186",
+      [["currency_amount", "5300.00 JPY", "5400.00 JPY"]]
+    ],
+    [
+      "ja-JP",
+      "\u00a5120,000,000",
+      "1\u51043\u5343\u4e07\u5186",
+      [["currency_amount", "120000000.00 JPY", "130000000.00 JPY"]]
+    ],
+    [
+      "ja-JP",
+      "\u00a52,000 off",
+      "\u5343\u5186OFF",
+      [["currency_amount", "2000.00 JPY", "1000.00 JPY"]]
+    ],
+    ["ja-JP", "SALE \u00a5500", "SALE\u00a5600", [["currency_amount", "500.00 JPY", "600.00 JPY"]]],
+    [
+      "de-DE",
+      "Only EUR 10",
+      "NurEUR10",
+      [
+        ["numbers", null, "10"],
+        ["currency_code", "EUR", null]
+      ]
+    ],
+    [
+      "ja-JP",
+      "\u00a52,000 everything",
+      "\u5168\u54c1\u5343\u5186",
+      [["currency_amount", "2000.00 JPY", "1000.00 JPY"]]
+    ],
+    [
+      "ja-JP",
+      "\u00a510,000-30,000",
+      "1\u4e07\uff5e4\u4e07\u5186",
+      [["currency_amount", "30000.00 JPY", "40000.00 JPY"]]
+    ],
+    [
+      "de-DE",
+      "Prices \u20ac10\u201330",
+      "Preise 10\u201340 \u20ac",
+      [["currency_amount", "30.00 EUR", "40.00 EUR"]]
+    ],
+    [
+      "de-DE",
+      "Price \u20ac50",
+      "Preis 60,\u2013 \u20ac",
+      [["currency_amount", "50.00 EUR", "60.00 EUR"]]
+    ],
+    ["de-DE", "Only \u20ac2", "Nur \u20ac 2 000", [["numbers", null, "0"]]],
+    [
+      "de-DE",
+      "Only \u20ac2,000",
+      "Nur \u20ac 2 500",
+      [["currency_amount", "2000.00 EUR", "2500.00 EUR"]]
+    ],
+    [
+      "de-DE",
+      "Between \u20ac10 and \u20ac30",
+      "Zwischen 10 und 40 \u20ac",
+      [["currency_amount", "30.00 EUR", "40.00 EUR"]]
+    ],
+    [
+      "ja-JP",
+      "Budget \u00a510,000-30,000",
+      "\u3054\u4e88\u7b971\uff5e4\u4e07\u5186",
+      [["currency_amount", "30000.00 JPY", "40000.00 JPY"]]
+    ],
+    [
+      "de-CH",
+      "Only CHF 12-15 until 8 PM",
+      "Nur CHF 12\u201315 bis 21 Uhr",
+      [["numbers", "20:00", "21:00"]]
+    ]
+  ],
+  "known_limitation_a_currency_word_other_than_yen_is_no_currency": [
+    [
+      "fr-FR",
+      "Win $10,000",
+      "Gagnez 10 000 dollars",
+      [
+        ["numbers", null, "10000"],
+        ["currency_code", "USD", null]
+      ]
+    ]
+  ],
+  "known_limitation_fr_before_a_dotted_date_is_francs_in_swiss_german": [
+    [
+      "de-CH",
+      "Black Friday, Fri Nov 27",
+      "Black Friday, Fr. 27.11.",
+      [
+        ["currency_code", null, "CHF"],
+        ["dates", "11/27 Fri", null]
+      ]
+    ],
+    [
+      "de-CH",
+      "Black Friday: Fri Nov 27",
+      "Black Friday: Fr. 27.11.",
+      [
+        ["currency_code", null, "CHF"],
+        ["dates", "11/27 Fri", null]
+      ]
+    ]
+  ],
+  "known_limitation_a_whole_franc_price_before_a_word_range_reads_as_friday": [
+    [
+      "de-CH",
+      "Only CHF 9 until 8 PM",
+      "Nur Fr. 9 bis 20 Uhr",
+      [
+        ["numbers", null, "9"],
+        ["currency_code", "CHF", null]
+      ]
+    ],
+    [
+      "de-CH",
+      "CHF 20 until 9 PM",
+      "Fr. 20 bis 21 Uhr",
+      [
+        ["numbers", null, "20"],
+        ["currency_code", "CHF", null]
+      ]
+    ]
+  ],
+  "known_limitation_fr_before_split_hours_is_francs_in_swiss_german": [
+    [
+      "de-CH",
+      "Fri 10am-12pm and 2-6pm",
+      "Fr. 10\u201312 und 14\u201318 Uhr",
+      [
+        ["numbers", "10:00", null],
+        ["numbers", "12:00", null],
+        ["currency_code", null, "CHF"]
+      ]
+    ],
+    [
+      "de-CH",
+      "Fri 9am-12pm, 2-6pm",
+      "Fr. 9\u201312, 14\u201318 Uhr",
+      [
+        ["numbers", "09:00", null],
+        ["numbers", "12:00", null],
+        ["currency_code", null, "CHF"]
+      ]
+    ],
+    [
+      "de-CH",
+      "Fri 8am-12pm and 1-5pm",
+      "Fr. 8 bis 12 und 13 bis 17 Uhr",
+      [
+        ["numbers", "08:00", null],
+        ["numbers", "12:00", null],
+        ["currency_code", null, "CHF"]
+      ]
+    ]
+  ],
+  "known_limitation_an_amount_in_kanji_numerals_is_not_read": [
+    [
+      "ja-JP",
+      "\u00a520,000 gift card",
+      "\u4e8c\u4e07\u5186\u5206\u306e\u30ae\u30d5\u30c8\u30ab\u30fc\u30c9",
+      [["currency_code", "JPY", null]]
+    ],
+    [
+      "ja-JP",
+      "\u00a5100,000 prize",
+      "\u8cde\u91d1\u5341\u4e07\u5186",
+      [["currency_code", "JPY", null]]
+    ],
+    [
+      "ja-JP",
+      "\u00a55,000 off",
+      "\u4e94\u5343\u5186\u5f15\u304d",
+      [["currency_code", "JPY", null]]
+    ],
+    [
+      "ja-JP",
+      "\u00a53,000 coupon",
+      "\u4e09\u5343\u5186\u30af\u30fc\u30dd\u30f3",
+      [["currency_code", "JPY", null]]
+    ],
+    [
+      "ja-JP",
+      "\u00a510,000 gift card",
+      "\u4e00\u4e07\u5186\u5206\u306e\u30ae\u30d5\u30c8\u30ab\u30fc\u30c9",
+      [["currency_code", "JPY", null]]
+    ],
+    ["ja-JP", "\u00a520,000", "\u91d1\u5f10\u4e07\u5186", [["currency_code", "JPY", null]]],
+    ["ja-JP", "\u00a530,000", "\u91d1\u53c2\u4e07\u5186", [["currency_code", "JPY", null]]],
+    ["ja-JP", "\u00a510,000", "\u91d1\u58f1\u4e07\u5186", [["currency_code", "JPY", null]]],
+    ["ja-JP", "\u00a5100,000", "\u91d1\u62fe\u4e07\u5186", [["currency_code", "JPY", null]]]
+  ]
+}

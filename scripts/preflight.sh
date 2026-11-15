@@ -15,6 +15,7 @@ TOOL_GATES=(
   "typecheck:typecheck"
   "dup:dup"
   "test:test:gate"
+  "perf:test:perf"
 )
 
 run_gate() {

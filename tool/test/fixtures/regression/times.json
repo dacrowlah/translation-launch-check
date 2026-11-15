@@ -1,0 +1,276 @@
+{
+  "a_clock_time_kept_by_the_translation_has_no_finding": [
+    ["fr-FR", "24-hour delivery", "Livraison en 24 h", []],
+    ["fr-FR", "12 hours only", "12 h seulement", []],
+    ["de-DE", "Midnight Sale ends Nov 29", "Midnight Sale endet am 29. November", []],
+    ["de-DE", "Sale ends Nov 27 - 11:59 PM PT", "Endet am 27. Nov. - 23:59 Uhr PT", []],
+    ["de-DE", "Nov 27 to 11 PM", "27. Nov. bis 23 Uhr", []],
+    ["en-GB", "Ends 9:30 PM", "Ends 9.30pm", []],
+    ["fr-FR", "Delivered within 2 hours", "Livr\u00e9 sous 2 h", []],
+    ["fr-FR", "Valid for 12 hours only", "Valable 12 h seulement", []],
+    ["fr-FR", "Ends 9 PM", "Fin \u00e0 21 h", []],
+    ["de-DE", "Midnight Blue jacket", "Jacke in Mitternachtsblau", []],
+    ["fr-FR", "Midnight Blue jacket", "Veste bleu nuit", []],
+    [
+      "ja-JP",
+      "Midnight Blue jacket",
+      "\u30df\u30c3\u30c9\u30ca\u30a4\u30c8\u30d6\u30eb\u30fc\u306e\u30b8\u30e3\u30b1\u30c3\u30c8",
+      []
+    ],
+    ["de-DE", "Midnight Sale starts now", "Mitternachts-Sale startet jetzt", []],
+    ["de-DE", "Ends at noon", "Endet mittags", []],
+    ["de-DE", "Ends at 12 noon", "Endet um 12 Uhr", []],
+    ["ja-JP", "Live: Dec 3 - 8 PM ET", "12\u67083\u65e5\u5348\u5f8c8\u6642\uff08ET\uff09", []],
+    ["de-DE", "Live: Nov 27 - 7:00 PM ET", "Live: 27. November \u2013 19:00 Uhr ET", []],
+    ["de-DE", "Live: Dec 3 - 8 PM ET", "3. Dezember \u2013 20 Uhr ET", []],
+    ["de-DE", "Open 9am-5pm", "Ge\u00f6ffnet 9-17 Uhr", []],
+    ["de-DE", "Open 10am to 6pm", "Ge\u00f6ffnet von 10 bis 18 Uhr", []],
+    ["ja-JP", "Open 10am-6pm", "10\uff5e18\u6642\u55b6\u696d", []],
+    ["fr-FR", "Open 9am-6pm", "Ouvert 9-18 h", []],
+    ["ja-JP", "Starts at 9:30", "9\u6642\u534a\u958b\u59cb", []],
+    ["ja-JP", "Ends 11:59 PM PT", "PT23:59\u307e\u3067", []],
+    ["fr-FR", "From 6 pm", "\u00c0 partir de 18 h", []],
+    ["fr-FR", "Delivery in 1-2 hours", "Livraison en 1 \u00e0 2 h", []],
+    ["fr-FR", "Ships within 2-4 hours", "Exp\u00e9di\u00e9 sous 2 \u00e0 4 h", []],
+    ["fr-FR", "Ready in 2 to 3 hours", "Pr\u00eat en 2 \u00e0 3 h", []],
+    ["fr-FR", "Hotel 2 hours from Paris", "H\u00f4tel \u00e0 2 h de Paris", []],
+    ["fr-FR", "Last 24 hours!", "\u00c0 24 h de la fin !", []],
+    ["fr-FR", "Open 9am-6pm", "Ouvert de 9 h \u00e0 18 h", []],
+    ["ja-JP", "Open 1-5pm", "\u5348\u5f8c1\u6642\uff5e5\u6642", []],
+    ["ja-JP", "Open 1-5pm", "\u5348\u5f8c1\uff5e5\u6642", []],
+    ["ja-JP", "Live 1:30-3pm", "\u5348\u5f8c1\u664230\u5206\uff5e3\u6642", []],
+    ["ja-JP", "Ends 9 PM", "\u5348\u5f8c 9\u6642\u306b\u7d42\u4e86", []],
+    ["de-DE", "Shop till midnight", "Shoppen Sie bis Mitternacht", []],
+    ["de-DE", "Valid through midnight", "G\u00fcltig bis Mitternacht", []],
+    ["de-DE", "Sale ends midnight PT", "Sale endet um Mitternacht PT", []],
+    ["ja-JP", "Ends at noon", "\u6b63\u5348\u306b\u7d42\u4e86", []],
+    ["en-GB", "Ends at noon", "Ends at midday", []],
+    [
+      "de-DE",
+      "Choose from Midnight Blue or Ivory",
+      "W\u00e4hlen Sie Mitternachtsblau oder Elfenbein",
+      []
+    ],
+    ["de-DE", "Now at Midnight Market", "Jetzt bei Midnight Market", []],
+    ["en-GB", "Live 9:30-11pm", "Live 9.30-11pm", []],
+    [
+      "ja-JP",
+      "Nov 27, 12:00 AM - Nov 30, 11:59 PM",
+      "11\u670827\u65e5(\u91d1)0\u6642\uff5e30\u65e5(\u6708)23\u664259\u5206",
+      []
+    ],
+    ["fr-FR", "Starts at 8 PM", "\u00c0 partir de 20 h", []],
+    ["fr-FR", "Delivered by 6 PM", "Livr\u00e9 vers 18 h", []],
+    ["fr-FR", "Delivery between 6 and 8 PM", "Livraison entre 18 h et 20 h", []],
+    ["fr-FR", "Sunday, Nov 29, 8 PM", "Dimanche 29 novembre, 20 h", []],
+    [
+      "fr-FR",
+      "24-hour delivery on orders before 9 PM",
+      "Livraison en 24 h pour toute commande avant 21 h",
+      []
+    ],
+    ["fr-FR", "Ends 9 PM, delivery in 24 hours", "Livraison en 24 h, fin \u00e0 21 h", []],
+    ["fr-FR", "Delivery in 1-2 hours, ends 9 PM", "Livraison en 1 \u00e0 2 h, fin \u00e0 21 h", []],
+    ["ja-JP", "Open 11am-1pm", "\u5348\u524d11\u6642\uff5e1\u6642", []],
+    ["ja-JP", "Open 10am-6pm", "\u5348\u524d10\u6642\uff5e6\u6642", []],
+    [
+      "fr-FR",
+      "Delivery in 2 hours when you order by 6 PM",
+      "Livraison en 2 h pour toute commande avant 18 h",
+      []
+    ],
+    [
+      "fr-FR",
+      "Delivery in 24 hours if you order by noon",
+      "Livraison en 24 h pour toute commande avant midi",
+      []
+    ],
+    [
+      "fr-FR",
+      "Sale: 12 hours only, ends at midnight",
+      "Soldes : 12 h seulement, fin \u00e0 minuit",
+      []
+    ],
+    ["fr-FR", "24-hour flash sale ends at 9 PM", "Vente flash de 24 h : fin \u00e0 21 h", []],
+    [
+      "fr-FR",
+      "Free returns within 24 hours. Open 10 AM - 8 PM",
+      "Retour gratuit sous 24 h. Ouvert de 10 h \u00e0 20 h",
+      []
+    ],
+    [
+      "fr-FR",
+      "Ships within 1 to 2 hours - order by 2 PM",
+      "Exp\u00e9di\u00e9 sous 1 \u00e0 2 h - commandez avant 14 h",
+      []
+    ],
+    ["de-DE", "Sizes 8 and 10 until 9 PM", "Gr\u00f6\u00dfen 8 und 10 bis 21 Uhr", []],
+    [
+      "de-DE",
+      "Midnight Blue jacket - order by noon",
+      "Jacke in Midnight Blue - bestellen bis 12 Uhr",
+      []
+    ],
+    [
+      "fr-FR",
+      "Midnight Blue jacket - order by noon",
+      "Veste Midnight Blue - commandez avant midi",
+      []
+    ],
+    [
+      "ja-JP",
+      "Midnight Blue jacket - order by noon",
+      "\u30df\u30c3\u30c9\u30ca\u30a4\u30c8\u30d6\u30eb\u30fc\u306e\u30b8\u30e3\u30b1\u30c3\u30c8 - \u6b63\u5348\u307e\u3067\u306b\u3054\u6ce8\u6587",
+      []
+    ],
+    [
+      "fr-FR",
+      "Midnight Blue hoodie, delivered in 2 hours",
+      "Sweat Midnight Blue, livr\u00e9 en 2 h",
+      []
+    ],
+    ["fr-FR", "Midnight Madness: 2 hours only", "Midnight Madness : 2 h seulement", []],
+    [
+      "fr-FR",
+      "Midnight Blue hoodie, delivered in 24 hours",
+      "Sweat Bleu nuit, livr\u00e9 en 24 h",
+      []
+    ],
+    ["de-DE", "Free shipping on orders over 50 until 2 PM", "Gratisversand ab 50 bis 14 Uhr", []],
+    ["de-DE", "Save 30 until 8 PM", "Sparen Sie 30 bis 20 Uhr", []],
+    ["fr-FR", "Orders over 50 by 2 PM", "Commandes de plus de 50 \u00e0 14 h", []],
+    ["de-CH", "Only 29.99 until 8 PM", "Nur 29.99 bis 20 Uhr", []],
+    ["de-DE", "Code 99 and 8 PM", "Code 99 und 20 Uhr", []],
+    ["de-CH", "Only 9.50 until 8 PM", "Nur 9.50 bis 20 Uhr", []],
+    ["ja-JP", "Open 11pm-1am", "\u5348\u5f8c11\u6642\uff5e1\u6642", []],
+    ["ja-JP", "Open 8pm-midnight", "\u5348\u5f8c8\u6642\uff5e12\u6642", []],
+    ["de-DE", "Open 10am-noon", "Ge\u00f6ffnet 10-12 Uhr", []],
+    ["de-DE", "Open 9pm-midnight", "Ge\u00f6ffnet 21-24 Uhr", []],
+    ["de-DE", "From 50 until 2 PM", "ab 50 bis 14 Uhr", []],
+    ["de-DE", "Open 9-11am", "9-11 Uhr", []],
+    ["de-DE", "Mon-Fri 9am-6pm", "Mo\u2013Fr 9\u201318 Uhr", []],
+    [
+      "fr-FR",
+      "Delivery in 2 hours, order before 6 PM",
+      "Livraison en 2 h, commandez avant 18 h",
+      []
+    ],
+    ["de-DE", "10am-noon", "10-12 Uhr", []],
+    ["de-DE", "9pm-midnight", "21-24 Uhr", []],
+    [
+      "ja-JP",
+      "Order 2,000 sets by 9 PM",
+      "2\u5343\u30bb\u30c3\u30c8\u3092\u5348\u5f8c9\u6642\u307e\u3067",
+      []
+    ],
+    ["de-DE", "Ends 8 PM: shop now", "Endet 20 Uhr: jetzt shoppen", []],
+    ["fr-FR", "Ends 8 PM: shop now", "Fin \u00e0 20 h : achetez", []],
+    ["ja-JP", "Ends 8 PM: shop now", "20\u6642\u307e\u3067\uff1a\u4eca\u3059\u3050", []],
+    ["de-DE", "Ends 11:59 PM: last chance", "Endet 23:59 Uhr: letzte Chance", []],
+    ["de-DE", "Mon-Fri 9am-12pm, 2-6pm", "Mo.\u2013Fr. 9\u201312, 14\u201318 Uhr", []],
+    ["de-CH", "Mon-Fri 8am-12pm, 1:30-5:30pm", "Mo.\u2013Fr. 8\u201312, 13.30\u201317.30 Uhr", []],
+    ["de-DE", "Sat 9am-12pm, 1-4pm", "Sa. 9\u201312, 13\u201316 Uhr", []],
+    ["de-DE", "Mon-Fri 9am-12pm and 2-6pm", "Mo.\u2013Fr. 9\u201312 und 14\u201318 Uhr", []],
+    ["fr-FR", "Open 9am-12pm, 2-6pm", "Ouvert 9-12, 14-18 h", []],
+    ["ja-JP", "Open 9am-12pm, 2-6pm", "\u55b6\u696d9\uff5e12\u300114\uff5e18\u6642", []],
+    ["ja-JP", "Open 11am-2pm, 5-10pm", "11\uff5e14\u300117\uff5e22\u6642", []],
+    ["ja-JP", "Open 9am-12pm, 2-6pm", "\u55b6\u696d9\uff5e12\uff0c14\uff5e18\u6642", []]
+  ],
+  "a_changed_clock_time_is_a_finding": [
+    ["en-GB", "Only 9.30 left", "Only 9:30 left", [["numbers", "9.3", "09:30"]]],
+    [
+      "ja-JP",
+      "Live: Dec 3 - 8 PM ET",
+      "12\u67083\u65e5\u5348\u5f8c9\u6642\uff08ET\uff09",
+      [["numbers", "20:00", "21:00"]]
+    ],
+    ["fr-FR", "Open 9am-6pm", "Ouvert de 9 h \u00e0 19 h", [["numbers", "18:00", "19:00"]]],
+    ["ja-JP", "Open 1-5pm", "\u5348\u5f8c1\u6642\uff5e6\u6642", [["numbers", "17:00", "18:00"]]],
+    [
+      "fr-FR",
+      "Ends 9 PM, delivery in 24 hours",
+      "Livraison en 24 h, fin \u00e0 22 h",
+      [["numbers", "21:00", "22:00"]]
+    ],
+    ["fr-FR", "Ends 9 PM", "Fin \u00e0 22 h", [["numbers", "21:00", "22:00"]]],
+    ["fr-FR", "Ends 9 PM. Only 21 left", "Fin \u00e0 21 h", [["numbers", "21", null]]],
+    ["de-DE", "Ends 9 PM. Only 21 left", "Endet um 21 Uhr", [["numbers", "21", null]]],
+    ["fr-FR", "Top 21 deals end at 9 PM", "Top 22 : fin \u00e0 21 h", [["numbers", "21", "22"]]],
+    [
+      "fr-FR",
+      "Ends 9 PM - 21 items left",
+      "Fin \u00e0 21 h - 20 articles restants",
+      [["numbers", "21", "20"]]
+    ],
+    ["de-DE", "Ends 8 PM. 20 items", "Endet 20 Uhr", [["numbers", "20", null]]],
+    [
+      "fr-FR",
+      "Ends 9 PM",
+      "Fin \u00e0 22:00, livraison en 24 h",
+      [
+        ["numbers", "21:00", "22:00"],
+        ["numbers", null, "24"]
+      ]
+    ],
+    ["ja-JP", "Starts 9 PM. Only 21 left", "21\u6642\u958b\u59cb", [["numbers", "21", null]]],
+    [
+      "de-DE",
+      "Ends 8 PM: shop now",
+      "Endet 21 Uhr: jetzt shoppen",
+      [["numbers", "20:00", "21:00"]]
+    ],
+    [
+      "de-DE",
+      "Mon-Fri 9am-12pm, 2-6pm",
+      "Mo.\u2013Fr. 9\u201313, 14\u201318 Uhr",
+      [["numbers", "12:00", "13:00"]]
+    ],
+    [
+      "ja-JP",
+      "Open 9am-12pm, 2-6pm",
+      "\u55b6\u696d9\uff5e13\u300114\uff5e18\u6642",
+      [["numbers", "12:00", "13:00"]]
+    ]
+  ],
+  "known_limitation_round_the_clock_forms_keep_their_extra_numbers": [
+    [
+      "fr-FR",
+      "24/7 support",
+      "Assistance 24h/24 et 7j/7",
+      [
+        ["numbers", null, "7"],
+        ["numbers", null, "24"]
+      ]
+    ]
+  ],
+  "known_limitation_a_ratio_written_with_a_colon_is_a_time": [
+    [
+      "fr-FR",
+      "16:10 display",
+      "\u00e9cran 16/10",
+      [
+        ["numbers", "16:10", "16"],
+        ["numbers", null, "10"]
+      ]
+    ]
+  ],
+  "known_limitation_a_bare_range_without_a_half_stays_numbers": [
+    [
+      "de-DE",
+      "Open 9-5, ends at midnight",
+      "Ge\u00f6ffnet 9-17 Uhr, endet um Mitternacht",
+      [["numbers", "5", "17"]]
+    ]
+  ],
+  "known_limitation_a_leftover_candidate_is_promoted_in_text_order": [
+    [
+      "fr-FR",
+      "Ends 9 PM, delivery within a day",
+      "Livraison en 24 h, fin \u00e0 22 h",
+      [
+        ["numbers", "21:00", "00:00"],
+        ["numbers", null, "22"]
+      ]
+    ]
+  ]
+}

@@ -10,7 +10,7 @@ trap 'rm -rf "$SCRATCH"' EXIT
 FAILED=0
 
 mkdir "$SCRATCH/base"
-rsync -a --exclude .vitest.json "$ROOT/tool/" "$SCRATCH/base/tool/"
+rsync -a --exclude .vitest.json --exclude .vitest-perf.json "$ROOT/tool/" "$SCRATCH/base/tool/"
 
 # plant <label> <gate script> <expected output regex> <file> <content> [<file 2> <content 2>]
 plant() {
@@ -22,6 +22,12 @@ plant() {
   if [ "$#" -ge 7 ]; then
     printf '%s\n' "$7" >"$dir/tool/$6"
   fi
+  expect_red "$label" "$script" "$pattern" "$dir"
+}
+
+# expect_red <label> <gate script> <expected output regex> <scratch copy>
+expect_red() {
+  local label="$1" script="$2" pattern="$3" dir="$4"
   (cd "$dir/tool" && pnpm run "$script") >"$dir/out.log" 2>&1
   local status=$?
   if [ "$status" -ne 0 ] && grep -Eq "$pattern" "$dir/out.log"; then
@@ -34,12 +40,28 @@ plant() {
   fi
 }
 
+# edit_plant <label> <gate script> <regex> <file> <text to replace> <replacement> <text to append>
+# Edits an existing file of the scratch copy instead of writing a new one.
+edit_plant() {
+  local label="$1" script="$2" pattern="$3" file="$4"
+  local dir="$SCRATCH/$label"
+  cp -Rc "$SCRATCH/base" "$dir" 2>/dev/null || cp -R "$SCRATCH/base" "$dir"
+  FROM="$5" TO="$6" TAIL="$7" python3 - "$dir/tool/$file" <<'PY'
+import os, sys
+path = sys.argv[1]
+text = open(path).read()
+assert text.count(os.environ["FROM"]) == 1, "edit_plant: the text to replace is not there once"
+open(path, "w").write(text.replace(os.environ["FROM"], os.environ["TO"]) + os.environ["TAIL"])
+PY
+  expect_red "$label" "$script" "$pattern" "$dir"
+}
+
 control() {
   local dir="$SCRATCH/control" script
   cp -Rc "$SCRATCH/base" "$dir" 2>/dev/null || cp -R "$SCRATCH/base" "$dir"
   mkdir -p "$dir/tool/src/domain"
   printf 'export const noop = 1;\n' >"$dir/tool/src/domain/noop.ts"
-  for script in format:check lint lint:directives typecheck dup test:gate; do
+  for script in format:check lint lint:directives typecheck dup test:gate test:perf; do
     if ! (cd "$dir/tool" && pnpm run "$script") >"$dir/$script.log" 2>&1; then
       echo "FAIL control: gate '$script' is red on a no-op plant (see $dir/$script.log)"
       FAILED=1
@@ -83,11 +105,96 @@ plant duplicate-block dup 'Clone found' src/domain/dup-a.ts "$(dup_block first)"
 plant skipped-test test:gate '1 skipped or todo' test/skipped.test.ts \
   'import { it } from "vitest";
 it.skip("skipped", () => {});'
+plant quadratic-work test:perf 'to be less than 8' test/perf/quadratic.test.ts \
+  'import { expect, it } from "vitest";
+import { growth, LINEAR_GROWTH } from "../support/scaling";
+let sink = 0;
+const quadratic = (n: number) => {
+  for (let i = 0; i < n * n; i++) sink += i % 7;
+};
+it("quadratic", () => {
+  expect(growth(quadratic, 2000)).toBeLessThan(LINEAR_GROWTH);
+});'
+# A quadratic stage in tokenize: a contract-bound package of mixed cells only 1.2 times slower.
+edit_plant quadratic-stage test:perf 'to be less than 8' src/domain/tokens/tokenize.ts \
+  'start(text));' 'start(slowly(text)));' '
+let sink = 0;
+const slowly = (text: string): string => {
+  for (let i = 0; i < text.length; i++) for (let j = 0; j < text.length; j += 16) sink += (i ^ j) & 1;
+  return sink < 0 ? "" : text;
+};'
+# A quadratic loop over the numbers found per text (the numbers stage only).
+edit_plant quadratic-numbers test:perf 'to be less than 8' src/domain/tokens/numbers.ts \
+  'const spaced = items.filter' 'items.forEach((a) => items.forEach((b) => { sink += a === b ? 1 : 0; }));
+  const spaced = items.filter' '
+let sink = 0;'
+# A test that hangs (busy work Vitest cannot interrupt) runs into the gate's wall-clock limit.
+# The plant lowers the limit to 20 s and runs only the hanging file, so it is quick.
+export TEST_PERF_LIMIT_S=20
+plant hanging-test test:perf 'time limit: vitest ran over' test/perf/hang.test.ts \
+  'import { it } from "vitest";
+it("hangs", () => {
+  const until = Date.now() + 120_000;
+  while (Date.now() < until) {
+    // busy
+  }
+});' vitest.perf.config.ts 'import { defineConfig } from "vitest/config";
+export default defineConfig({ test: { include: ["test/perf/hang.test.ts"], pool: "forks" } });'
+unset TEST_PERF_LIMIT_S
 plant type-error typecheck 'TS2322' src/domain/bad.ts 'export const x: number = "a";'
 plant waiver-without-reason lint:directives 'needs .-- <description>.' \
   src/domain/waiver.ts '// eslint-disable-next-line metz/max-params
 export const w = 1;'
 control
+
+# ---- The gates' wall-clock wrapper: exit codes pass through and nothing it started survives ----
+TL="$ROOT/tool/scripts/time-limit.mjs"
+MARK="tlmark$$"
+BUSY="node -e \"/*$MARK*/ while (true) {}\""
+
+survivors() {
+  sleep 1
+  ps -axo command | grep "$MARK" | grep -v grep | grep -vc "BUSY="
+}
+
+# expect_run <label> <expected exit> <actual exit>
+expect_run() {
+  local left
+  left="$(survivors)"
+  if [ "$3" -eq "$2" ] && [ "$left" -eq 0 ]; then
+    echo "OK   time limit, $1: exit $3, no process left"
+  else
+    echo "FAIL time limit, $1: exit $3 (expected $2), $left process(es) left"
+    pkill -f "$MARK"
+    FAILED=1
+  fi
+}
+
+# kill_run <label> <signal> [group]: start a busy run, then signal the wrapper or its group.
+kill_run() {
+  local pid
+  if [ "${3:-}" = group ]; then
+    perl -e 'setpgrp; exec @ARGV' sh -c "node $TL 60 sh -c '$BUSY'" &
+  else
+    node "$TL" 60 sh -c "$BUSY" &
+  fi
+  pid=$!
+  sleep 2
+  if [ "${3:-}" = group ]; then kill "-$2" "-$pid"; else kill "-$2" "$pid"; fi
+  wait "$pid" 2>/dev/null
+  expect_run "$1" "$4" $?
+}
+
+node "$TL" 60 node -e "process.exit(0)"; expect_run "the command exits 0" 0 $?
+node "$TL" 60 node -e "process.exit(3)"; expect_run "the command exits 3" 3 $?
+node "$TL" 2 sh -c "$BUSY" 2>/dev/null; expect_run "the command runs over the limit" 124 $?
+node "$TL" 60 sh -c "$BUSY & exit 3"; expect_run "the command exits with a busy child left" 3 $?
+kill_run "the wrapper gets SIGHUP" HUP "" 1
+kill_run "the wrapper gets SIGQUIT" QUIT "" 1
+kill_run "the wrapper is killed" KILL "" 137
+kill_run "the caller's group is killed" KILL group 137
+node "$TL" 15m node -e "0" 2>/dev/null; expect_run "a limit that is no whole number" 2 $?
+node "$TL" 60 no-such-command-tl 2>/dev/null; expect_run "a command that cannot start" 127 $?
 
 # ---- Mark half: plants run in a scratch copy of mark/ plus tool/config/rules.json ----
 VENV="$ROOT/.venv/bin"

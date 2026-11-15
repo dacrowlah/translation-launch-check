@@ -12,11 +12,18 @@ const epochDays = (year: number, month: number, day: number): number =>
 const daysIn = (year: number, month: number): number =>
   epochDays(year, month + 1, 1) - epochDays(year, month, 1);
 
+/** 9 -> "09". */
+export const twoDigits = (n: number): string => String(n).padStart(2, "0");
+
 const iso = (year: number, month: number, day: number): string =>
-  [year, month, day].map((n, i) => String(n).padStart(i === 0 ? 4 : 2, "0")).join("-");
+  `${String(year).padStart(4, "0")}-${twoDigits(month)}-${twoDigits(day)}`;
 
 /** Weekday of an ISO date, Monday = 0 (1970-01-01 was a Thursday). */
 export const weekdayOf = (date: string): number => (epochDays(...parts(date)) + 3) % 7;
+
+/** The ISO form of a date, or null when the month has no such day (1-12, 1-31 given). */
+export const isoDate = (year: number, month: number, day: number): string | null =>
+  day <= daysIn(year, month) ? iso(year, month, day) : null;
 
 const occursIn = (year: number, month: number, day: number, today: string): boolean =>
   day <= daysIn(year, month) && iso(year, month, day) >= today;

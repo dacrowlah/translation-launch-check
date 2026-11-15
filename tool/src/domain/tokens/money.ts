@@ -1,34 +1,77 @@
 import type { LocaleRule, Rules } from "../rules";
-import { normalizeNumber, numberPattern } from "./numbers";
-import { alternation } from "./regex";
+import { compile } from "./compiled";
+import { currencyCodeOf } from "./currency";
+import { plainParts, readAmount } from "./number-patterns";
+import { rangeOf, type Numeral, type Pricer } from "./price-ranges";
+import { takeParts, type Groups, type Part } from "./take";
 
-/** minor = amount * 100 as an integer (JPY too); currency is the ISO code. */
+/** amount: the normalized decimal string ("1299.5", every decimal place kept); currency: ISO. */
 export interface Money {
-  readonly minor: number;
+  readonly amount: string;
   readonly currency: string;
 }
 
-const GAP = "[ \\u00a0\\u202f]?";
+/**
+ * "\u20ac 2 000": the whole price, or the first part as the price and the rest as numbers, as the
+ * other side of the line decides (resolvePair).
+ */
+export interface SpacedMoney {
+  readonly whole: Money;
+  readonly first: Money;
+  readonly rest: readonly string[];
+}
 
-const pattern = (locale: LocaleRule, rules: Rules): RegExp => {
-  const [cur, amount] = [alternation(Object.keys(rules.currencies)), numberPattern(locale, true)];
-  const before = `(?<![\\p{L}])(?<c>${cur})(?!\\p{L})${GAP}(?<a>${amount})`;
-  const after = `(?<!\\d)(?<a>${amount})${GAP}(?<c>${cur})(?!\\p{L})`;
-  return new RegExp(`${before}|${after}`, "gu");
+interface Found {
+  readonly money: Money[];
+  readonly spacedMoney: SpacedMoney[];
+}
+
+/** The price of a match (or a plain-space group's whole), for comparing it with a range end. */
+interface Main {
+  readonly found: Found;
+  readonly price: Money;
+}
+
+const pricerOf = (g: Groups, locale: LocaleRule, rules: Rules): Pricer => {
+  const currency = currencyCodeOf(g.c ?? "", locale, rules);
+  return (raw, chain) => ({ amount: readAmount(raw, chain, locale, rules), currency });
 };
 
-/** "1299.5" becomes 129950: the digits are joined, never multiplied. */
-const toMinor = (amount: string): number => {
-  const [whole = "0", fraction = ""] = amount.split(".");
-  return Number(whole + fraction.padEnd(2, "0").slice(0, 2));
+const numeralOf =
+  (locale: LocaleRule, rules: Rules): Numeral =>
+  (raw) =>
+    Number(readAmount(raw, undefined, locale, rules));
+
+const spacedOf = (raw: string, price: Pricer, locale: LocaleRule, rules: Rules): SpacedMoney => {
+  const [first = "", ...rest] = plainParts(raw);
+  const parts = rest.map((p) => readAmount(p, undefined, locale, rules));
+  return { whole: price(raw), first: price(first), rest: parts };
 };
 
-const isoOf = (symbol: string, rules: Rules): string =>
-  Object.entries(rules.currencies).find(([key]) => key.normalize("NFKC") === symbol)?.[1] ?? symbol;
+/** A missing amount ("\u5343\u5186": a chain alone) counts as one. */
+const plainMain = (g: Groups, price: Pricer): Main => {
+  const main = price(g.a ?? "1", g.x);
+  return { found: { money: [main], spacedMoney: [] }, price: main };
+};
 
-const moneyOf = (g: Record<string, string>, locale: LocaleRule, rules: Rules): Money => ({
-  minor: toMinor(normalizeNumber(g.a ?? "", locale)),
-  currency: isoOf(g.c ?? "", rules),
+const mainOf = (g: Groups, price: Pricer, locale: LocaleRule, rules: Rules): Main => {
+  if (g.sp === undefined) return plainMain(g, price);
+  const spaced = spacedOf(g.sp, price, locale, rules);
+  return { found: { money: [], spacedMoney: [spaced] }, price: spaced.whole };
+};
+
+/** One match: a range start, the price or a plain-space group, and a range end. */
+const partOf = (m: RegExpExecArray, locale: LocaleRule, rules: Rules): Part<Found> => {
+  const price = pricerOf(m.groups ?? {}, locale, rules);
+  const main = mainOf(m.groups ?? {}, price, locale, rules);
+  const { start, end, from, length } = rangeOf(m, price, main.price, numeralOf(locale, rules));
+  const money = [...start, ...main.found.money, ...end];
+  return { item: { money, spacedMoney: main.found.spacedMoney }, from, length };
+};
+
+const joined = (items: readonly Found[]): Found => ({
+  money: items.flatMap((f) => f.money),
+  spacedMoney: items.flatMap((f) => f.spacedMoney),
 });
 
 /** Finds a currency symbol or code next to an amount; each price becomes one space in rest. */
@@ -36,11 +79,8 @@ export const extractMoney = (
   text: string,
   locale: LocaleRule,
   rules: Rules,
-): { money: Money[]; rest: string } => {
-  const money: Money[] = [];
-  const rest = text.replace(pattern(locale, rules), (...args) => {
-    money.push(moneyOf(args.at(-1) as Record<string, string>, locale, rules));
-    return " ";
-  });
-  return { money, rest };
+): Found & { rest: string } => {
+  const read = (m: RegExpExecArray) => partOf(m, locale, rules);
+  const { items, rest } = takeParts(text, compile(locale, rules).money, read);
+  return { ...joined(items), rest };
 };

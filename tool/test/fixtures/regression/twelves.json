@@ -1,0 +1,231 @@
+{
+  "a_twelve_oclock_kept_by_the_translation_has_no_finding": [
+    ["ja-JP", "Ends at midnight", "\u5348\u524d0\u6642\u306b\u7d42\u4e86", []],
+    ["ja-JP", "Starts at noon", "\u5348\u5f8c0\u6642\u958b\u59cb", []],
+    ["de-DE", "Lunch 12-2pm", "Mittagessen 12-14 Uhr", []],
+    ["de-DE", "Open 12-3pm", "Ge\u00f6ffnet 12-15 Uhr", []],
+    ["fr-FR", "Lunch 12-2pm", "D\u00e9jeuner de 12 h \u00e0 14 h", []],
+    ["ja-JP", "Lunch 12-2pm", "\u30e9\u30f3\u30c112\uff5e14\u6642", []],
+    ["de-DE", "Valid 10-12pm", "G\u00fcltig 10-12 Uhr", []],
+    ["fr-FR", "12-24 hour delivery", "Livraison en 12 \u00e0 24 h", []],
+    ["de-DE", "Open noon-6pm", "Ge\u00f6ffnet 12-18 Uhr", []],
+    ["de-DE", "Open 12-6pm", "Ge\u00f6ffnet 12-18 Uhr", []],
+    ["de-DE", "Live Q&A 12-2pm ET", "Live-Fragestunde 12-14 Uhr ET", []],
+    ["de-DE", "Open 10-12pm", "Ge\u00f6ffnet 10-12 Uhr", []],
+    [
+      "fr-FR",
+      "From Nov 27 12 AM to Nov 30 11:59 PM",
+      "Du 27 novembre 0 h au 30 novembre 23 h 59",
+      []
+    ],
+    ["ja-JP", "Ends 12 PM", "\u5348\u524d12\u6642\u307e\u3067", []],
+    ["de-DE", "Open 11-12am", "Ge\u00f6ffnet 11-12 Uhr", []],
+    ["ja-JP", "Open 12-6am", "\u5348\u524d12\u6642\uff5e6\u6642", []],
+    ["ja-JP", "Open 12am-1am", "\u5348\u5f8c12\u6642\uff5e1\u6642", []],
+    ["ja-JP", "Open 11 AM - 12 PM", "11\u6642\uff5e\u5348\u524d12\u6642", []],
+    ["ja-JP", "Open 12 PM - 12 AM", "\u5348\u5f8c12\u6642\uff5e\u5348\u524d0\u6642", []],
+    [
+      "ja-JP",
+      "Lunch 12-1 PM, dinner until 12 AM",
+      "\u30e9\u30f3\u30c1\u5348\u5f8c12\u6642\uff5e1\u6642\u3001\u30c7\u30a3\u30ca\u30fc\u5348\u524d0\u6642\u307e\u3067",
+      []
+    ],
+    ["ja-JP", "Sale 12 AM - 12 PM", "\u5348\u524d0\u6642\uff5e\u5348\u5f8c12\u6642", []],
+    [
+      "ja-JP",
+      "Starts at midnight, ends at noon",
+      "\u5348\u524d0\u6642\u958b\u59cb\u3001\u5348\u5f8c12\u6642\u7d42\u4e86",
+      []
+    ],
+    ["ja-JP", "Open 12 PM - 12 AM", "\u5348\u5f8c12\u6642\uff5e\u5348\u524d12\u6642", []],
+    ["ja-JP", "Open 12 PM - 12 AM", "\u6b63\u5348\uff5e\u5348\u524d0\u6642", []],
+    ["ja-JP", "Ends 12 noon", "\u6b63\u5348\uff08\u5348\u5f8c12\u6642\uff09", []],
+    ["fr-FR", "Open 11-12am", "Ouvert de 11 h \u00e0 12 h", []],
+    ["de-DE", "Open 10-12am", "10-12 Uhr", []],
+    ["de-DE", "Open 8-12am", "8-12 Uhr", []],
+    ["ja-JP", "Open 11-12am", "\u5348\u524d11\u6642\uff5e12\u6642", []],
+    ["ja-JP", "Open 11-12am", "11\u6642\uff5e12\u6642", []],
+    ["de-DE", "Brunch 10:30-12am", "10:30-12 Uhr", []],
+    ["de-DE", "Brunch 10-12 am", "10-12 Uhr", []],
+    ["de-DE", "Brunch 10-12 a.m.", "10-12 Uhr", []],
+    ["ja-JP", "Open 9-12 AM", "9\u6642\uff5e12\u6642", []],
+    ["de-DE", "Open 12-6am", "0-6 Uhr", []],
+    ["de-DE", "Ends 12am", "Endet um 0 Uhr", []],
+    ["ja-JP", "Ends 12 AM", "\u5348\u524d12\u6642\u307e\u3067", []],
+    ["ja-JP", "Ends 12 PM", "\u5348\u5f8c12\u6642\u307e\u3067", []],
+    ["ja-JP", "Open 10am-12pm", "\u5348\u524d10\u6642\uff5e\u5348\u5f8c12\u6642", []],
+    ["ja-JP", "Lunch 12:30 PM", "\u30e9\u30f3\u30c1\u5348\u5f8c12\u664230\u5206", []],
+    ["ja-JP", "Lunch 12-1 PM", "\u30e9\u30f3\u30c1\u5348\u5f8c12\u6642\uff5e1\u6642", []],
+    [
+      "ja-JP",
+      "Lunch 12-1 PM",
+      "\u30e9\u30f3\u30c1\u5348\u5f8c12\u6642\uff5e\u5348\u5f8c1\u6642",
+      []
+    ],
+    ["ja-JP", "Open 12-6pm", "\u55b6\u696d\u6642\u9593 \u5348\u5f8c12\u6642\uff5e6\u6642", []],
+    ["ja-JP", "Sale 12-3pm", "\u5348\u5f8c12\uff5e3\u6642", []],
+    ["ja-JP", "Ends 12 noon", "\u6b63\u5348\uff08\u5348\u5f8c12\u6642\uff09\u307e\u3067", []],
+    ["ja-JP", "Ends midnight", "\u5348\u524d12\u6642\u307e\u3067", []],
+    ["ja-JP", "8pm-12am", "\u5348\u5f8c8\u6642\uff5e\u5348\u524d12\u6642", []],
+    ["de-DE", "Brunch 10-12am", "10-12 Uhr", []],
+    ["de-DE", "Ends 12am", "Endet 0 Uhr", []],
+    ["de-DE", "Open 11am-12am", "Ge\u00f6ffnet 11-24 Uhr", []],
+    ["de-DE", "Open daily 11 AM\u201312 AM", "T\u00e4glich ge\u00f6ffnet 11\u201324 Uhr", []],
+    ["de-DE", "Mon-Sat 10am-12am", "Mo.\u2013Sa. 10\u201324 Uhr", []],
+    ["de-DE", "Open 9am\u201312am", "Ge\u00f6ffnet 9\u201324 Uhr", []],
+    ["de-DE", "Open 11am-12am", "Ge\u00f6ffnet 11\u20130 Uhr", []],
+    ["fr-FR", "Open 11am-12am", "Ouvert de 11 h \u00e0 minuit", []],
+    ["fr-FR", "Open 11am-12am", "Ouvert 11 h - 0 h", []],
+    ["ja-JP", "Open 11am-12am", "11\u6642\uff5e24\u6642", []],
+    ["ja-JP", "Open 11am-12am", "\u5348\u524d11\u6642\uff5e\u5348\u524d0\u6642", []],
+    ["ja-JP", "Open 11 AM - 12 AM", "11\u6642\uff5e24\u6642", []],
+    ["en-GB", "Open 11am-12am", "Open 11am-midnight", []],
+    ["de-DE", "Open 10pm-12am", "Ge\u00f6ffnet 22\u201324 Uhr", []],
+    ["de-DE", "Open 11-12am", "Ge\u00f6ffnet 11\u201312 Uhr", []],
+    ["de-DE", "Open 11am-12pm", "Ge\u00f6ffnet 11\u201312 Uhr", []],
+    ["de-DE", "Open 10am-12am daily", "T\u00e4glich 10\u201324 Uhr", []],
+    ["de-DE", "Open 10am-12am daily", "T\u00e4glich 10:00\u20130:00 Uhr", []],
+    ["fr-FR", "Open 10am-12am daily", "Tous les jours de 10 h \u00e0 minuit", []],
+    ["fr-FR", "Open 10am-12am daily", "Tous les jours de 10 h \u00e0 0 h", []],
+    [
+      "ja-JP",
+      "Open 10am-12am daily",
+      "\u6bce\u65e5\u5348\u524d10\u6642\uff5e\u5348\u524d0\u6642",
+      []
+    ],
+    ["en-GB", "Open 10am-12am daily", "Open 10am-midnight daily", []],
+    ["de-DE", "Hours: 7am - 12am", "\u00d6ffnungszeiten: 7\u201324 Uhr", []],
+    ["de-DE", "Open 9am to 12am", "Ge\u00f6ffnet 9 bis 24 Uhr", []],
+    ["de-DE", "Open 11:30am-12am", "Ge\u00f6ffnet 11:30\u201324 Uhr", []],
+    ["de-DE", "11 AM - 12 AM", "11\u201324 Uhr", []],
+    ["de-DE", "Open 8am-12am, Fri-Sat 8am-2am", "8\u201324 Uhr, Fr.\u2013Sa. 8\u20132 Uhr", []],
+    [
+      "ja-JP",
+      "12-6 PM, delivery until 12 AM",
+      "\u5348\u5f8c12\u6642\uff5e6\u6642\u3001\u914d\u9001\u5348\u524d12\u6642\u307e\u3067",
+      []
+    ]
+  ],
+  "a_changed_twelve_oclock_is_a_finding": [
+    ["de-DE", "Lunch 12-2pm", "Mittagessen 12-15 Uhr", [["numbers", "14:00", "15:00"]]],
+    [
+      "de-DE",
+      "Open 11-12am",
+      "Ge\u00f6ffnet 23-24 Uhr",
+      [
+        ["numbers", "11:00", "23:00"],
+        ["numbers", "12:00", "00:00"]
+      ]
+    ],
+    [
+      "de-DE",
+      "Open 8-12am",
+      "Ge\u00f6ffnet 20-24 Uhr",
+      [
+        ["numbers", "08:00", "20:00"],
+        ["numbers", "12:00", "00:00"]
+      ]
+    ],
+    [
+      "ja-JP",
+      "Open 11 AM - 1 PM",
+      "11\u6642\uff5e\u5348\u524d12\u6642",
+      [["numbers", "13:00", "12:00"]]
+    ],
+    [
+      "ja-JP",
+      "Open 12 PM - 1 AM",
+      "\u5348\u5f8c12\u6642\uff5e\u5348\u524d0\u6642",
+      [["numbers", "01:00", "00:00"]]
+    ],
+    [
+      "de-DE",
+      "Open 11-12am",
+      "23-24 Uhr",
+      [
+        ["numbers", "11:00", "23:00"],
+        ["numbers", "12:00", "00:00"]
+      ]
+    ],
+    [
+      "de-DE",
+      "Late night 10-12am",
+      "22-24 Uhr",
+      [
+        ["numbers", "10:00", "22:00"],
+        ["numbers", "12:00", "00:00"]
+      ]
+    ],
+    [
+      "ja-JP",
+      "Open 11 AM - 1 PM",
+      "\u5348\u524d11\u6642\uff5e\u5348\u5f8c12\u6642",
+      [["numbers", "13:00", "12:00"]]
+    ],
+    ["ja-JP", "Ends 1 PM", "\u5348\u524d12\u6642\u307e\u3067", [["numbers", "13:00", "12:00"]]],
+    ["de-DE", "Open 11am-12am", "Ge\u00f6ffnet 11-12 Uhr", [["numbers", "00:00", "12:00"]]],
+    ["de-DE", "Open 11am-12am", "Ge\u00f6ffnet 11\u201323 Uhr", [["numbers", "00:00", "23:00"]]],
+    ["de-DE", "Open 10am-12am", "T\u00e4glich 10\u201312 Uhr", [["numbers", "00:00", "12:00"]]],
+    [
+      "ja-JP",
+      "12 PM and 12 AM",
+      "\u5348\u5f8c12\u6642\u3068\u5348\u5f8c12\u6642",
+      [["numbers", "12:00", "00:00"]]
+    ],
+    [
+      "ja-JP",
+      "12 PM and 12 AM",
+      "\u5348\u524d12\u6642\u3068\u5348\u524d12\u6642",
+      [["numbers", "00:00", "12:00"]]
+    ],
+    [
+      "ja-JP",
+      "Lunch from 12 PM, closes at 12 AM",
+      "\u30e9\u30f3\u30c1\u5348\u5f8c12\u6642\u304b\u3089\u3001\u9589\u5e97\u5348\u5f8c12\u6642",
+      [["numbers", "12:00", "00:00"]]
+    ],
+    [
+      "ja-JP",
+      "Opens 12 PM, sale ends 12 PM",
+      "\u958b\u5e97\u5348\u5f8c12\u6642\u3001\u30bb\u30fc\u30eb\u7d42\u4e86\u5348\u524d12\u6642",
+      [["numbers", "12:00", "00:00"]]
+    ],
+    [
+      "ja-JP",
+      "Lunch from 12 PM, last order 12 AM",
+      "\u30e9\u30f3\u30c1\u5348\u5f8c12\u6642\u304b\u3089\u3001\u30e9\u30b9\u30c8\u30aa\u30fc\u30c0\u30fc\u5348\u5f8c12\u6642",
+      [["numbers", "12:00", "00:00"]]
+    ],
+    [
+      "ja-JP",
+      "Ends 12 PM, ships 12 AM",
+      "\u5348\u524d12\u6642\u307e\u3067\u3001\u5348\u524d12\u6642\u767a\u9001",
+      [["numbers", "00:00", "12:00"]]
+    ],
+    [
+      "ja-JP",
+      "Noon to 6 PM, then 12 AM",
+      "\u5348\u5f8c12\u6642\uff5e\u5348\u5f8c6\u6642\u3001\u5348\u5f8c12\u6642",
+      [["numbers", "12:00", "00:00"]]
+    ],
+    ["ja-JP", "Open 12-6 PM", "\u5348\u5f8c12\u6642\uff5e7\u6642", [["numbers", "18:00", "19:00"]]],
+    ["ja-JP", "Open 12-6am", "\u5348\u524d12\u6642\uff5e7\u6642", [["numbers", "06:00", "07:00"]]],
+    [
+      "ja-JP",
+      "Open 12-6 PM, delivery until 12 AM",
+      "\u5348\u5f8c12\u6642\uff5e7\u6642\u3001\u914d\u9001\u5348\u524d12\u6642\u307e\u3067",
+      [["numbers", "18:00", "19:00"]]
+    ]
+  ],
+  "known_limitation_an_evening_range_to_twelve_am_reads_as_morning": [
+    [
+      "de-DE",
+      "Happy hour 5-12am",
+      "Happy Hour 17-24 Uhr",
+      [
+        ["numbers", "05:00", "17:00"],
+        ["numbers", "12:00", "00:00"]
+      ]
+    ]
+  ]
+}

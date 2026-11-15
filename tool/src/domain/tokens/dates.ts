@@ -1,5 +1,8 @@
 import type { LocaleRule, Rules } from "../rules";
-import { compile, type Compiled } from "./date-patterns";
+import { compile } from "./compiled";
+import type { CalendarPatterns } from "./date-patterns";
+import { orderOf, pieceOf, weekdayNamed, type Piece } from "./date-reader";
+import { takeParts, type Part } from "./take";
 
 /** weekday: 0 = Monday, or null when the text names none next to the date. */
 export interface DateToken {
@@ -9,53 +12,28 @@ export interface DateToken {
   readonly weekday: number | null;
 }
 
-type Groups = Readonly<Record<string, string | undefined>>;
-type Order = "mdy" | "dmy";
+/** A yearless n/n: a date or two numbers, decided by the other side of the line (resolvePair). */
+export interface Slash {
+  readonly numbers: readonly string[];
+  /** Read in the locale's own order; null when that is no month and day. */
+  readonly date: DateToken | null;
+  readonly weekday: number | null;
+}
 
-const number = (text: string | undefined): number => Number(text);
-
-const monthAndDay = (g: Groups, calendar: Compiled, order: Order): [number, number] => {
-  if (g.n1 === undefined)
-    return [calendar.months.get(g.mn?.toLowerCase() ?? "") ?? number(g.mi), number(g.d)];
-  return order === "mdy" ? [number(g.n1), number(g.n2)] : [number(g.n2), number(g.n1)];
-};
-
-const weekdayIn = (g: Groups, calendar: Compiled): number | null =>
-  calendar.weekdays.get((g.wd ?? g.ws ?? "").toLowerCase()) ?? null;
-
-const toDate = (g: Groups, calendar: Compiled, order: Order): DateToken | null => {
-  const [month, day] = monthAndDay(g, calendar, order);
-  const year = g.y === undefined ? null : number(g.y);
-  const real = month >= 1 && month <= 12 && day >= 1 && day <= 31;
-  return real ? { month, day, year, weekday: weekdayIn(g, calendar) } : null;
-};
-
-const orderOf = (locale: LocaleRule): Order => locale.date_order ?? "dmy";
-
-const reader =
-  (calendar: Compiled, order: Order, dates: DateToken[]) =>
-  (...args: unknown[]): string => {
-    const date = toDate(args.at(-1) as Groups, calendar, order);
-    if (date) dates.push(date);
-    return date ? " " : String(args[0]);
-  };
-
-/** Finds dates in the locale's written and numeric forms, with an adjacent weekday. */
+/** Finds dates (ranges as two) with an adjacent weekday, and yearless slash forms to resolve. */
 export const extractDates = (
   text: string,
   locale: LocaleRule,
   rules: Rules,
-): { dates: DateToken[]; rest: string } => {
-  const calendar = compile(locale, rules);
-  const dates: DateToken[] = [];
-  const rest = text.replace(calendar.date, reader(calendar, orderOf(locale), dates));
-  return { dates, rest };
+): { dates: DateToken[]; slashes: Slash[]; rest: string } => {
+  const { calendar } = compile(locale, rules);
+  const read = (m: RegExpExecArray): Part<Piece> | null => pieceOf(m, calendar, orderOf(locale));
+  const { items, rest } = takeParts(text, calendar.date, read);
+  return { dates: items.flatMap((p) => p.dates), slashes: items.flatMap((p) => p.slashes), rest };
 };
 
-const weekdaysIn = (text: string, calendar: Compiled): number[] =>
-  [...text.matchAll(calendar.bare)].flatMap(
-    (m) => calendar.weekdays.get((m.groups?.w ?? "").toLowerCase()) ?? [],
-  );
+const weekdaysIn = (text: string, calendar: CalendarPatterns): number[] =>
+  [...text.matchAll(calendar.bare)].flatMap((m) => weekdayNamed(m.groups?.w, calendar) ?? []);
 
 /** Finds weekday names standing alone: full names only, never a short form like "So" or "Do". */
 export const extractWeekdays = (
@@ -63,6 +41,6 @@ export const extractWeekdays = (
   locale: LocaleRule,
   rules: Rules,
 ): { weekdays: number[]; rest: string } => {
-  const calendar = compile(locale, rules);
+  const { calendar } = compile(locale, rules);
   return { weekdays: weekdaysIn(text, calendar), rest: text.replace(calendar.bare, " ") };
 };

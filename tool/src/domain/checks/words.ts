@@ -1,17 +1,12 @@
-import { escape } from "../tokens/regex";
+import { alternatives, LATIN, termSource } from "../tokens/regex";
 
-const LATIN = "\\p{Script=Latin}";
 export const LATIN_WORD = `${LATIN}+`;
-
-const phrase = (term: string): string => term.split(/\s+/u).map(escape).join("\\s+");
 
 /** Terms as whole words: a neighbouring Latin letter blocks a match, so CJK text still matches. */
 export const bounded = (source: string): string => `(?<!${LATIN})(?:${source})(?!${LATIN})`;
 
-export const wholeWordSource = (terms: readonly string[]): string => {
-  const sorted = [...terms].sort((a, b) => b.length - a.length);
-  return bounded(sorted.length === 0 ? "(?!)" : sorted.map(phrase).join("|"));
-};
+export const wholeWordSource = (terms: readonly string[]): string =>
+  bounded(alternatives(terms, termSource));
 
 export const wholeWords = (terms: readonly string[], flags: string): RegExp =>
   new RegExp(wholeWordSource(terms), flags);

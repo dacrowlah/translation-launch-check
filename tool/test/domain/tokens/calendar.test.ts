@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { nextOccurrence, weekdayOf } from "../../../src/domain/tokens/calendar";
+import { isoDate, nextOccurrence, weekdayOf } from "../../../src/domain/tokens/calendar";
 import { FAKE_NOW } from "../../support/clock";
 
 describe("calendar", () => {
@@ -32,5 +32,16 @@ describe("calendar", () => {
     [4, 31],
   ])("returns_null_for_a_date_that_never_exists %s/%s", (m, d) => {
     expect(nextOccurrence(m, d, FAKE_NOW)).toBeNull();
+  });
+});
+
+describe("isoDate", () => {
+  it.each([
+    [2028, 2, 29, "2028-02-29"],
+    [2026, 2, 29, null],
+    [2026, 11, 31, null],
+    [2026, 1, 5, "2026-01-05"],
+  ])("writes_a_real_date_in_iso_form_and_refuses_a_day_the_month_lacks_%#", (y, m, d, iso) => {
+    expect(isoDate(y, m, d)).toBe(iso);
   });
 });
