@@ -64,7 +64,7 @@ mark/                                      the Agent Platform source
 The agents, skills, workflow and build:
 ```
 mark/
-  README.md                                setup (section 3) and the demo cases (section 5); planned
+  README.md                                setup, import, running and the demo walkthrough
   workflow/workflow.json                   steps, triggers, conditions, canvas positions
                                            (code steps by code_file; section 4)
   build.py                                 python mark/build.py [--example] [--out DIR]
@@ -418,8 +418,9 @@ The how-to is the [writing-tests skill](../../.claude/skills/writing-tests/SKILL
   only allow-listed imports, the example config injected, no real private value in a
   tracked file, and the five built steps run end to end on the fake SDK).
 - **End-to-end runs in the instance are the integration test.** Each demo case
-  (`mark/README.md`, planned) is run, and the outcome checked in the run log, not only in
-  chat text. The run budget is in the plan.
+  (`mark/README.md` section 5) is run, and the outcome checked in the run log, not only in
+  chat text. The budget is about 10 end-to-end runs; credits per run are measured in Task 23
+  (pending).
 
 ## 6. Tooling and gates
 
