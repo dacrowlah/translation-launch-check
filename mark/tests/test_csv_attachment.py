@@ -48,7 +48,7 @@ def test_refuses_a_character_count(fake_tools):
         (csv_canvas("id,en-US\r\nL1," + "a" * 190 + "\ufffd" + "a" * 190 + "\r\n"), "not_utf8"),
         (ok({"data": {"content": None}}), "unavailable"),
         (ok({"data": "id,en-US"}), "unavailable"),
-        (ok({"content": CSV}), "unavailable"),
+        (ok({"data": {"content": CSV}, "error": "tool failed"}), "unavailable"),
         (error(503), "unavailable"),
         (ProxyChannelError("down"), "unavailable"),
     ],

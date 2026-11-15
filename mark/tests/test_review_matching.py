@@ -77,3 +77,24 @@ def test_an_unknown_confidence_counts_as_unsure(fake_tools, tmp_path, confidence
         "unsure",
         "ready_with_warnings",
     )
+
+
+REVIEW_NOTES = [
+    a_review_finding("L2", "tone", "warning"),
+    a_review_finding("L1", "tone", "warning"),
+    a_review_finding("L2", "meaning", "warning"),
+]
+
+
+def test_a_tone_finding_where_the_code_found_formality_is_dropped(fake_tools, tmp_path):
+    def review(item):
+        return a_review(item, REVIEW_NOTES)
+
+    formality = {("de-DE", "L2"): [a_finding("formality", "warning")]}
+    found = score_with(fake_tools, tmp_path, formality, review)
+    assert [(f["source"], f["line_id"], f["check"]) for f in found["findings"]] == [
+        ("rules", "L2", "formality"),
+        ("review", "L1", "tone"),
+        ("review", "L2", "meaning"),
+    ]
+    assert found["unmatched_notes"] == 0

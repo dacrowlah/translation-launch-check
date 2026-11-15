@@ -96,9 +96,8 @@ def _csv_status(text, size):
     return _text_status(text, size) if isinstance(text, str) else "unavailable"
 
 
-def _csv_result(body, size):
-    data = body.get("data") if body else None
-    text = data.get("content") if isinstance(data, dict) else None
+def _csv_result(data, size):
+    text = data.get("content") if data else None
     status = _csv_status(text, size)
     return {"status": status, "text": text if status == "ok" else None}
 

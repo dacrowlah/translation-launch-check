@@ -144,10 +144,18 @@ def call_tool(tool, /, **params):
     return {"ok": status == "ok", "status": status, "body": body if status == "ok" else None}
 
 
+def _payload(body):
+    """A platform tool's result sits under `data` (verified for create_canvas from a code step);
+    a body without a data object is read as it is. A set `error` is a failure."""
+    if not isinstance(body, dict) or body.get("error") is not None:
+        return None
+    data = body.get("data")
+    return data if isinstance(data, dict) else body
+
+
 def call_platform(tool, /, **params):
-    """A platform tool (no status token of ours): the body dict or None; callers check fields."""
-    body = _body(_invoke(tool, params))
-    return body if isinstance(body, dict) else None
+    """A platform tool (no status token of ours): its result dict or None; callers check fields."""
+    return _payload(_body(_invoke(tool, params)))
 
 
 def send_email(recipient, subject, text):
@@ -171,9 +179,8 @@ def _csv_attachment(attachment):
     return name.endswith(".csv") and type(size) is int and 0 < size <= MAX_ATTACHMENT_BYTES
 
 
-def _csv_text(body, size):
-    data = body.get("data") if body else None
-    text = data.get("content") if isinstance(data, dict) else None
+def _csv_text(data, size):
+    text = data.get("content") if data else None
     return text if isinstance(text, str) and len(text.encode("utf-8")) == size else None
 
 

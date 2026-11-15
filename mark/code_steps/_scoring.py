@@ -8,6 +8,9 @@ from _verdict import verdict_for
 NO_OPINION = {"opinion": None, "reason": None}
 MAX_FOUND = 300  # the run log's findings list; the total says how many there were
 COLUMN = "column"
+# A reviewer finding that restates a code finding on the same line is dropped; the code's
+# stays: {review check: the code checks it restates}.
+SAME_PROBLEM = {"tone": {"formality"}}
 
 
 def _rule_rows(facts, review):
@@ -29,14 +32,23 @@ def _report_line(master, line):
     return {**names, "master": master["text"], **found}
 
 
+def _restates(row, rule_rows):
+    same = SAME_PROBLEM.get(row["check"], set())
+    return any(rule["line_id"] == row["line_id"] and rule["check"] in same for rule in rule_rows)
+
+
+def _merged(rule_rows, review_rows_):
+    return rule_rows + [row for row in review_rows_ if not _restates(row, rule_rows)]
+
+
 def _judged(facts, saved):
     """A language is not checked without a counted review and a back-translation, or when
     the tool didn't check it (unsupported_locale). Review notes whose line id matches no
-    line are dropped and counted."""
+    line are dropped and counted; one restating a code finding on its line is dropped."""
     review, back = counted_review(saved, facts), _back_translation(saved)
     not_checked = review is None or back is None or facts["status"] != "checked"
     rows, unmatched = review_rows(review, facts)
-    findings = _rule_rows(facts, review) + rows
+    findings = _merged(_rule_rows(facts, review), rows)
     return {"findings": findings, "not_checked": not_checked, "unmatched_notes": unmatched}
 
 

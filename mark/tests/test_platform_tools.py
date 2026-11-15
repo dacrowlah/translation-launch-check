@@ -110,6 +110,33 @@ def test_create_canvas_returns_the_artifact_url(fake_tools):
     assert create_canvas("Report 0123", "# Report") == "https://example.com/a/1"
 
 
+# The envelope create_canvas really returned (verified from a code step; placeholder ids).
+CANVAS_URL = "https://mark.example.test/instances/INSTANCE/artifacts?artifactId=A1&spaceId=S1"
+CANVAS_DATA = {"id": "A1", "name": "Report 0123.md", "artifact_url": CANVAS_URL}
+EMPTY = {"success": None, "type": None, "result": None, "file_contents": None}
+
+
+def enveloped(data, error=None):
+    return ok({**EMPTY, "data": data, "error": error})
+
+
+def test_create_canvas_reads_the_url_under_data(fake_tools):
+    fake_tools.respond("create_canvas", enveloped(CANVAS_DATA))
+    assert create_canvas("Report 0123", "# Report") == CANVAS_URL
+
+
+def test_a_platform_result_with_an_error_is_a_failure(fake_tools):
+    fake_tools.respond("create_canvas", enveloped(CANVAS_DATA, error="canvas failed"))
+    assert create_canvas("Report 0123", "# Report") is None
+    fake_tools.respond("send_email", enveloped({"status": "sent"}, error="send failed"))
+    assert send_email(ALLOWED, "Subject", "Body") is False
+
+
+def test_send_email_reads_sent_under_data(fake_tools):
+    fake_tools.respond("send_email", enveloped({"status": "sent"}))
+    assert send_email(ALLOWED, "Subject", "Body") is True
+
+
 def test_create_canvas_sends_markdown_by_name(fake_tools):
     fake_tools.respond("create_canvas", ok({"artifact_url": "u"}))
     create_canvas("Report 0123", "# Report")
