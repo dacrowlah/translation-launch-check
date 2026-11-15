@@ -57,6 +57,11 @@ REQUIRED = {
         "Keep links, merge tags, promo codes and numbers exactly as the current translation "
         "writes them. Change one only when a problem names it",
         "A localized link path such as /de-de/ stays.",
+        "Never change a price, an amount or a currency, even when a finding names it "
+        "(currency_code, currency_amount, numbers on a price). Keep them exactly as the current "
+        "translation writes them, and put the problem in the note for a person.",
+        '"For a person" appears only when the code found a price or currency problem in the '
+        "line: never act on it, and name it in the note.",
         "Never add a value or qualifier the master doesn't have",
         "When a listed problem is not real in this line, keep that part",
         "Keep the locale's formality",
@@ -96,6 +101,7 @@ REQUIRED = {
         "never remove an accent or a letter the language needs",
         'other than "ok": the call failed. Keep the draft and report `fits` false.',
         "Never drop a claim, a condition or legal text to make a line fit",
+        "Never change a price, an amount or a currency, even when a problem names it",
     ),
 }
 

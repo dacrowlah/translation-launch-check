@@ -5,7 +5,7 @@ never change verdicts: the verdict describes the file as submitted. Nothing here
 
 from _agent_output import agent_answer
 from _config import RULES
-from _fix_input import SPELLING, fixable
+from _fixable import SPELLING, fixable
 from _model_output import model_text
 from _shared import call_tool
 from _tool_report import usable_report

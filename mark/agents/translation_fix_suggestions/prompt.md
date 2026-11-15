@@ -17,9 +17,13 @@ Start from: <the current translation with its market spelling fixed>
 Length: <length> of <limit> <unit>
 Problems:
 - <check> (<severity>): <what is wrong> Expected: <master value>. Found: <translated value>.
+For a person (keep prices and currencies as written):
+- <check> (<severity>): <what is wrong>
 ```
 
-"Start from:" appears only when the code fixed the line's market spelling. "Length:" has no
+"Start from:" appears only when the code fixed the line's market spelling. "For a person"
+appears only when the code found a price or currency problem in the line: never act on it,
+and name it in the note. "Length:" has no
 "of <limit>" when the channel has no limit. Expected and Found appear only when the code read
 a value.
 
@@ -41,7 +45,12 @@ a value.
 # Rules for every draft
 - Keep links, merge tags, promo codes and numbers exactly as the current translation writes
   them. Change one only when a problem names it, and then to the master's value, written the
-  way the market writes it. A localized link path such as /de-de/ stays.
+  way the market writes it: a discount percentage or a date, for example. A localized link
+  path such as /de-de/ stays.
+- Never change a price, an amount or a currency, even when a finding names it
+  (currency_code, currency_amount, numbers on a price). Keep them exactly as the current
+  translation writes them, and put the problem in the note for a person. Local prices come
+  from the customer's price list, never from the master.
 - Never add a value or qualifier the master doesn't have: no time zone, date, price,
   condition or "up to". A problem the master has too, such as a time with no time zone, is
   for the master's author: leave that part as it is and say so in the note.
@@ -121,6 +130,35 @@ Draft "{{first_name}}, your favourite colours are 30% off": fits true.
       "suggested_text": "{{first_name}}, your favourite colours are 30% off",
       "fits": true,
       "note": "Restored the 30% discount from the master, kept the UK spelling and the merge tag."
+    }
+  ]
+}
+```
+
+Example 3, a claim fix in a line whose local price stays:
+
+```text
+[de-CH L5] email/body
+Master: TrailPro jackets from $49.90, this week only.
+Translation: TrailPro-Jacken ab CHF 49.90, nur heute.
+Length: 40 chars
+Problems:
+- claim (blocker): The deadline changed from this week to today.
+For a person (keep prices and currencies as written):
+- currency_code (warning): The currency differs from the master; confirm the local price.
+```
+
+Draft "TrailPro-Jacken ab CHF 49.90, nur diese Woche.": fits true.
+
+```json
+{
+  "fixes": [
+    {
+      "locale": "de-CH",
+      "line_id": "L5",
+      "suggested_text": "TrailPro-Jacken ab CHF 49.90, nur diese Woche.",
+      "fits": true,
+      "note": "Restored \"this week only\" from the master and kept the Swiss price CHF 49.90 as written; confirm the local price against the price list."
     }
   ]
 }

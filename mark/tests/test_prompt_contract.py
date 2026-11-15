@@ -3,6 +3,8 @@ tests feed each prompt example's facts through the real builders and require the
 appear in the prompt verbatim, so the code and the prompts can't drift apart. A change to
 either goes through the controller, in both places together."""
 
+import pytest
+
 from _fix_input import fix_input
 from _loop_items import review_input
 from builders import FIX_DIR, REVIEW_DIR
@@ -110,6 +112,27 @@ EXAMPLE_2 = an_entry(
 )
 
 
-def test_the_fix_inputs_match_the_merged_prompts_examples():
-    text = prompt(FIX_DIR)
-    assert fix_input([EXAMPLE_1]) + "\n```" in text and fix_input([EXAMPLE_2]) + "\n```" in text
+EXAMPLE_3 = an_entry(
+    ("de-CH", "L5", "email", "body"),
+    (
+        "TrailPro jackets from $49.90, this week only.",
+        "TrailPro-Jacken ab CHF 49.90, nur heute.",
+        "TrailPro-Jacken ab CHF 49.90, nur heute.",
+    ),
+    {"value": 40, "limit": None, "unit": "chars"},
+    [
+        a_problem("claim", "blocker", "The deadline changed from this week to today."),
+        a_problem(
+            "currency_code",
+            "warning",
+            "The currency differs from the master; confirm the local price.",
+            "$",
+            "CHF",
+        ),
+    ],
+)
+
+
+@pytest.mark.parametrize("example", [EXAMPLE_1, EXAMPLE_2, EXAMPLE_3])
+def test_the_fix_inputs_match_the_merged_prompts_examples(example):
+    assert fix_input([example]) + "\n```" in prompt(FIX_DIR)

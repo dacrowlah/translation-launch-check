@@ -45,6 +45,7 @@ mark/                                      the Agent Platform source
   code_steps/_markdown.py                  md_text(): untrusted text shown as text
   code_steps/_verdict.py                   verdict_for, overall (code decides every verdict)
   code_steps/_scoring.py                   one language's score
+  code_steps/_fixable.py                   which findings a fix addresses; prices never
   code_steps/_fix_input.py                 lines to fix and the fixer's input text
   code_steps/_fixes.py                     suggested fixes and their one re-check call
   code_steps/_report_view.py  _message.py  the chat reply (also the QA-inbox email)

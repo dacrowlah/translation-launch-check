@@ -20,7 +20,7 @@ from step_builders import (
 
 NUMBERS = a_finding("numbers", expected="30%", found="20 %", detail="The number differs.")
 SPELLING = a_finding("locale_spelling", "warning", detail="Use UK spelling.")
-UNSURE = a_finding("currency_code", "warning", "unsure", detail="Is CHF 30 the same price?")
+UNSURE = a_finding("numbers", "warning", "unsure", detail="Is 30 % the same number?")
 
 
 def run(fake_tools, tmp_path, findings, review=None):
@@ -115,6 +115,30 @@ def test_fix_input_lists_each_line_with_its_problems(fake_tools, tmp_path):
         "Length: 22 chars\n"
         "Problems:\n"
         "- numbers (blocker): The number differs. Expected: 30%. Found: 20 %."
+    )
+
+
+CURRENCY = a_finding(
+    "currency_code",
+    "warning",
+    detail="The currency differs from the master; confirm the local price.",
+    expected="$",
+    found="CHF",
+)
+PRICE = a_finding("currency_amount", detail="A price differs.", expected="49.90", found="59.90")
+
+
+def test_a_line_with_only_price_or_currency_problems_is_not_sent(fake_tools, tmp_path):
+    out, scores = run(fake_tools, tmp_path, {("de-DE", "L1"): [CURRENCY, PRICE]})
+    assert to_fix(scores) == [] and out["fix_input"] == ""
+
+
+def test_price_and_currency_problems_go_to_a_person_without_values(fake_tools, tmp_path):
+    out, _ = run(fake_tools, tmp_path, {("de-DE", "L1"): [CURRENCY, NUMBERS]})
+    assert out["fix_input"].endswith(
+        "Problems:\n- numbers (blocker): The number differs. Expected: 30%. Found: 20 %.\n"
+        "For a person (keep prices and currencies as written):\n"
+        "- currency_code (warning): The currency differs from the master; confirm the local price."
     )
 
 

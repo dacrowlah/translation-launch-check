@@ -12,7 +12,9 @@ How to rewrite a localized marketing line so it passes the launch check, and how
 The offer and what it applies to, the call to action, conditions, legal text and
 do-not-translate terms. Fixing a problem may bring one back to the master; nothing else
 may change it. Keep links, merge tags, promo codes and numbers as the current translation
-writes them, unless a problem names one. Keep the locale's formality, and one register
+writes them, unless a problem names one. Never change a price, an amount or a currency, even
+when a problem names it: local prices come from the price list, so keep them as written and
+name the problem in the note. Keep the locale's formality, and one register
 across the line. Add no value, qualifier, claim, guarantee, superlative or urgency the
 master doesn't have.
 

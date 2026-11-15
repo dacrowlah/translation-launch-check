@@ -26,9 +26,7 @@ EVIL_COPY = (
 )
 EVIL_FIX = f"Jetzt [hier klicken](https://evil.example/fix) {RLO}gnilleps"
 EVIL_REASON = "Click [here](https://evil.example/reason)"
-UNSURE = a_finding(
-    "currency_code", "warning", "unsure", detail="Is [this](https://evil.example/q) 30?"
-)
+UNSURE = a_finding("numbers", "warning", "unsure", detail="Is [this](https://evil.example/q) 30?")
 # Markup that would render live: the same characters, not preceded by a backslash escape.
 LIVE = re.compile(r"(?<!\\)(\]\(https://evil|\*\*fett|<img)|" + RLO)
 
@@ -96,7 +94,7 @@ def test_the_human_look_block_is_capped_per_language(fake_tools, tmp_path):
         "findings": {("de-DE", f"L{n}"): [UNSURE] for n in range(1, 7)},
     }
     text = deliver(fake_tools, ctx, run(fake_tools, ctx, case))["message"]
-    assert text.count("currency\\_code") == 5 and "- ...and 1 more in the detailed report." in text
+    assert text.count("(numbers)") == 5 and "- ...and 1 more in the detailed report." in text
 
 
 def a_big_case():

@@ -70,7 +70,7 @@ def test_fixer_schema_fields():
 
 
 @pytest.mark.parametrize(
-    ("agent_dir", "count"), [(REVIEW, 3), (FIX, 2)], ids=["translation_review", "fixer"]
+    ("agent_dir", "count"), [(REVIEW, 3), (FIX, 3)], ids=["translation_review", "fixer"]
 )
 def test_worked_examples_match_the_enforced_schema(agent_dir, count):
     examples = _json_examples(agent_dir)
