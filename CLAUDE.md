@@ -101,14 +101,13 @@ docs/standards/README.md  TOOL.md  MARK.md
 scripts/     preflight.sh  prove-gates.sh  mark-test-gate.sh  send_package.py  write_demo_fixtures.py  catch_rate.py
 .githooks/   pre-commit
 tool/        api/  config/  scripts/  src/{domain,application,infrastructure,presentation}  test/
-mark/        code_steps/ (steps and helper modules)  agents/  skills/  _build/  tests/
+mark/        code_steps/ (steps and helper modules)  agents/  skills/  workflow/  build.py  _build/  tests/  dist/ (generated)
 demo/        template.csv  black-friday-{clean,errors,broken,uk-ch}.csv  seeded-errors.csv (+ .answers.json)  encodings/
 ```
 
 Planned, created as the build proceeds:
 ```
 README.md
-mark/        workflow/  build.py  dist/ (generated)
 ```
 See [standards README section 4](docs/standards/README.md#4-repository-layout), and
 [TOOL.md](docs/standards/TOOL.md) section 1 and [MARK.md](docs/standards/MARK.md) section 1

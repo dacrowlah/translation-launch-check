@@ -28,7 +28,8 @@ characters are written as `\uXXXX` escapes.
   run."). Each language's reviewer gets the master and that language's column, with room for
   the English back-translation (counted at the master's size), and that must fit 66,000 bytes
   as escaped JSON, where every non-ASCII character counts 6 bytes; the English master itself
-  must fit 30,000. In practice that is about 21,000 master characters (about 420 a line over
+  must fit 28,080 (what _Save the review_'s budget leaves after the largest review the
+  reviewer's schema admits). In practice that is about 21,000 master characters (about 420 a line over
   50 lines) with one Latin-script target, fewer for accented text, and about 7,000
   characters of Japanese in a ja-JP column. So a 46 KB en-US + de-DE file of long email
   bodies is refused although it is under 64 KB; the 64 KB cap binds first only with two or
@@ -354,10 +355,27 @@ become limitations or unsure findings, not new parsing rules.
   rule; the essential checks (UTF-8, delimiter, header, known locales, unique ids, known
   channels, non-empty cells, size caps, the reserved route prefix) all run. Not pinned by a
   test.
-- **Lines past the fixer's input cap get no suggestion.** The fixer's input is capped at
-  50,000 bytes; lines beyond it get no suggested fix, and the chat reply says "N more lines
+- **Lines past the fixer's caps get no suggestion.** The fixer gets the lines to fix in file
+  order until one of three caps is reached: 60 lines (its output schema admits 60 fixes), a
+  50,000-byte input, or about 25,800 bytes of expected answers (what the report step's code
+  leaves for them). Lines beyond get no suggested fix, and the chat reply says "N more lines
   need a fix but got no suggestion (too many for one run)." Why: one agent call per run keeps
-  the run's time and cost bounded; at 50 rows this is rare. Pinned by a test.
+  the run's time and cost bounded, and its answer must fit the report step's input. With 50
+  rows and several languages, the 60-line cap can bind. Pinned by a test.
+- **Findings past 20 per language get no second opinion.** Translation Review answers at most
+  20 rule findings per language (its schema's `rule_checks` bound). When more need a second
+  opinion (unsure findings and blockers on numbers, prices and dates), unsure findings go
+  first and the rest are sent in line order up to 20; the others keep their verdict effect
+  but get no opinion, and the chat reply says "N more findings weren't sent for a second
+  opinion (too many for one run)." Why: the review's answer must fit _Save the review_'s
+  input. Pinned by a test.
+- **A webhook package is at most about 27.8 KB.** The package must fit _Read and check the
+  file_'s input next to its code: 27,800 bytes as escaped JSON, where every non-ASCII
+  character counts 6 bytes. `scripts/send_package.py` refuses a larger package before
+  sending. A CMP that posts directly and goes over it gets no answer: the platform fails the
+  step before any code runs, and the webhook caller is not told. Why: the step's code shares
+  the platform's 75,776-byte event cap with its input. A larger campaign goes through chat
+  as a file. Not pinned as a limitation (the sender's refusal is tested).
 - **A back-translation that isn't text leaves its language unchecked.** _Save the review_
   expects Content Translation's answer as text; any other shape is stored as null, and that
   language becomes `check_incomplete` ("re-run"). The answer's real shape inside a workflow

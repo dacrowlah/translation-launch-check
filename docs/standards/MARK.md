@@ -78,15 +78,17 @@ checksum per hop:
 - `check.json`, written by *Read and check the file* and handed on as `run_key` +
   `check_checksum`. It holds everything Score needs: campaign, source, `notify_email`,
   `rules_version`, the master lines, and per locale its status, lines, rule findings (those
-  that need a second opinion carry an `R<n>` ref, the rest `ref: null`), checks and locale
-  checksum;
+  that need a second opinion carry an `R<n>` ref, at most 20 per locale with unsure
+  findings first, the rest `ref: null`), the count of findings that needed a second opinion
+  but weren't sent (`unsent_checks`), checks and locale checksum;
 - `reviews/<locale>.json`, written by *Save the review*: `{locale, checksum, review,
   back_translation}`. Score binds it to that locale's checksum in the verified `check.json`
   (the loop item carries the same value);
 - `scores.json`, written by *Score each language* and handed on as `run_key` +
   `verdict_checksum`: campaign, source, `notify_email` and `rules_version` copied forward,
-  the outcome, each locale's score, the lines to fix and the count left unfixed. The report
-  reads only this file.
+  the outcome, each locale's score, the lines to fix, the count left unfixed
+  (`unfixed_lines`) and the run's total of findings not sent for a second opinion
+  (`unsent_checks`). The report reads only this file and says what was left out.
 
 **Source of truth: the repo, not the instance.**
 - Every agent, skill and code step is edited here, then built and imported. Mark exports the
@@ -121,12 +123,15 @@ The platform contract (verified; the evidence and more facts are in the
     code counts toward that cap** (2026-11, tiny input: 68,200 and 70,700 bytes of code ran;
     73,200 and more failed with exit_code=-1 and no message). Rule: the JSON-escaped built
     code plus the escaped input (`json_size`) stays at most 68,000, about 5 KB under the cap.
-    `_budgets.py` holds each step's code ceiling (escaped) and `input_budget(step)` =
-    68,000 - ceiling. The caps derive from the budgets: the back-translation cap is Save the
+    `_budgets.py` holds each step's code ceiling (escaped: read and check 40,000, save the
+    review 10,000, score 24,000, report 42,000, ask for a corrected file 21,000; none above
+    `MAX_CODE_BYTES`, 60,000) and `input_budget(step)` = 68,000 - ceiling. The caps derive from the budgets: the back-translation cap is Save the
     review's budget less the largest review the agent schema admits; the fixer cap keeps
     the lines' expected fixes (each bounded by the fixer schema) within the report step's
     budget; problems leave the read step at most 25 (plus a count), each field at most 300
-    characters. The webhook sender refuses a package over Read and check the file's budget;
+    characters; second-opinion refs stop at the review schema's 20 per locale, and fixer
+    lines at the fix schema's 60. The webhook sender refuses a package over Read and check
+    the file's budget less its keys (27,800 bytes of escaped JSON);
   - a return is at most 256 KB, and a bigger one silently becomes `null` (docs);
   - the timeout is set per step: default 30 s, at most 300 s (docs).
 - **Loops:** the step after a loop that takes the loop output receives each iteration's full
@@ -291,8 +296,11 @@ The authoring format, export fields and import steps: the
 - **Agent answers that feed a code step are bounded in their output schemas** (`maxItems`,
   `maxLength`), and `_budgets.py` holds the same bounds (`REVIEW_BOUNDS`, `FIX_BOUNDS`;
   `test_budgets.py` pins them equal), because the platform fails a code step whose input is
-  too large before any code runs. Whether Mark enforces `maxItems` and `maxLength` (it
-  enforced keys and enums) is a Task 22 check.
+  too large before any code runs. Translation Review: at most 20 findings (detail 240
+  characters, evidence 120) and 20 `rule_checks` (reason 200). Translation Fix Suggestions:
+  at most 60 fixes (suggested text 1,000 characters, note 240). Whether Mark enforces
+  `maxItems` and `maxLength` (it enforced keys and enums) is not verified yet; an instance
+  test checks it.
 - **Every agent:**
   - has one job;
   - has a strict JSON output schema;
@@ -357,8 +365,9 @@ The workflow's export format, loops, conditions, triggers and canvas layout: the
     locale's checksum;
   - facts handed across steps carry a checksum (section 2).
 - **Pretty canvas: owner requirement.** `agent_metadata.nodes` in `mark/workflow/workflow.json`
-  gives every node an explicit position, hard-coded by this recipe (R118 cut the layout
-  table and its overlap tests):
+  gives every node an explicit position, hard-coded by this recipe. There is no separate
+  layout file and no overlap test; `test_build.py` checks that every node has a position and
+  that loop children are placed relative to their loop:
   - **Main flow** runs top to bottom in one column at `x = 0`, 220 px between rows.
   - **Branches** go to the side: a second column at `x = 440`, so nothing comes closer
     than 80 px to the loop container (320 px wide).
@@ -368,8 +377,8 @@ The workflow's export format, loops, conditions, triggers and canvas layout: the
     another.
   - Every node has the short, human name from the table above.
   - **Verify visually** after each import: a screenshot of the canvas is checked (kept
-    with the submission materials, outside this repo; Task 22).
-- **Triggers:** Chat and Webhook (Email is deferred, K4). `auth_key` is null in the source
+    with the submission materials, outside this repo).
+- **Triggers:** Chat and Webhook (the Email source is deferred). `auth_key` is null in the source
   and the platform makes the URL. **Set the webhook's auth key in the import dialog's
   trigger step, before the workflow is activated:** the platform docs say the key can't be
   edited after the trigger is saved. Then check that a POST without the header is refused.

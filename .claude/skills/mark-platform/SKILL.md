@@ -43,9 +43,10 @@ copied from the raw trigger, so check each before use: email inputs on the recor
 `trigger_name` `"Email"` plus the attachment shape, a webhook payload on its own checksum
 (see `mark-code-step-patterns`). That checksum proves integrity, not who sent it; the
 webhook's auth key is the sender gate. A webhook payload is a code-step input, so it must
-fit the 75,776-byte cap: senders measure the UTF-8 bytes of the JSON body as sent and
-refuse above 50,000 (the ratio to the cap comes from one ASCII measurement; non-ASCII
-expansion is untested).
+fit the 75,776-byte cap, which the step's own code shares (see below): a sender measures the
+payload against what the receiving step's code leaves, as escaped JSON, and refuses above it.
+A payload over the cap fails the run before any code runs, and the webhook caller is not
+told.
 
 ### Files that come with a run (verified 2026-11)
 - **Chat attachment:** lands at `ctx["input_dir"]/attachments/<name>`, byte-exact (same
@@ -83,6 +84,12 @@ expansion is untested).
   code runs. Nothing is truncated silently. **Pattern:** narrow, small code-step inputs
   (never the whole trigger object); large data in files (next point) with a reference
   plus checksum.
+- **The step's own code counts toward that cap** (verified 2026-11-15). With a tiny input,
+  code of 68,200 and 70,700 bytes ran; 73,200 bytes and more failed with "Code step failed
+  with exit_code=-1:", no stderr and no "payload too large" message, retried, and the run
+  failed. **Pattern:** keep a step's built code at most about 60,000 bytes, and its
+  JSON-escaped code plus escaped input at most about 68,000 bytes; give each step a code
+  ceiling and derive its input caps from what is left.
 - **Files persist between the steps of one run:** a file written under `/workspace/...` by
   one code step was read intact by a later one. **Pattern:** a run folder
   `/workspace/<project>/<run_key>/` holding `{data, checksum}` files; steps pass only the
@@ -143,8 +150,10 @@ expansion is untested).
 - **`regex` works and is evaluated classically, not by a model** (`route.{0,4}fix`
   matched; the run log says `"evaluated_by": "classical"`). **Pattern:** a code step emits
   a route token with a reserved prefix (`"route": "example_route_fix"`) and the condition
-  matches the whole token (`\bexample_route_fix\b`, standard regex, not tested
-  separately). A short word such as `fix` also matches `fixed` or a line of copy. Because
+  matches the whole token (`\bexample_route_fix\b`). **A case-sensitive `regex` with `\b`
+  works** (verified 2026-11-15, with a real route token in this shape): it matched the
+  output `{"route": "<token>"}` and did not match the token with a letter glued to each end
+  (`x<token>x`; that run went to `else`). A short word such as `fix` also matches `fixed` or a line of copy. Because
   the output can include user copy, input validation rejects the reserved prefix in copy,
   so copy can't force a branch; keep large copy out of the output a condition reads.
 - **Design rule: a condition should only ever follow a code step.** The platform allows a

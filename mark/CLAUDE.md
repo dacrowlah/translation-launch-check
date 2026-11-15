@@ -57,6 +57,11 @@ binding docs rather than repeating them.
 
 - A code step's input event is at most **75,776 bytes** as Mark wraps it. Over that, the step
   fails, is retried 3 times, and the run fails before the code starts.
+- **The step's own code counts toward that cap**: with a tiny input, 70,700 bytes of code ran
+  and 73,200 failed (exit_code=-1, no message). So built code is at most 60,000 bytes, and
+  escaped code plus escaped input at most 68,000. Each step's code ceiling and input budget
+  is in `code_steps/_budgets.py`; `build.py` refuses a step over its ceiling, and every input
+  cap derives from the budgets (MARK.md section 2).
 - The step after a loop that takes the loop output gets **each iteration's full record,
   including the loop item**. A code step at the end of the loop body gets only its declared
   inputs. So each iteration ends with *Save the review*, and the step after the loop reads
@@ -70,7 +75,7 @@ binding docs rather than repeating them.
 
 Authored as files under `mark/agents/` and `mark/skills/`. `mark/_build/` holds the
 conversion to export-format JSON (agents, skills, and the market rules rendered from
-`tool/config/rules.json`); `build.py` (planned) will run it, and the output is imported.
+`tool/config/rules.json`); `build.py` runs it, and the output in `mark/dist/` is imported.
 Never typed into the Mark editor: it swallows text after `/`. A change made in the Mark UI is
 exported and committed in the same session, or reverted.
 
