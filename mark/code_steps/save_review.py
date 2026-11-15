@@ -3,12 +3,15 @@ agent answers to the run folder (reviews/<locale>.json) for "Score each language
 
 Inputs (Automatic, all small): run_key, locale and checksum from the loop item; review
 (Translation Review's output, an object or JSON text) and back_translation (Content
-Translation's text). Never the loop item itself: it would count against the input cap.
+Translation's text); either may arrive as the agent's whole execution record, so each is
+stored as its answer (the review as an object, or null). Never the loop item itself: it
+would count against the input cap.
 It never fails (one failed iteration stops the workflow); a file it couldn't write is
 missing later, which makes that language check_incomplete. Score checks everything it
 reads, so this step only strips the translation leak and writes.
 """
 
+from _agent_output import agent_answer, agent_text
 from _run_folder import run_root, write_run_file
 from _shared import run_safely
 from _text import TEXT
@@ -38,8 +41,8 @@ def leak_free_text(text):
 
 
 def _record(input_):
-    locale, answers = input_.get("locale"), {"review": input_.get("review")}
-    answers["back_translation"] = leak_free_text(input_.get("back_translation"))
+    locale, answers = input_.get("locale"), {"review": agent_answer(input_.get("review"))}
+    answers["back_translation"] = leak_free_text(agent_text(input_.get("back_translation")))
     return {"locale": locale, "checksum": input_.get("checksum"), **answers}
 
 

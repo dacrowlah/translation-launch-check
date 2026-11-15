@@ -1,6 +1,8 @@
+import json
+
 import report
 from _budgets import REVIEW_BOUNDS
-from builders import error
+from builders import an_execution_record, error
 from report_support import CANVAS_URL, fixed_now, names, write
 from step_builders import (
     a_ctx,
@@ -69,6 +71,15 @@ def test_findings_past_the_second_opinion_bound_are_counted(fake_tools, tmp_path
     message = write(fake_tools, ctx, a_scored_run(fake_tools, ctx, many))["message"]
     note = "2 more findings weren't sent for a second opinion (too many for one run)."
     assert f"\n\n{note}\n\n" in message
+
+
+def test_fixes_passed_as_the_agents_execution_record_are_used(fake_tools, tmp_path):
+    ctx = a_ctx(tmp_path)
+    scored = a_scored_run(fake_tools, ctx, BLOCKED_AND_WARNED)
+    recheck_answers(fake_tools, [fixed_line()])
+    record = json.dumps(an_execution_record(json.dumps({"fixes": [a_fix()]})))
+    message = write(fake_tools, ctx, scored, record)["message"]
+    assert "Top fixes:\n- de-DE L1: Bis zu 30 % auf alle Jacken (passes the rule checks)" in message
 
 
 def test_ready_is_never_called_approved(fake_tools, tmp_path):

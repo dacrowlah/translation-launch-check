@@ -3,9 +3,10 @@ spelling fixes, re-checked together with ONE localization_check call. A fix pass
 line has no blocker or warning; if the tool fails, every fix is "not re-checked". Fixes
 never change verdicts: the verdict describes the file as submitted. Nothing here raises."""
 
+from _agent_output import agent_answer
 from _config import RULES
 from _fix_input import SPELLING, fixable
-from _model_output import json_object, model_text
+from _model_output import model_text
 from _shared import call_tool
 from _tool_report import usable_report
 from _verdict import FAILING
@@ -39,7 +40,7 @@ def _agent_fix(fix):
 
 
 def _agent_fixes(scores, raw):
-    sent, given = _sent(scores), (json_object(raw) or {}).get("fixes")
+    sent, given = _sent(scores), (agent_answer(raw) or {}).get("fixes")
     found = [_agent_fix(each) for each in given] if isinstance(given, list) else []
     first = {_key(fix): fix for fix in reversed(found) if fix}
     return [first[key] for key in sent if key in first]

@@ -49,6 +49,29 @@ def json_error(status):
     return ok({"status_code": status, "detail": "tool failed"})
 
 
+METRIC_KEYS = (
+    "save_time",
+    "setup_start",
+    "llm_call_time",
+    "model_init_time",
+    "tool_call_count",
+    "tool_setup_time",
+    "memory_setup_time",
+    "prompt_process_time",
+    "tool_execution_time",
+    "final_db_update_time",
+    "initial_db_save_time",
+)
+
+
+def an_execution_record(response):
+    """An agent step's whole execution record, with the keys observed in a live run's step
+    parameters (values made up): what the orchestrator sometimes passes for its output."""
+    metrics = {key: 0.5 for key in METRIC_KEYS}
+    usage = {"input_tokens": 1200, "output_tokens": 300}
+    return {"metrics": metrics, "response": response, "token_usage": usage}
+
+
 def tool_body(status="ok", **fields):
     """Our own tool's response body: a top-level status token, plus fields."""
     return {"status": status, **fields}

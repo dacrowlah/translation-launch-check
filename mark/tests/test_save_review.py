@@ -1,8 +1,10 @@
+import json
+
 import pytest
 
 import save_review
 from _run_folder import read_review, run_root
-from builders import RUN_KEY
+from builders import RUN_KEY, an_execution_record
 from step_builders import a_ctx
 
 LEAK = "[[file]] (at least one needed)"
@@ -31,10 +33,18 @@ def test_writes_both_answers_for_score_to_bind(tmp_path):
     assert (stored["status"], stored["data"]) == ("ok", record)
 
 
-def test_a_review_as_json_text_is_stored_as_given(tmp_path):
+def test_a_review_as_json_text_is_stored_as_its_object(tmp_path):
     ctx = a_ctx(tmp_path)
     save(ctx, review='{"locale": "de-DE"}')
-    assert saved(ctx)["data"]["review"] == '{"locale": "de-DE"}'
+    assert saved(ctx)["data"]["review"] == {"locale": "de-DE"}
+
+
+def test_answers_passed_as_execution_records_are_stored_as_the_answers(tmp_path):
+    ctx = a_ctx(tmp_path)
+    record = an_execution_record(json.dumps(REVIEW))
+    save(ctx, review=json.dumps(record), back_translation=an_execution_record("[L1] Up to 30%"))
+    data = saved(ctx)["data"]
+    assert (data["review"], data["back_translation"]) == (REVIEW, "[L1] Up to 30%")
 
 
 @pytest.mark.parametrize(

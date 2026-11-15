@@ -41,6 +41,7 @@ mark/                                      the Agent Platform source
   code_steps/_budgets.py                   code ceilings and code-step input budgets
   code_steps/_review.py                    Translation Review's answer: parsed and bound
   code_steps/_model_output.py              JSON as object or text; model text, shortened
+  code_steps/_agent_output.py              an agent's answer, even inside its execution record
   code_steps/_markdown.py                  md_text(): untrusted text shown as text
   code_steps/_verdict.py                   verdict_for, overall (code decides every verdict)
   code_steps/_scoring.py                   one language's score

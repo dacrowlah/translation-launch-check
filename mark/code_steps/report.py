@@ -4,8 +4,9 @@ QA inbox when the run has one (allow-list enforced in code), and returns the fin
 
 Inputs (Automatic): run_key and verdict_checksum from "Score each language", and on the fix
 path fixes (Translation Fix Suggestions' output: {fixes: [{locale, line_id, suggested_text,
-fits, note}]}, as an object or JSON text). Returns {message, canvas_url, emailed, outcome,
-summary}. The message is the workflow's answer: it states the outcome and the rule.
+fits, note}]}, as an object or JSON text, or inside the agent's execution record). Returns
+{message, canvas_url, emailed, outcome, summary}. The message is the workflow's answer: it
+states the outcome and the rule.
 """
 
 from datetime import UTC, datetime
