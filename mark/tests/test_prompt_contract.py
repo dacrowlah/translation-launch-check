@@ -33,6 +33,7 @@ EXAMPLE_FINDINGS = [
     a_rule_finding("R1", "L3", "currency_code", CHF, "CHF"),
     a_rule_finding("R2", "L5", "numbers", "A number differs from the master.", "00:00", "12:00"),
     a_rule_finding("R3", "L6", "dates", "A date or weekday differs from the master.", "Friday"),
+    a_rule_finding(None, "L7", "formality", "Formal and informal address are mixed."),
     a_rule_finding(
         "R4",
         None,
@@ -42,10 +43,17 @@ EXAMPLE_FINDINGS = [
 ]
 
 
-def test_the_review_inputs_double_check_items_match_the_merged_prompt():
-    section = review_input([], {"lines": [], "rule_findings": EXAMPLE_FINDINGS})
-    assert section.startswith("Rule findings to double-check:\n[R1] L3 (currency_code): ")
-    assert section + "\n</lines>" in prompt(REVIEW_DIR)
+def test_the_review_inputs_code_findings_match_the_merged_prompt():
+    sections = review_input([], {"lines": [], "rule_findings": EXAMPLE_FINDINGS})
+    assert sections.startswith("Already reported by code (never report these again, in any form):")
+    assert "\n\nRule findings to double-check:\n[R1] L3 (currency_code): " in sections
+    assert sections + "\n</lines>" in prompt(REVIEW_DIR)
+
+
+def test_the_review_input_with_no_code_findings_matches_the_merged_prompt():
+    sections = review_input([], {"lines": [], "rule_findings": []})
+    assert sections + "\n</lines>" in prompt(REVIEW_DIR)
+    assert sections.endswith(": none.\n\nRule findings to double-check: none.")
 
 
 def an_entry(head, texts, length, findings):

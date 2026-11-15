@@ -1,8 +1,10 @@
 import read_and_check
+from _config import RULES
 from _loop_items import size_problems
 from step_builders import (
     a_csv,
     a_ctx,
+    a_finding,
     a_line,
     a_package,
     a_tool_report,
@@ -72,6 +74,18 @@ def test_a_realistic_fifty_line_file_in_four_languages_with_japanese_passes(fake
     pkg = a_package(locales=("de-DE", "fr-FR", "en-GB", "ja-JP"), lines=lines_of(50, texts))
     assert len(a_csv(rows=[[*["L"] * 3, *t.values()] for t in [texts] * 50])) < 65_536
     assert checked_route(fake_tools, tmp_path, pkg) == "tlc_route_check"
+
+
+def test_fifty_lines_with_every_check_reported_on_every_line_still_fit(fake_tools, tmp_path):
+    """The worst "Already reported by code" section: 24 check names on each of 50 lines."""
+    texts = {**REALISTIC, "ja-JP": (JA * 4)[:60]}
+    pkg = a_package(locales=("de-DE", "fr-FR", "en-GB", "ja-JP"), lines=lines_of(50, texts))
+    every = [a_finding(check) for check in RULES["severities"]]
+    found = {(locale, f"L{n}"): every for locale in pkg["locales"] for n in range(1, 51)}
+    fake_tools.respond("localization_check", ok_body(a_tool_report(pkg, found)))
+    out = read_and_check.handler(a_webhook_input(pkg), a_ctx(tmp_path))
+    assert out["route"] == "tlc_route_check"
+    assert all("\nL50: currency_amount, " in item["review_input"] for item in out["locales"])
 
 
 def test_a_japanese_file_a_third_of_the_file_cap_passes(fake_tools, tmp_path):

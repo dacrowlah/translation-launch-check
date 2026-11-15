@@ -26,8 +26,8 @@ what the reader is promised.
 Apply the judgment rubric and the glossary in the Market Rules and Glossary instructions.
 
 # Inputs
-The lines for [[locale]], then the rule findings the code wants your second opinion on, in
-this shape:
+The lines for [[locale]], then the checks the code already reported on each line, then the
+rule findings the code wants your second opinion on, in this shape:
 
 ```text
 [L1] <channel>/<field>
@@ -35,14 +35,19 @@ Master: <master copy>
 Translation: <translated copy>
 Length: <length> of <limit> <unit>
 
+Already reported by code (never report these again, in any form):
+L3: <check>, <check>
+whole column: <check>
+
 Rule findings to double-check:
 [R1] L3 (<check>): <the code's finding> Expected: <master value>. Found: <translated value>.
 ```
 
 "Length:" has no "of <limit>" when the channel has no limit. Expected and Found appear only
 when the code read a value. An item about the whole locale says "whole column" instead of a
-line id. With nothing to double-check, the section reads "Rule findings to double-check:
-none."
+line id. "Already reported by code" names, per line, the checks the code reported there
+(check names only). With nothing reported, or nothing to double-check, that section reads
+"none.".
 
 <lines>
 [[review_input]]
@@ -66,6 +71,10 @@ spelling, typography, lines left identical to the master and the language of eac
 Never report them, even when you notice one. The only exception is the "Rule findings to
 double-check" section, which you answer in `rule_checks`. How the words around a value change
 the offer is yours: see Claims vs values.
+
+Never report a problem the code already reported on that line, under any check name: a
+pronoun mix is the code's formality, a respelled brand or product name is the code's
+glossary_dnt, a changed number is the code's numbers.
 
 # Claims vs values
 The code compares values only: it sees 30 become 20, not "up to 30%" become "30%". How the
@@ -141,6 +150,8 @@ Master: Free shipping on orders over 50 EUR.
 Translation: Kostenloser Versand ab 50 EUR Bestellwert.
 Length: 42 chars
 
+Already reported by code (never report these again, in any form): none.
+
 Rule findings to double-check: none.
 </lines>
 <back_translation>
@@ -203,6 +214,8 @@ Master: Our bestsellers are on sale
 Translation: Unsere Bestseller im Sale
 Length: 25 chars
 
+Already reported by code (never report these again, in any form): none.
+
 Rule findings to double-check: none.
 </lines>
 <back_translation>
@@ -221,7 +234,8 @@ Rule findings to double-check: none.
 }
 ```
 
-Example 3, rule findings to double-check (de-CH):
+Example 3, rule findings to double-check (de-CH). The informal "Hol dir deine" in L7 is the
+code's formality finding, listed as already reported, so it is not reported again:
 
 ```text
 <lines>
@@ -240,6 +254,18 @@ Master: Last chance: sale ends Friday!
 Translation: Letzte Chance: Sale endet Fr.!
 Length: 1 of 1 sms_segments
 
+[L7] email/body
+Master: Get your TrailPro jacket before it's gone.
+Translation: Hol dir deine TrailPro-Jacke, bevor sie weg ist.
+Length: 48 chars
+
+Already reported by code (never report these again, in any form):
+L3: currency_code
+L5: numbers
+L6: dates
+L7: formality
+whole column: language_column
+
 Rule findings to double-check:
 [R1] L3 (currency_code): Couldn't find the master's price in this line. Is it written in a form the tool can't read (kanji numerals, a currency word), or is it missing? Expected: CHF.
 [R2] L5 (numbers): A number differs from the master. Expected: 00:00. Found: 12:00.
@@ -250,6 +276,7 @@ Rule findings to double-check:
 [L3] Jackets from forty-nine francs
 [L5] The sale ends on Sunday at 12 o'clock.
 [L6] Last chance: sale ends Fri.!
+[L7] Get your TrailPro jacket before it's gone.
 </back_translation>
 ```
 

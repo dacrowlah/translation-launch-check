@@ -20,6 +20,7 @@ NUMBERS = a_finding("numbers", expected="30%", found="20 %", detail="The number 
 UNSURE = a_finding("language_column", "warning", "unsure", detail="Is the de-DE column German?")
 FORMALITY = a_finding("formality", "warning")
 FINDINGS = {("de-DE", None): [UNSURE], ("de-DE", "L1"): [NUMBERS], ("de-DE", "L2"): [FORMALITY]}
+REPORTED = "Already reported by code (never report these again, in any form):"
 LINES = (
     "[L1] email/subject\nMaster: Up to 30% off jackets\nTranslation: Bis zu 30 % auf Jacken\n"
     "Length: 22 chars\n\n"
@@ -43,6 +44,7 @@ def checked(fake_tools, tmp_path, findings=None, pkg=None):
 def test_review_input_lists_each_line_and_the_findings_to_double_check(fake_tools, tmp_path):
     out, _ = checked(fake_tools, tmp_path, FINDINGS)
     assert out["locales"][0]["review_input"] == LINES + (
+        f"{REPORTED}\nL1: numbers\nL2: formality\nwhole column: language_column\n\n"
         "Rule findings to double-check:\n"
         "[R1] whole column (language_column): Is the de-DE column German?\n"
         "[R2] L1 (numbers): The number differs. Expected: 30%. Found: 20 %."
@@ -53,7 +55,9 @@ def test_review_input_says_none_when_nothing_to_double_check(fake_tools, tmp_pat
     out, _ = checked(
         fake_tools, tmp_path, {("de-DE", "L2"): [FORMALITY, a_finding("numbers", "warning")]}
     )
-    assert out["locales"][0]["review_input"] == LINES + "Rule findings to double-check: none."
+    assert out["locales"][0]["review_input"] == LINES + (
+        f"{REPORTED}\nL2: formality, numbers\n\nRule findings to double-check: none."
+    )
 
 
 def test_rule_findings_are_flat_and_carry_their_refs(fake_tools, tmp_path):

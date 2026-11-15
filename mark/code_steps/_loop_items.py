@@ -1,7 +1,8 @@
 """Each language's loop item: what its agents read and the checksum they echo, size-capped.
-The review input holds each line's master and translation and the rule findings to
-double-check; the back-translation input is one labelled line per entry. Nothing here
-raises."""
+The review input holds each line's master and translation, the checks the code already
+reported per line (names only, so the reviewer never reports them again), and the rule
+findings to double-check; the back-translation input is one labelled line per entry.
+Nothing here raises."""
 
 from _budgets import input_budget, review_allowance
 from _checksum import json_size
@@ -16,6 +17,8 @@ MAX_AGENT_INPUT_BYTES = 66_000  # one agent step's input; verified intact to abo
 MAX_ENGLISH_BYTES = input_budget("save_review") - review_allowance() - 200
 MAX_ITEMS_BYTES = 240_000  # this step's return: 256 KB, and run_safely refuses over 250,000
 DOUBLE_CHECK_HEADING = "Rule findings to double-check:"
+REPORTED_HEADING = "Already reported by code (never report these again, in any form):"
+WHOLE_COLUMN = "whole column"
 
 
 def _line_block(master, line):
@@ -24,23 +27,34 @@ def _line_block(master, line):
     return head + body + length_text(line["length"])
 
 
+def _section(heading, lines):
+    return "\n".join([heading, *lines]) if lines else heading + " none."
+
+
+def _checks_at(findings, line_id):
+    return sorted({finding["check"] for finding in findings if finding["line_id"] == line_id})
+
+
+def _reported_lines(findings):
+    """ "<line id>: <check names>" per line with code findings, in line order, the whole
+    column last."""
+    ids = [*dict.fromkeys(f["line_id"] for f in findings if f["line_id"]), None]
+    named = [(line_id or WHOLE_COLUMN, _checks_at(findings, line_id)) for line_id in ids]
+    return [f"{where}: {', '.join(checks)}" for where, checks in named if checks]
+
+
 def _double_check_line(finding):
-    where = finding["line_id"] or "whole column"
+    where = finding["line_id"] or WHOLE_COLUMN
     head = f"[{finding['ref']}] {where} ({finding['check']}): {finding['detail']}"
     return head + values_text(finding)
 
 
-def _double_check_section(findings):
-    flagged = [_double_check_line(finding) for finding in findings if finding["ref"]]
-    return (
-        "\n".join([DOUBLE_CHECK_HEADING, *flagged]) if flagged else DOUBLE_CHECK_HEADING + " none."
-    )
-
-
 def review_input(master_lines, facts):
-    pairs = zip(master_lines, facts["lines"], strict=True)
+    pairs, findings = zip(master_lines, facts["lines"], strict=True), facts["rule_findings"]
     blocks = [_line_block(master, line) for master, line in pairs]
-    return "\n\n".join([*blocks, _double_check_section(facts["rule_findings"])])
+    reported = _section(REPORTED_HEADING, _reported_lines(findings))
+    flagged = [_double_check_line(finding) for finding in findings if finding["ref"]]
+    return "\n\n".join([*blocks, reported, _section(DOUBLE_CHECK_HEADING, flagged)])
 
 
 def back_translation_input(facts):

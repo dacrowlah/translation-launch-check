@@ -13,6 +13,10 @@ REQUIRED = {
         "The code has already checked numbers, prices, currencies, dates, weekdays, times and "
         "time zones, links, merge tags, promo codes",
         "Never report them, even when you notice one.",
+        "Never report a problem the code already reported on that line, under any check name: a "
+        "pronoun mix is the code's formality, a respelled brand or product name is the code's "
+        "glossary_dnt, a changed number is the code's numbers.",
+        "Already reported by code (never report these again, in any form):",
         "The code compares values only",
         "change the offer is yours: see Claims vs values.",
         'a qualifier changes: "Up to 50% off" became "50 % Rabatt auf alle Jacken";',
