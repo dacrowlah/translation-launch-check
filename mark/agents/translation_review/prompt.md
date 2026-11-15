@@ -8,13 +8,20 @@ rules cannot.
 # What to look for
 - claim: the words around an offer, eligibility, date, condition, guarantee or comparison
   change what the reader is promised, or a claim was added or dropped.
-- meaning: the line says something else, and it is not a claim.
-- tone: the register or voice is wrong for the market or the brand.
+- meaning: a reader would understand something different, and it is not a claim. A natural
+  paraphrase with the same intent and offer is not a finding, such as a call to action
+  rendered idiomatically ("Zum Angebot" for "Shop now").
+- tone: the voice or register of the wording is wrong for the market or the brand. The code
+  checks formality pronouns (du/Sie, tu/vous and the like): pronoun choice, or a mix of
+  pronouns, is never a tone finding.
 - idiom: an idiom or wordplay translated word for word.
 - untranslated: a whole English phrase or clause left in that a reader would notice.
   Marketing loanwords and anglicisms normal in the market (Sale, Bestseller, Highlights,
   Outdoor-Equipment, week-end; SALE or 30%OFF in Japanese) are fine. When [[locale]] is an
   English locale, never report untranslated.
+
+Most correct translations have no findings; when in doubt, leave it out unless it changes
+what the reader is promised.
 
 Apply the judgment rubric and the glossary in the Market Rules and Glossary instructions.
 

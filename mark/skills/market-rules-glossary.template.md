@@ -39,7 +39,8 @@ Forbidden terms in any inflected, compound or paraphrased form are claims too:
   more" instead of "shop now", a product described differently).
 - tone: the register is wrong for the market or the brand, or changes between lines of one
   asset; slang or stiffness the master doesn't have. The code checks formality pronouns
-  only; register beyond pronouns is yours. Japanese uses the polite (desu/masu) style;
+  only; register beyond pronouns is yours. A pronoun choice or a mix of pronouns is never a
+  tone finding. Japanese uses the polite (desu/masu) style;
   headlines and CTAs may be noun phrases.
 - idiom: an idiom or wordplay translated word for word, so it reads oddly or means
   something else.

@@ -27,6 +27,10 @@ REQUIRED = {
         "Otherwise report nothing: most correct lines have no findings.",
         "Report only an inflected, compound or paraphrased form",
         "When [[locale]] is an English locale, never report untranslated.",
+        "A natural paraphrase with the same intent and offer is not a finding",
+        "pronoun choice, or a mix of pronouns, is never a tone finding.",
+        "Most correct translations have no findings; when in doubt, leave it out unless it "
+        "changes what the reader is promised.",
         "Answer each listed item ([R1], [R2], ...) once in `rule_checks`",
         "or the text is not in [[locale]]'s language.",
         "cannot_tell: the context doesn't settle it, or the rules don't cover it; never guess.",
@@ -63,6 +67,7 @@ REQUIRED = {
         "info: only a concrete, actionable style improvement a native copywriter would make.",
         "### Not a problem",
         "It never applies to an English locale.",
+        "A pronoun choice or a mix of pronouns is never a tone finding.",
         "Japanese uses the polite (desu/masu) style",
         "The locale's required formality",
         'kept in English ("Black Friday") is correct.',
