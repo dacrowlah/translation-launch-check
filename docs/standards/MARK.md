@@ -23,7 +23,7 @@ mark/                                      the Agent Platform source
   code_steps/_shared.py                    call_tool, call_platform, run_safely
   code_steps/_routes.py                    route tokens; has_route_word, defused (stdlib only)
   code_steps/_platform.py                  platform-tool helpers: send_email (allow-list),
-                                           create_canvas, read_csv_attachment
+                                           create_canvas, write_file, read_csv_attachment
   code_steps/_address.py                   email address and allow-list rules
   code_steps/_url.py                       the template URL rule
   code_steps/_checksum.py                  canonical JSON, sha256_hex, facts_checksum,
@@ -49,6 +49,7 @@ mark/                                      the Agent Platform source
   code_steps/_fix_input.py                 lines to fix and the fixer's input text
   code_steps/_fixes.py                     suggested fixes and their one re-check call
   code_steps/_report_view.py  _message.py  the chat reply (also the QA-inbox email)
+  code_steps/_corrected_file.py            the corrected CSV: passing fixes applied, no prices
   code_steps/_canvas.py                    the canvas markdown
   code_steps/_text.py  _text_problems.py  _text_report.py   every user-facing template
   agents/<agent_id>/                       agent.json, prompt.md, output.schema.json
@@ -90,7 +91,10 @@ checksum per hop:
   `verdict_checksum`: campaign, source, `notify_email` and `rules_version` copied forward,
   the outcome, each locale's score, the lines to fix, the count left unfixed
   (`unfixed_lines`) and the run's total of findings not sent for a second opinion
-  (`unsent_checks`). The report reads only this file and says what was left out.
+  (`unsent_checks`). The report reads only this file and says what was left out. When a
+  fix passes the re-check, the report also writes the corrected file from it: the same
+  columns and rows with each passing fix applied (never to a line with a price or currency
+  finding), UTF-8 with a BOM, CRLF, through `write_content_to_file`, and links its download.
 
 **Source of truth: the repo, not the instance.**
 - Every agent, skill and code step is edited here, then built and imported. Mark exports the
@@ -158,7 +162,8 @@ Rules:
   - Platform tools: `call_platform(tool, /, **params)` returns the body dict, or `None` for
     the same failure shapes. The helpers in `_platform.py` then check that tool's own
     fields: `send_email` counts only `status == "sent"`, `create_canvas` needs an
-    `artifact_url`, and `read_csv_attachment` returns a status with the text.
+    `artifact_url`, `write_file` needs `file_metadata.download_link` (not under `data`), and
+    `read_csv_attachment` returns a status with the text.
   - Never branch on an error's own keys: they differ between tools.
 - **Never raise for expected problems.** Return a status or a route.
   - Each step's handler calls `run_safely(impl, input_, ctx, fallback=None)` from

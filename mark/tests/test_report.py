@@ -2,7 +2,7 @@ import json
 
 import report
 from _budgets import REVIEW_BOUNDS
-from builders import an_execution_record, error
+from builders import FILE_LINK, an_execution_record, error
 from report_support import CANVAS_URL, fixed_now, names, write
 from step_builders import (
     a_ctx,
@@ -48,7 +48,8 @@ def test_message_for_fix_first(fake_tools, tmp_path):
 WHOLE_MESSAGE = (
     "Overall: Fix first. 1 of 1 languages need fixes before launch.\n\n"
     "- de-DE: Fix first (1 blocker, 1 warning)\n\n"
-    "Top fixes:\n- de-DE L1: Bis zu 30 % auf alle Jacken (passes the rule checks)\n\n"
+    "Top fixes:\n- de-DE L1: Bis zu 30 % auf alle Jacken (passes the rule checks)\n"
+    "Corrected file (1 fix applied, re-checked): [Download]({file})\n\n"
     "Detailed report: [{name}]({url})\n\n"
     "A language passes only when every check ran and nothing blocks it.\n\n"
     "Checked against market rules v1.0 (effective 2026-11-13).\n\n"
@@ -62,7 +63,7 @@ def test_the_whole_message_for_one_fixed_language(fake_tools, tmp_path):
     recheck_answers(fake_tools, [fixed_line()])
     name = f"{CANVAS_NAME} - {scored['run_key'][:6]}"
     message = write(fake_tools, ctx, scored, {"fixes": [a_fix()]})["message"]
-    assert message == WHOLE_MESSAGE.format(name=name, url=CANVAS_URL)
+    assert message == WHOLE_MESSAGE.format(name=name, url=CANVAS_URL, file=FILE_LINK)
 
 
 def test_findings_past_the_second_opinion_bound_are_counted(fake_tools, tmp_path):

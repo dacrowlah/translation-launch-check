@@ -1,9 +1,9 @@
 import pytest
 from opal_tms_sdk import ToolInvocationError, ToolValidationError
 
-from _platform import create_canvas, send_email
+from _platform import create_canvas, send_email, write_file
 from _shared import call_platform
-from builders import EXAMPLE_ALLOWED, error, json_error, ok
+from builders import EXAMPLE_ALLOWED, FILE_LINK, a_written_file, error, json_error, ok
 
 ALLOWED = EXAMPLE_ALLOWED
 
@@ -162,3 +162,27 @@ def test_create_canvas_sends_markdown_by_name(fake_tools):
 def test_create_canvas_is_none_without_a_url(fake_tools, result):
     fake_tools.respond("create_canvas", result)
     assert create_canvas("Report 0123", "# Report") is None
+
+
+def test_write_file_returns_the_download_link_from_file_metadata(fake_tools):
+    fake_tools.respond("write_content_to_file", a_written_file())
+    assert write_file("Report - corrected - abc123.csv", "id\r\n") == FILE_LINK
+    params = {"content": "id\r\n", "filename": "Report - corrected - abc123.csv"}
+    assert fake_tools.calls == [("write_content_to_file", params)]
+
+
+@pytest.mark.parametrize(
+    "result",
+    [
+        a_written_file(error="write failed"),
+        a_written_file(link=None),
+        a_written_file(link="http://files.example.test/v1/file/F1"),
+        a_written_file(link="https://files.example.test/a b"),
+        a_written_file(link="https://files.example.test/a)b"),
+        ok({"success": True, "data": {"download_link": FILE_LINK}}),
+        error(500),
+    ],
+)
+def test_write_file_is_none_without_a_usable_link(fake_tools, result):
+    fake_tools.respond("write_content_to_file", result)
+    assert write_file("Report - corrected - abc123.csv", "id\r\n") is None

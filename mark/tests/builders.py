@@ -72,6 +72,18 @@ def an_execution_record(response):
     return {"metrics": metrics, "response": response, "token_usage": usage}
 
 
+FILE_LINK = "https://files.example.test/v1/file/F1?download=true"
+
+
+def a_written_file(link=FILE_LINK, error=None):
+    """write_content_to_file's envelope as verified from a code step (placeholder ids): the
+    result sits under file_metadata, not data."""
+    names = {"file_id": "F1", "name": "Campaign - corrected - abc123.csv", "mime_type": "text/csv"}
+    where = {"size": 120, "uri": "gs://bucket/F1", "link": "https://files.example.test/v1/file/F1"}
+    meta = {**names, **where, "download_link": link, "customer_id": "C1", "metadata": {}}
+    return ok({"success": True, "file_metadata": meta, "error": error})
+
+
 def tool_body(status="ok", **fields):
     """Our own tool's response body: a top-level status token, plus fields."""
     return {"status": status, **fields}

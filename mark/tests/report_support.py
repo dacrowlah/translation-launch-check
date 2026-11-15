@@ -6,7 +6,7 @@ from datetime import UTC, datetime
 import read_and_check
 import report
 import score
-from builders import ok
+from builders import a_written_file, ok
 from step_builders import (
     a_package,
     a_review,
@@ -24,9 +24,15 @@ def fixed_now():
 
 
 def write(fake_tools, ctx, scored, fixes=None):
+    return delivered_with(fake_tools, ctx, {**scored, "fixes": fixes}, a_written_file())
+
+
+def delivered_with(fake_tools, ctx, report_input, written):
+    """The report step's answer, with `written` as write_content_to_file's result."""
     fake_tools.respond("create_canvas", ok({"artifact_url": CANVAS_URL}))
     fake_tools.respond("send_email", ok({"status": "sent"}))
-    return report.impl({**scored, "fixes": fixes}, ctx, fixed_now)
+    fake_tools.respond("write_content_to_file", written)
+    return report.impl(report_input, ctx, fixed_now)
 
 
 def names(fake_tools):

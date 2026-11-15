@@ -1,6 +1,7 @@
 """Step "Write and send the report": reads scores.json (bound to verdict_checksum), re-checks
-the suggested fixes with one localization_check call, saves the canvas, emails the
-QA inbox when the run has one (allow-list enforced in code), and returns the final message.
+the suggested fixes with one localization_check call, writes the corrected file when a fix
+passed, saves the canvas, emails the QA inbox when the run has one (allow-list enforced in
+code), and returns the final message.
 
 Inputs (Automatic): run_key and verdict_checksum from "Score each language", and on the fix
 path fixes (Translation Fix Suggestions' output: {fixes: [{locale, line_id, suggested_text,
@@ -13,6 +14,7 @@ from datetime import UTC, datetime
 
 from _campaign import clean_campaign
 from _canvas import render
+from _corrected_file import corrected_file
 from _fixes import rechecked, suggested_fixes
 from _message import message
 from _platform import allowed_recipient, create_canvas, send_email
@@ -63,7 +65,7 @@ def _emailed(scores, text):
 
 def _delivered(scores, fixes, place):
     canvas = _canvas(scores, fixes, place)
-    text = message(scores, fixes, canvas)
+    text = message(scores, fixes, canvas, corrected_file(scores, fixes, place["run_key"]))
     emailed = _emailed(scores, text)
     note = "\n\n" + REPORT["email_failed"] if scores["notify_email"] and not emailed else ""
     return _answer(text + note, canvas["url"], emailed, scores["outcome"])

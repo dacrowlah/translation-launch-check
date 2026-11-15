@@ -2,7 +2,7 @@ import re
 
 import report
 import score
-from builders import ok
+from builders import a_written_file, ok
 from report_support import CANVAS_URL, fixed_now
 from step_builders import (
     a_checked_run,
@@ -45,6 +45,7 @@ def run(fake_tools, ctx, case):
 def deliver(fake_tools, ctx, scored, fixes=None):
     fake_tools.respond("create_canvas", ok({"artifact_url": CANVAS_URL}))
     fake_tools.respond("send_email", ok({"status": "sent"}))
+    fake_tools.respond("write_content_to_file", a_written_file())
     return report.impl({**scored, "fixes": fixes}, ctx, fixed_now)
 
 

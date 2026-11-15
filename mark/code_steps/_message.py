@@ -1,7 +1,8 @@
 """The chat reply, which is also the QA-inbox email: the overall verdict, one line per
-language, the top fixes, the canvas link, what needs a human look, the rule, the rules
-version and the footer. All text from the templates; every untrusted value through safe().
-Bounded: top fixes and each language's human-look items are capped. Nothing here raises."""
+language, the top fixes and the corrected file, the canvas link, what needs a human look,
+the rule, the rules version and the footer. All text from the templates; every untrusted
+value through safe(). Bounded: top fixes and each language's human-look items are capped.
+Nothing here raises."""
 
 from _report_view import (
     closing_lines,
@@ -64,6 +65,20 @@ def _unsent_section(count):
     return [REPORT["unsent"].format(count=count)] if count else []
 
 
+def _corrected_link(corrected):
+    key = "corrected_one" if corrected["applied"] == 1 else "corrected"
+    return REPORT[key].format(count=corrected["applied"], url=corrected["url"])
+
+
+def corrected_section(corrected):
+    """The corrected file's link and how many lines are left for a person; one line when the
+    write failed; nothing when no fix passed (corrected is None)."""
+    if not (corrected and corrected["url"]):
+        return [REPORT["corrected_failed"]] if corrected else []
+    left = _counted(corrected["open"], "open")
+    return [_corrected_link(corrected), *([left] if left else [])]
+
+
 def canvas_line(canvas):
     if not canvas["url"]:
         return REPORT["canvas_failed"]
@@ -100,10 +115,10 @@ def _joined(sections):
     return "\n\n".join("\n".join(section) for section in sections if section)
 
 
-def message(scores, fixes, canvas):
+def message(scores, fixes, canvas, corrected=None):
     """Sections separated by blank lines, so Markdown keeps them apart."""
     head = [[overall_line(scores)], [locale_line(scored) for scored in scores["locales"]]]
-    fixed = _fixes_section(fixes, scores["unfixed_lines"])
+    fixed = _fixes_section(fixes, scores["unfixed_lines"]) + corrected_section(corrected)
     links = [_unsent_section(scores["unsent_checks"]), fixed, [canvas_line(canvas)]]
     humans = [human_block(scored) for scored in scores["locales"]]
     return _joined([*head, *links, *humans, *([line] for line in closing_lines(scores))])

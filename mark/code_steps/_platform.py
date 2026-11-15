@@ -50,6 +50,21 @@ def create_canvas(name, content):
     return url if isinstance(url, str) and url.strip() else None
 
 
+def _download_link(link):
+    """An https link that can sit inside a Markdown link: no space or parenthesis."""
+    shaped = isinstance(link, str) and link.startswith("https://")
+    return shaped and not any(char.isspace() or char in "()" for char in link)
+
+
+def write_file(name, content):
+    """The written file's download_link, or None. The result sits under file_metadata, not
+    data (verified): {success, file_metadata: {..., link, download_link}, error}."""
+    body = call_platform("write_content_to_file", content=content, filename=name)
+    meta = body.get("file_metadata") if body else None
+    link = meta.get("download_link") if isinstance(meta, dict) else None
+    return link if _download_link(link) else None
+
+
 def _csv_shape(name, url, size):
     csv = isinstance(name, str) and name.lower().endswith(".csv")
     linked = isinstance(url, str) and GS_URL.fullmatch(url) is not None

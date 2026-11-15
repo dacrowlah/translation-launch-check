@@ -138,6 +138,11 @@ word the report its own way: show the canvas.
    says members. Open the canvas: findings, back-translations, and suggested fixes, each
    re-checked (the top fixes "pass the rule checks").
 
+   The reply links the corrected file ("Corrected file (N fixes applied, re-checked)"): the
+   same CSV with every fix that passed the re-check applied. Download the corrected file,
+   re-upload it, and it comes back Ready (lines still left for a person are counted; the
+   download needs a signed-in Mark user).
+
 3. **Broken file** (`black-friday-broken.csv`): one message lists all three problems, and no
    agent runs: "Column jp isn't a supported locale. Did you mean ja-JP?", "L4 has no fr-FR
    text." and "The id L5 is used more than once.", with a link to the template.
