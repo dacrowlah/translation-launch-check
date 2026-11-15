@@ -53,15 +53,22 @@ section 5.
   `express.json` is mounted before `new ToolsService`, and the service is created before
   any `registerTool` call (`createApp` in `src/main.ts`).
 - **The SDK logs request bodies and results** with `console.log`, which would put campaign
-  copy in the logs. `quietConsole()` in `createApp` silences that logging. Our own log lines
-  go through the `Logger` port (`ConsoleLogger` writes one JSON line to stdout), never
-  `console` directly: lint allows `console` only in `src/infrastructure/console-logger.ts`.
+  copy in the logs. `createApp` calls `quietConsole()` once the app is built, which silences
+  every console channel, `error` included. Our own log lines go through the `Logger` port
+  (`ConsoleLogger` writes one JSON line to stdout), never `console` directly: lint allows
+  `console` only in `src/infrastructure/console-logger.ts`.
 - **Every tool response is HTTP 200 with a top-level `status` token:** `ok` with the
   result, or `invalid_input`, `internal_error` or `invalid_request` with nothing else (no
-  message, validation text, path, input or stack). The one exception is the SDK's own 401
-  for a missing or wrong bearer token. Mark may read a response aloud, so the token is the
-  only signal; expected problems with the copy are per-item statuses inside an `ok`
-  response.
+  message, validation text, path, input or stack). The exceptions are the SDK's own 401 for a
+  missing or wrong bearer token, and 404 `{"status":"not_found"}` for any route other than
+  discovery and the two tools. Mark may read a response aloud, so the token is the only
+  signal; expected problems with the copy are findings and statuses inside an `ok` response.
+- **Relative imports end in `.js`** (`./domain/types.js`). tsconfig is `NodeNext`, and Vercel
+  compiles each file on its own, without bundling, for Node's ESM loader, which does not guess
+  extensions. Typecheck rejects an extensionless import.
+- **The bearer token is the environment variable `TOOL_BEARER_TOKEN`** (at least 32
+  characters, no surrounding whitespace, or the app refuses to start). It lives in Vercel's
+  environment settings (`.env*` files are gitignored); never in code, tests or docs.
 - **`config/rules.json` is the only home for market data**: locales, currencies, date and
   number formats, spelling, glossary, channel limits and every other per-language list.
   `rules-schema.ts` parses it; the Mark side reads its subset of the same file. Never a

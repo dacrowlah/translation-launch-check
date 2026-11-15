@@ -10,6 +10,8 @@ code, or amend the doc in the same change. Never invent a standard. Items marked
 | [TOOL.md](TOOL.md) | `tool/`: the TypeScript service on Vercel (architecture, TypeScript, errors and security, testing, tooling, platform facts) |
 | [MARK.md](MARK.md) | `mark/`: the Agent Platform side (code steps, agents, skills, workflow and canvas layout, testing, tooling, security) |
 | [../contract/TOOL_CONTRACT.md](../contract/TOOL_CONTRACT.md) | what the tool must do (binding behaviour) |
+| [../contract/BEHAVIOUR.md](../contract/BEHAVIOUR.md) | how the tool's value checks read copy, with examples |
+| [../contract/KNOWN_LIMITATIONS.md](../contract/KNOWN_LIMITATIONS.md) | what the tool does not do, and why each gap is accepted |
 
 ## 1. Principles (both halves of the repo)
 
@@ -86,6 +88,8 @@ documented shape.
 README.md            (planned)    what the solution is, how to run and deploy it
 CLAUDE.md                         operating manual for Claude; tool/ and mark/ have their own
 docs/contract/TOOL_CONTRACT.md    the tool's binding behaviour
+docs/contract/BEHAVIOUR.md        how the value checks read copy (rules with examples)
+docs/contract/KNOWN_LIMITATIONS.md  accepted gaps, each with its reason
 docs/standards/                   this file, TOOL.md, MARK.md
 .claude/skills/                   writing-tests (both halves), mark-platform,
                                   mark-code-step-patterns, mark-json-authoring,

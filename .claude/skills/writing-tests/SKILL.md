@@ -33,7 +33,7 @@ names its fix. Use part 1 for `tool/`, part 2 for `mark/`.
    | domain | unit, table-driven, literal values | token parsing per locale, each check's findings and severities, length counting, language-text stripping |
    | application | use case over fakes | one finding list per line and locale, `unsupported_locale`, `checks` verified vs not_applicable, master carries only the language checks |
    | infrastructure | adapter + shared contract test | `eld-detector` against the `LanguageDetector` contract; `rules-schema` rejects a bad severity or a missing check id |
-   | presentation | requests through the Express app | 401 without the bearer token, zod rejection (missing locale key in `texts`, over-long cell), response shape, no diagnostics or `authorization` text, no request body on stdout |
+   | presentation | requests through the Express app | the SDK's 401 without the bearer token; 200 status tokens: `invalid_input` for a zod rejection (missing locale key in `texts`, over-long cell), `internal_error` for a defect, `invalid_request` for malformed or oversized JSON; 404 `not_found` for any other route; response shape; no diagnostics or `authorization` text, no request body on stdout |
 
 5. **Prove each new test can fail.**
    - Copy the production file to a scratch path, break the line the test pins, and watch the

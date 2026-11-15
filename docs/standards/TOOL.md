@@ -8,33 +8,39 @@ git rules are in [README.md](README.md); the behaviour to build is
 
 ## 1. Architecture and layers
 
-Planned layout under `tool/` (its own `package.json`; the Vercel project's root directory),
-created as the build proceeds:
+Layout under `tool/` (its own `package.json`; the Vercel project's root directory):
 
 ```
 api/index.ts                      Vercel entry: imports src/main.ts, exports the Express app
 config/rules.json                 the one source of market rules (contract section 6)
 src/domain/                       pure types and rules, no I/O
   types.ts                        package, finding, report types; ALL_CHECK_IDS and CheckId
-  rules.ts  finding.ts            Rules type (shape of rules.json); makeFinding()
-  ports/                          LanguageDetector, Clock, Logger
-  tokens/                         tokenize, urls, merge-tags, promo-codes, numbers, money,
-                                  dates, calendar
-  checks/                         compare, numbers, money, dates, merge-tags, urls,
-                                  promo-codes, trademarks, markup, length,
-                                  template-leftovers, length-ratio, formality, glossary,
-                                  untranslated, typography, time-zone, language,
-                                  language-text
-  copy-fit.ts                     units: chars, ads_chars, sms_segments; artifacts
+  rules.ts  finding.ts            Rules type (shape of rules.json); makeFinding(),
+                                  makeUnsureFinding()
+  locale-code.ts                  the locale-code pattern (schemas and rules share it)
+  copy-fit.ts  sms.ts             units: chars, ads_chars, sms_segments; copy-fit results
+  artifacts.ts                    template leftovers (both tools)
+  ports/                          LanguageDetector, Clock, Logger, Stopwatch
+  tokens/                         tokenize (the stage pipeline) and one module per token
+                                  kind and its helpers: links, merge tags, promo codes,
+                                  references, dates, times, money, numbers, pair resolution
+  checks/                         one module per check (numbers, money, dates, urls,
+                                  language, ...) plus compare (the shared diff and result
+                                  builders), spans (visible text, protected spans) and words
 src/application/                  use cases over ports: check-localization.ts,
-                                  locale-checks.ts, check-copy-fit.ts
-src/infrastructure/               adapters: eld-detector.ts, console-logger.ts,
-                                  system-clock.ts, rules-schema.ts (zod, parses rules.json)
-src/presentation/                 opal-tools-sdk registrations: schemas.ts,
-                                  localization-check-tool.ts, copy-fit-check-tool.ts,
-                                  safe-handler.ts (request -> use case -> response mapping)
+                                  locale-checks.ts, locale-report.ts, check-copy-fit.ts
+src/infrastructure/               adapters: eld-detector.ts, console-logger.ts (and
+                                  quietConsole), system-clock.ts, system-stopwatch.ts;
+                                  rules-schema.ts (zod, parses rules.json) with
+                                  rules-cross-checks.ts and rules-patterns.ts
+src/presentation/                 opal-tools-sdk registrations: tool-definition.ts
+                                  (definitions, per-service registration, routes),
+                                  schemas.ts, localization-check-tool.ts,
+                                  copy-fit-check-tool.ts, safe-handler.ts (validate, run,
+                                  status token, one log event)
 src/main.ts                       composition root: createApp(config); loads rules.json, wires
-                                  adapters into use cases, registers tools, silences the console
+                                  adapters into use cases, mounts the route allow-list, body
+                                  parser and tools, silences the console
 test/                             mirrors src/; test/support/ holds fakes, builders, harnesses
 ```
 
@@ -60,6 +66,9 @@ How the SDK registers, validates and logs: the
 
 - Node 24, ESM (`"type": "module"`), TypeScript ~6.0, `strict: true`,
   `noUncheckedIndexedAccess: true`, `exactOptionalPropertyTypes: true`.
+- `module` and `moduleResolution` are `NodeNext`, so every relative import names its `.js`
+  extension (`./domain/types.js`), and typecheck rejects one without it. Vercel compiles each
+  file on its own without bundling, and Node's ESM loader does not guess extensions.
 - No `any`. `unknown` at boundaries is parsed with zod, then narrowed.
 - Domain values are plain readonly types. Prefer discriminated unions for statuses
   (`{ status: "verified" } | { status: "unverified"; reason: ... }`).
@@ -71,7 +80,8 @@ How the SDK registers, validates and logs: the
   each definition on that service only, with `registerOn`, which calls the SDK's public
   instance method `service.registerTool(...)`. The discovery parameters are built from
   `z.toJSONSchema` of the shape, the same way the SDK's global `registerTool` builds them.
-  `app.use(express.json())` is added explicitly, before the service.
+  The route allow-list and `express.json({ limit: "256kb" })` are mounted explicitly, before
+  the service (section 3).
 - Tool descriptions are written for the calling model: what the function does, when to call
   it, and what comes back.
 
@@ -83,30 +93,58 @@ The SDK's auth, logging and failure behaviour, and the response rule: the
 - **Statuses, not exceptions,** for every expected problem (contract section 2). Use cases
   return results; adapters (e.g. the language detector answering null when unsure) never
   throw past the port.
-- **No diagnostics in responses.** Technical detail goes to the `Logger` port only, as one
-  structured line `{ event, tool, status, counts, latency_ms }`, never any request text.
+- **No diagnostics in responses.** Every tool reply is HTTP 200 with a status token and nothing
+  else on failure (contract section 2). Technical detail goes to the `Logger` port only
+  (`ConsoleLogger`: one JSON line on stdout), never any request text. Two event kinds:
+  - a tool call: `{ event: "tool_call" | "defect", tool, status, latency_ms, lines, locales }`,
+    written by `safeHandler`;
+  - a request refused before any tool ran (malformed JSON, a body over the limit):
+    `{ event: "request_failed", status }`, written by the Express error handler in
+    `src/main.ts`, never with the body, the error message or the path.
+
+  A 404 `not_found` and the SDK's 401 write no line. `latency_ms` comes from the injected
+  `Stopwatch` port, never from `Date.now()`.
+
 - **Never log or echo** request headers, the bearer token, environment variables or
   campaign copy. A test pins that a response contains no `authorization` text.
 - **The SDK itself `console.log`s full request bodies and tool results** (SDK 0.1.41-dev;
-  seen in Vercel logs). That would put campaign copy in logs, so the console is silenced in the
-  composition root (`src/main.ts`), and a test pins that a tool call writes no request body
-  to stdout.
+  seen in Vercel logs), and `console.error`s a stack with file paths when a handler throws.
+  That would put campaign copy in logs, so `createApp` calls `quietConsole()` after the app is
+  built, which silences `log`, `info`, `debug`, `warn` and `error`. Tests pin that an invalid
+  call and a malformed body each write only our one JSON event line to stdout and nothing to
+  stderr (`test/presentation/app-security.test.ts`).
 - **Don't use the SDK's error helpers** (`providerError`, `validationError`,
   `resourceNotFound`) for expected problems. They reply HTTP 200 with an error envelope that a
   workflow code step sees as a success. Expected problems are per-item statuses.
+- **Never let a handler throw.** The SDK turns a throw into HTTP 500 `{"error": <message>}`.
+  `safeHandler` catches every throw from validation or the use case and returns the bare
+  `{"status":"internal_error"}`. A logger that throws while recording that failure would
+  still escape to the SDK's 500; `ConsoleLogger` only writes one line to stdout.
 - **Auth:** SDK `static_token` mode with `TOOL_BEARER_TOKEN` from the environment. The
-  service refuses to start without it.
+  service refuses to start without it, or when it is shorter than 32 characters or has
+  leading or trailing whitespace.
+- **Routes:** an allow-list (`routesOf` in `tool-definition.ts`, built from the same endpoint
+  names as registration) runs first, before the body parser and the SDK. Anything else is 404
+  `{"status":"not_found"}`, with nothing of the request echoed.
 - **Outbound: none.** The service makes no network requests. No URL from the copy is ever
-  fetched; URLs are only compared. A test pins that no code path calls `fetch`.
+  fetched; URLs are only compared. `src/` has no `fetch`, `http` or `net` call. `domain`,
+  `application` and `presentation` may import no Node built-in (presentation only the SDK and
+  zod); `infrastructure` may import Node built-ins, and the composition root (`src/main.ts`)
+  may import anything (it uses `express`). Lint does not ban the global `fetch`, and no test
+  pins its absence, so review checks it.
 - **Input:** every parameter is zod-validated with the bounds in the contract, inside the
   tool handler (`safeHandler`), after the SDK's bearer check. The SDK does not validate at
-  request time and has no status hook, so a malformed call does no work and throws a fixed
-  `invalid_input`; the SDK turns that into HTTP 500 `{"error":"invalid_input"}` (no zod text,
-  paths or input). Our only caller validates first, so a malformed call is a caller defect.
-  A defect is `{"error":"internal_error"}`. Never reach the SDK's private router.
-- **Body limit:** `express.json({ limit: "256kb" })`. A 64 KB CSV's package, with JSON
-  escaping, fits; real code-step calls are far smaller. Larger bodies get a generic 413
-  `{"error":"invalid_request"}`; malformed JSON gets a generic 400 of the same body.
+  request time and has no status hook. A malformed call does no work and replies HTTP 200
+  `{"status":"invalid_input"}` (no zod text, paths or input); a defect replies
+  `{"status":"internal_error"}`; a success replies `{...result, "status":"ok"}`, and a result
+  field can never override the status. Our only caller validates first, so a malformed call
+  is a caller defect. Never reach the SDK's private router.
+- **Body limit:** `express.json({ limit: "256kb" })`, mounted after the route allow-list and
+  before the SDK. A 64 KB CSV's package, with JSON escaping, fits; real code-step calls are far
+  smaller. A body the parser refuses (over the limit, malformed JSON, a charset that is not a
+  UTF encoding: any 4xx from the parser) gets HTTP 200 `{"status":"invalid_request"}`. The
+  body is parsed before the SDK's token check, so an unauthenticated malformed body gets
+  `invalid_request`, not 401 (by design: one token check, the SDK's).
 - **SDK registry:** the SDK's global `registerTool()` registers on every `ToolsService` ever
   created. We never call it (see section 2), so apps built in one process do not share tools.
 - **Secrets** live in Vercel environment variables, never in the repo; `.env*` is gitignored.
@@ -119,7 +157,7 @@ The SDK's auth, logging and failure behaviour, and the response rule: the
 Binding rules; the how-to is the `writing-tests` skill
 ([../../.claude/skills/writing-tests/SKILL.md](../../.claude/skills/writing-tests/SKILL.md), part 1).
 
-- **Runner:** Vitest. Test files are `test/**/*.test.ts`, mirroring `src/`. Two exceptions:
+- **Runner:** Vitest. Test files are `test/**/*.{test,spec}.ts`, mirroring `src/`. Two exceptions:
   scaling tests (they time CPU work) live in `test/perf/` and run only in `pnpm test:perf`;
   the regression corpus (every reproduction from a review, one row each) is
   `test/application/regression-corpus.test.ts` over `test/fixtures/regression/*.json`.
@@ -140,8 +178,9 @@ Binding rules; the how-to is the `writing-tests` skill
   - application: use cases over fakes;
   - infrastructure: the real adapter against the fake's contract test (`eld-detector`
     against `FakeLanguageDetector`), and `rules-schema` against the shipped `rules.json`;
-  - presentation: requests through the Express app (auth required, validation errors,
-    response shape, no diagnostics);
+  - presentation: requests through the Express app (the SDK's 401, the 200 status tokens
+    `invalid_input`, `internal_error` and `invalid_request`, 404 `not_found`, response shape,
+    no diagnostics);
 - **Read the test count** on every run. Zero tests or any unexpected skip is a failure (the
   gate enforces it).
 
@@ -198,3 +237,9 @@ What Mark sends, registry sync and what each caller sees: the
   limit.
 - Vercel entry: `tool/api/index.ts` exporting the Express app, plus `tool/vercel.json` with a
   rewrite of `/(.*)` to `/api`. The Vercel project's root directory is `tool/`.
+- Vercel compiles the TypeScript file by file, without bundling, and runs it as Node ESM, so
+  relative imports need their `.js` extension (section 2). The first production deploy, built
+  under `Bundler` module resolution with extensionless imports, failed on every request with
+  `ERR_MODULE_NOT_FOUND`.
+- The bearer token is the Vercel environment variable `TOOL_BEARER_TOKEN`, never in the repo;
+  Mark's registry entry for the tool sends the same value as its bearer token.

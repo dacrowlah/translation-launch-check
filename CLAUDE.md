@@ -33,7 +33,9 @@ Hard constraints:
 
 - How we test (read before writing or reviewing any test, in either half):
   [.claude/skills/writing-tests/SKILL.md](.claude/skills/writing-tests/SKILL.md)
-- What the tool must do (binding): [docs/contract/TOOL_CONTRACT.md](docs/contract/TOOL_CONTRACT.md)
+- What the tool must do (binding): [docs/contract/TOOL_CONTRACT.md](docs/contract/TOOL_CONTRACT.md);
+  how it reads copy: [BEHAVIOUR.md](docs/contract/BEHAVIOUR.md); its accepted gaps:
+  [KNOWN_LIMITATIONS.md](docs/contract/KNOWN_LIMITATIONS.md)
 - How we build (binding): [docs/standards/README.md](docs/standards/README.md),
   [TOOL.md](docs/standards/TOOL.md), [MARK.md](docs/standards/MARK.md)
 - Each half's own manual: [tool/CLAUDE.md](tool/CLAUDE.md), [mark/CLAUDE.md](mark/CLAUDE.md)
@@ -92,7 +94,7 @@ the same change. The contract changes only with the owner's approval.
 
 ```
 CLAUDE.md    tool/CLAUDE.md    mark/CLAUDE.md
-docs/contract/TOOL_CONTRACT.md
+docs/contract/TOOL_CONTRACT.md  BEHAVIOUR.md  KNOWN_LIMITATIONS.md
 docs/standards/README.md  TOOL.md  MARK.md
 .claude/skills/writing-tests/SKILL.md
 .claude/skills/mark-platform/  mark-code-step-patterns/  mark-json-authoring/  opal-custom-tools/
