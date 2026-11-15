@@ -2,7 +2,7 @@
 escapes and links written as "Label: url" on their own line. The chat reply keeps Markdown."""
 
 from builders import FILE_LINK
-from report_support import CANVAS_URL, write
+from report_support import CANVAS_URL, calls_to, write
 from step_builders import (
     a_ctx,
     a_finding,
@@ -24,7 +24,7 @@ def fixed_greeting(fake_tools, ctx):
     fixed = a_line("L2", "email", "body", **{"en-US": "Hi {{first_name}}", "de-DE": GREETING})
     fake_tools.respond("localization_check", ok_body(a_tool_report(a_package(lines=[fixed]))))
     out = write(fake_tools, ctx, scored, {"fixes": [a_fix(line_id="L2", text=GREETING)]})
-    body = next(params["body"] for name, params in fake_tools.calls if name == "send_email")
+    body = calls_to(fake_tools, "send_email")[0]["body"]
     return out, body
 
 
@@ -50,3 +50,10 @@ def test_the_chat_reply_keeps_markdown(fake_tools, tmp_path):
     assert "- de-DE L2: Hallo {{first\\_name}}, willkommen (passes the rule checks)" in message
     assert f"Corrected file (1 fix applied, re-checked): [Download]({FILE_LINK})" in message
     assert "Detailed report: [Translation Launch Check - Black Friday 2026 - " in message
+
+
+def test_the_chat_reply_escapes_the_canvas_name(fake_tools, tmp_path):
+    ctx = a_ctx(tmp_path)
+    scored = a_scored_run(fake_tools, ctx, pkg=a_package(campaign="Spring_Sale"))
+    message = write(fake_tools, ctx, scored)["message"]
+    assert "Detailed report: [Translation Launch Check - Spring\\_Sale - " in message

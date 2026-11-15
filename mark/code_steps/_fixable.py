@@ -13,3 +13,12 @@ def fixable(finding):
     if finding["severity"] not in FAILING:
         return False
     return finding["confidence"] != "unsure" or finding["opinion"] == "real_problem"
+
+
+def fixable_at(scored, line_id):
+    """The fixable findings on one line of a scored language."""
+    return [
+        finding
+        for finding in scored["findings"]
+        if finding["line_id"] == line_id and fixable(finding)
+    ]

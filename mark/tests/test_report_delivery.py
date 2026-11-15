@@ -1,7 +1,15 @@
 import read_and_check
 import report
 from builders import EXAMPLE_ALLOWED, error, ok
-from report_support import CANVAS_URL, by_webhook, fixed_now, names, scored_after, write
+from report_support import (
+    CANVAS_URL,
+    by_webhook,
+    calls_to,
+    fixed_now,
+    names,
+    scored_after,
+    write,
+)
 from step_builders import (
     ROWS,
     a_csv,
@@ -28,10 +36,6 @@ def in_chat(fake_tools, tmp_path, raw):
     return ctx, scored_after(fake_tools, ctx, checked)
 
 
-def email_calls(fake_tools):
-    return [params for name, params in fake_tools.calls if name == "send_email"]
-
-
 CLEAN_EMAIL = (
     "Overall: No issues found by automated checks.\n\n"
     "- de-DE: No issues found by automated checks\n\n"
@@ -46,7 +50,7 @@ def test_webhook_runs_email_the_qa_inbox(fake_tools, tmp_path):
     ctx = a_ctx(tmp_path)
     out = write(fake_tools, ctx, by_webhook(fake_tools, ctx))
     subject = "Translation Launch Check - Black Friday 2026: No issues found by automated checks"
-    assert email_calls(fake_tools) == [
+    assert calls_to(fake_tools, "send_email") == [
         {"recipient_emails": EXAMPLE_ALLOWED, "subject": subject, "body": CLEAN_EMAIL}
     ]
     assert out["emailed"] is True
@@ -55,7 +59,7 @@ def test_webhook_runs_email_the_qa_inbox(fake_tools, tmp_path):
 def test_chat_runs_send_no_email(fake_tools, tmp_path):
     ctx, scored = in_chat(fake_tools, tmp_path, a_csv())
     out = write(fake_tools, ctx, scored)
-    assert email_calls(fake_tools) == [] and out["emailed"] is False
+    assert calls_to(fake_tools, "send_email") == [] and out["emailed"] is False
     assert "couldn't be sent" not in out["message"]
 
 
@@ -63,7 +67,7 @@ def test_an_address_inside_the_copy_is_never_emailed(fake_tools, tmp_path):
     rows = [[*ROWS[0][:4], "Schreib an owner@example.com"], ROWS[1]]
     ctx, scored = in_chat(fake_tools, tmp_path, a_csv(rows=rows))
     write(fake_tools, ctx, scored)
-    assert email_calls(fake_tools) == []
+    assert calls_to(fake_tools, "send_email") == []
 
 
 def test_an_email_that_wasnt_sent_is_said(fake_tools, tmp_path):

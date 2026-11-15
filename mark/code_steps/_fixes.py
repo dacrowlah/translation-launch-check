@@ -1,11 +1,13 @@
 """Suggested fixes: the fixer agent's drafts (only for lines it was sent) and the code-made
 spelling fixes, re-checked together with ONE localization_check call. A fix passes when its
-line has no blocker or warning; if the tool fails, every fix is "not re-checked". Fixes
-never change verdicts: the verdict describes the file as submitted. Nothing here raises."""
+line has no blocker or warning and it doesn't read as a note; if the tool fails, every fix is
+"not re-checked". Fixes never change verdicts: the verdict describes the file as submitted.
+Nothing here raises."""
 
 from _agent_output import agent_answer
 from _config import RULES
-from _fixable import SPELLING, fixable
+from _fix_notes import fix_reads_as_a_note
+from _fixable import SPELLING, fixable_at
 from _model_output import model_text
 from _shared import call_tool
 from _tool_report import usable_report
@@ -47,8 +49,7 @@ def _agent_fixes(scores, raw):
 
 
 def _spelled(scored, line):
-    found = (f for f in scored["findings"] if f["line_id"] == line["id"] and fixable(f))
-    return any(finding["check"] == SPELLING for finding in found)
+    return any(finding["check"] == SPELLING for finding in fixable_at(scored, line["id"]))
 
 
 def _spelling_fix(scored, line, sent):
@@ -111,7 +112,15 @@ def _recheck_body(scores, fixes):
     return result["body"] if usable_report(result["body"], pkg["locales"]) else None
 
 
+def _fix_status_or_note(scores, body, fix):
+    """The re-check status, unless the fix reads as a note: then it never passes."""
+    status = fix_status(body, fix)
+    noted = status["status"] != "still_has" and fix_reads_as_a_note(scores, fix)
+    return {"status": "reads_as_a_note", "checks": []} if noted else status
+
+
 def rechecked(scores, fixes):
-    """Each fix with its re-check status, from one call for all of them."""
+    """Each fix with its status: the re-check's, from one call for all of them, or "reads as
+    a note" (_fix_notes)."""
     body = _recheck_body(scores, fixes) if fixes else None
-    return [{**fix, **fix_status(body, fix)} for fix in fixes]
+    return [{**fix, **_fix_status_or_note(scores, body, fix)} for fix in fixes]

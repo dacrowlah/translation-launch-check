@@ -21,10 +21,11 @@ mark/                                      the Agent Platform source
   code_steps/report.py                     step "Write and send the report"
   code_steps/needs_info.py                 step "Ask for a corrected file"
   code_steps/_shared.py                    call_tool, call_platform, run_safely
-  code_steps/_routes.py                    route tokens; has_route_word, defused (stdlib only)
+  code_steps/_routes.py                    route tokens; has_route_word, defused,
+                                           without_controls (stdlib only)
   code_steps/_platform.py                  platform-tool helpers: send_email (allow-list),
                                            create_canvas, write_file
-  code_steps/_csv_attachment.py            read_csv_attachment (create_csv_canvas; no step uses it)
+  code_steps/_csv_attachment.py            read_csv_attachment (create_csv_canvas; unused)
   code_steps/_address.py                   email address and allow-list rules
   code_steps/_url.py                       the template URL rule
   code_steps/_checksum.py                  canonical JSON, sha256_hex, facts_checksum,
@@ -51,6 +52,7 @@ mark/                                      the Agent Platform source
   code_steps/_fixable.py                   which findings a fix addresses; prices never
   code_steps/_fix_input.py                 lines to fix and the fixer's input text
   code_steps/_fixes.py                     suggested fixes and their one re-check call
+  code_steps/_fix_notes.py                 a fix that reads as a note, not copy
   code_steps/_report_view.py  _message.py  the chat reply (Markdown) and the QA-inbox email
                                            (plain text): one assembly, two styles
   code_steps/_corrected_file.py            the corrected CSV: passing fixes applied, no prices
@@ -96,11 +98,13 @@ checksum per hop:
   `verdict_checksum`: campaign, source, `notify_email` and `rules_version` copied forward,
   the outcome, each locale's score, the lines to fix, the count left unfixed
   (`unfixed_lines`) and the run's total of findings not sent for a second opinion
-  (`unsent_checks`). The report reads only this file and says what was left out. When a
-  fix passes the re-check, the report also writes the corrected file from it: the same
-  columns and rows with each passing fix applied (never to a line with a price or currency
-  finding, nor a fix that still holds a problem's found value or has its expected value
-  more often than the master: a correction note such as "X, not Y"), UTF-8 with a BOM, CRLF, through `write_content_to_file`, and links its download.
+  (`unsent_checks`). The report reads only this file and says what was left out. When a fix
+  passes the re-check, the report also writes the corrected file from it: the same columns
+  and rows with each passing fix applied (never to a line with a price or currency finding),
+  UTF-8 with a BOM, CRLF, through `write_content_to_file`, and links its download. A fix
+  that reads as a note, not copy (`_fix_notes`: an untranslated line's fix still quoting the
+  old wording, or a do-not-translate-only line's fix that grew by more than the terms) gets
+  the status "reads as a note" and is never applied.
 
 **Source of truth: the repo, not the instance.**
 - Every agent, skill and code step is edited here, then built and imported. Mark exports the
@@ -136,14 +140,15 @@ The platform contract (verified; the evidence and more facts are in the
     73,200 and more failed with exit_code=-1 and no message). Rule: the JSON-escaped built
     code plus the escaped input (`json_size`) stays at most 68,000, about 5 KB under the cap.
     `_budgets.py` holds each step's code ceiling (escaped: read and check 41,000, save the
-    review 10,000, score 24,000, report 43,000, ask for a corrected file 20,000; none above
-    `MAX_CODE_BYTES`, 60,000) and `input_budget(step)` = 68,000 - ceiling. The caps derive from the budgets: the back-translation cap is Save the
-    review's budget less the largest review the agent schema admits; the fixer cap keeps
-    the lines' expected fixes (each bounded by the fixer schema) within the report step's
-    budget; problems leave the read step at most 25 (plus a count), each field at most 300
-    characters; second-opinion refs stop at the review schema's 20 per locale, and fixer
-    lines at the fix schema's 60. The webhook sender refuses a package over Read and check
-    the file's budget less its keys (26,800 bytes of escaped JSON);
+    review 10,000, score 25,000, report 43,000, ask for a corrected file 15,500; none above
+    `MAX_CODE_BYTES`, 60,000) and `input_budget(step)` = 68,000 - ceiling. The caps derive
+    from the budgets: the back-translation cap is Save the review's budget less the largest
+    review the agent schema admits; the fixer cap keeps the lines' expected fixes (each
+    bounded by the fixer schema) within the report step's budget; problems leave the read
+    step at most 25 (plus a count), each field at most 300 characters; second-opinion refs
+    stop at the review schema's 20 per locale, and fixer lines at the fix schema's 60. The
+    webhook sender refuses a package over Read and check the file's budget less its keys
+    (26,800 bytes of escaped JSON);
   - a return is at most 256 KB, and a bigger one silently becomes `null` (docs);
   - the timeout is set per step: default 30 s, at most 300 s (docs).
 - **Loops:** the step after a loop that takes the loop output receives each iteration's full
@@ -188,15 +193,16 @@ Rules:
 - **Return only what downstream needs, as a plain-JSON dict, plus a one-line user-safe
   `summary`.** No diagnostics. Technical detail stays in the tool's own server log.
 - **User-facing text comes only from the templates** in `_text.py`, `_text_problems.py`,
-  `_text_report.py` and `_text_needs_info.py`. Each template is pure string formatting; the report and canvas code
-  never write prose.
+  `_text_report.py` and `_text_needs_info.py`. Each template is pure string formatting; the
+  report and canvas code never write prose.
 - **Untrusted text is shown as text.** Copy, the campaign name, the tool's details and the
   agents' drafts, reasons and notes reach the chat reply and the canvas only through
   `md_text()` (`_markdown.py`; `safe()` and `cell()` build on it). It escapes Markdown and
   HTML syntax (links, images, emphasis, headings, tables, tags), removes control and format
   characters (bidi overrides, zero-width characters), and defuses the route prefix. The
   QA-inbox email is plain text, so it gets the same text through `plain_text()` (`plain()`):
-  the controls removed and the route prefix defused, nothing escaped, links as "Label: url". Every echo of user or model text into a step output goes through `defused()`
+  the controls removed and the route prefix defused, nothing escaped, links as "Label: url".
+  Every echo of user or model text into a step output goes through `defused()`
   (`_routes.py`), so no copy or model text can form a route token.
 - **The parse chain runs outside Mark.** `_csv_package`, `_webhook_package` and `_checksum`,
   and every helper they import, use the standard library only: no `opal_tms_sdk`, no

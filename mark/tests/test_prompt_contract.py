@@ -133,7 +133,7 @@ EXAMPLE_3 = an_entry(
 )
 
 
-TRAILPRO = "Die neue Trailpro-Jacke: wasserdicht, leicht und ideal auf Wintertrails."
+TRAILPRO = "Die neue Trail-Pro-Jacke: wasserdicht, leicht und ideal auf Wintertrails."
 DNT = "A do-not-translate term is missing or was translated."
 EXAMPLE_4 = an_entry(
     ("de-DE", "L5", "email", "body"),
@@ -142,8 +142,8 @@ EXAMPLE_4 = an_entry(
         TRAILPRO,
         TRAILPRO,
     ),
-    {"value": 72, "limit": None, "unit": "chars"},
-    [a_problem("glossary_dnt", "blocker", DNT, "TrailPro")],
+    {"value": 73, "limit": None, "unit": "chars"},
+    [a_problem("glossary_dnt", "warning", DNT, "TrailPro")],
 )
 
 

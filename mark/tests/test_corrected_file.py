@@ -95,11 +95,12 @@ def test_flagged_lines_without_an_applied_fix_still_need_a_person():
 
     de = [at("L2", "numbers"), at("L1", "numbers")]  # L1 has an applied fix
     fr = [at("L2", "dates", "warning"), at("L1", "typography", "info")]  # info needs no one
+    fr += [at(None, "language_column", "warning")]  # a whole column is no line
     scores = a_scores(LINES, {"de-DE": de, "fr-FR": fr})
     assert open_lines(scores, {("de-DE", "L1"): "Bis zu 30 %, heute"}) == 2
 
 
-NUMBERS = a_finding("numbers", expected="30%", found="20 %")
+NUMBERS = a_finding("numbers", expected="30%", found="20%")
 TWO_FLAGGED = {("de-DE", "L1"): [NUMBERS], ("de-DE", "L2"): [a_finding("formality", "warning")]}
 
 
@@ -135,41 +136,3 @@ def test_no_passing_fix_means_no_export(fake_tools, tmp_path):
     out = write(fake_tools, ctx, a_scored_run(fake_tools, ctx, TWO_FLAGGED))
     assert "write_content_to_file" not in [name for name, _ in fake_tools.calls]
     assert "orrected file" not in out["message"]
-
-
-JA_MASTER = "Meet the new TrailPro jacket: waterproof, light and made for winter trails."
-JA_FIXED = (
-    "\u65b0\u3057\u3044TrailPro\u30b8\u30e3\u30b1\u30c3\u30c8\uff1a"
-    "\u9632\u6c34\u30fb\u8efd\u91cf\u3067\u3001\u51ac\u306e\u30c8\u30ec\u30a4\u30eb\u306b\u3074\u3063\u305f\u308a\u3002"
-)
-JA_NOTE = (
-    "\u65b0\u3057\u3044TrailProjacket\u3067\u306f\u306a\u304f" + JA_FIXED
-)  # observed live: a correction note as copy
-
-
-def applied_to_one_line(master, finding, text):
-    """applied_fixes for one ja-JP line with one rule finding and one passing fix."""
-    scores = a_scores(
-        [a_line_of("L5", master, {"ja-JP": "x"})], {"ja-JP": [{**finding, "line_id": "L5"}]}
-    )
-    return applied_fixes(scores, [a_passed_fix("ja-JP", "L5", text)])
-
-
-DNT = a_finding("glossary_dnt", expected="TrailPro")
-
-
-def test_a_fix_that_reads_as_a_correction_note_is_not_applied():
-    assert applied_to_one_line(JA_MASTER, DNT, JA_NOTE) == {}
-    assert applied_to_one_line(JA_MASTER, DNT, JA_FIXED) == {("ja-JP", "L5"): JA_FIXED}
-
-
-def test_a_fix_that_still_has_the_found_value_is_not_applied():
-    numbers = a_finding("numbers", expected="30%", found="20 %")
-    assert applied_to_one_line("Up to 30% off", numbers, "Bis zu 30 % statt 20 % Rabatt") == {}
-
-
-def test_values_the_market_spells_its_own_way_and_words_containing_the_found_one_pass():
-    spelling = a_finding("locale_spelling", "warning", expected="favourite", found="favorite")
-    assert applied_to_one_line("your favorite colors", spelling, "your favourite colours")
-    formality = a_finding("formality", "warning", expected="formal", found="dir")
-    assert applied_to_one_line("Shop now", formality, "Kaufen Sie direkt")

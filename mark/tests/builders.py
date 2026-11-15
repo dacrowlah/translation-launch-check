@@ -72,6 +72,12 @@ def an_execution_record(response):
     return {"metrics": metrics, "response": response, "token_usage": usage}
 
 
+# The reserved route prefix split by an invisible character (a zero-width space, a soft
+# hyphen), and what it must come out as once those are dropped: defused.
+HIDDEN_PREFIXES = {
+    "tlc\u200b_route_fix": "tlc-route-fix",
+    "TLC_\u00adROUTE_needs_info": "tlc-route-needs_info",
+}
 FILE_LINK = "https://files.example.test/v1/file/F1?download=true"
 
 

@@ -19,12 +19,19 @@ from _text_report import NOUNS, REPORT
 
 MAX_TOP_FIXES = 3
 MAX_HUMAN_ITEMS = 5  # per language; the canvas has them all
-MARKDOWN = {"text": safe, "link": "markdown_link"}
-PLAIN = {"text": plain, "link": "plain_link"}
 
 
-def _link(style, label, text, url):
-    return REPORT[style["link"]].format(label=label, text=text, url=url)
+def _markdown_link(label, text, url):
+    return REPORT["markdown_link"].format(label=label, text=safe(text), url=url)
+
+
+def _plain_link(label, _text, url):
+    """The link text isn't shown in plain text: "Label: url"."""
+    return REPORT["plain_link"].format(label=label, url=url)
+
+
+MARKDOWN = {"text": safe, "link": _markdown_link}
+PLAIN = {"text": plain, "link": _plain_link}
 
 
 def _certain(scored, severity):
@@ -76,7 +83,7 @@ def _unsent_section(count):
 def _corrected_link(corrected, style):
     key = "corrected_one" if corrected["applied"] == 1 else "corrected"
     label = REPORT[key].format(count=corrected["applied"])
-    return _link(style, label, REPORT["download"], corrected["url"])
+    return style["link"](label, REPORT["download"], corrected["url"])
 
 
 def corrected_section(corrected, style):
@@ -91,7 +98,7 @@ def corrected_section(corrected, style):
 def canvas_line(canvas, style):
     if not canvas["url"]:
         return REPORT["canvas_failed"]
-    return _link(style, REPORT["canvas_label"], style["text"](canvas["name"]), canvas["url"])
+    return style["link"](REPORT["canvas_label"], canvas["name"], canvas["url"])
 
 
 def _copy_lines(line, shown):

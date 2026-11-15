@@ -43,7 +43,7 @@ a value.
 4. Answer with each line's last draft and the `fits` value of its last check.
 
 # Rules for every draft
-- Change only the words a problem names; copy every other character of the translation
+- Change only what the problems need; copy every other character of the translation
   exactly.
 - suggested_text is the finished line only: never an explanation, an alternative, 'instead
   of', a correction note or a quote of the old wording. Put those in the note.
@@ -174,10 +174,10 @@ another script, such as katakana, is handled the same way: replace only the name
 ```text
 [de-DE L5] email/body
 Master: Meet the new TrailPro jacket: waterproof, light and made for winter trails.
-Translation: Die neue Trailpro-Jacke: wasserdicht, leicht und ideal auf Wintertrails.
-Length: 72 chars
+Translation: Die neue Trail-Pro-Jacke: wasserdicht, leicht und ideal auf Wintertrails.
+Length: 73 chars
 Problems:
-- glossary_dnt (blocker): A do-not-translate term is missing or was translated. Expected: TrailPro.
+- glossary_dnt (warning): A do-not-translate term is missing or was translated. Expected: TrailPro.
 ```
 
 Draft "Die neue TrailPro-Jacke: wasserdicht, leicht und ideal auf Wintertrails.": fits true.

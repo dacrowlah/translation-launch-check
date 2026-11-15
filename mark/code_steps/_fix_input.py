@@ -12,7 +12,7 @@ Nothing here raises."""
 from _budgets import FIX_BOUNDS, fix_overhead, input_budget
 from _checksum import json_size
 from _finding_text import length_text, values_text
-from _fixable import FOR_A_PERSON, SPELLING, fixable
+from _fixable import FOR_A_PERSON, SPELLING, fixable_at
 
 PERSON_HEADING = "\nFor a person (keep prices and currencies as written):"
 MAX_FIX_INPUT_BYTES = 50_000  # the fixer's input; lines past it get no suggestion
@@ -28,11 +28,11 @@ def _brief(finding):
     return {key: finding[key] for key in ("check", "severity", "detail", "expected", "found")}
 
 
-def _entry(scored, line, found):
+def _entry(scored, line, findings):
     copied = {key: line[key] for key in ("channel", "field", "master", "text", "length")}
     start = line["spelling_fix"] or line["text"]
     head = {"locale": scored["locale"], "line_id": line["id"], **copied, "start_text": start}
-    return {**head, "findings": [_brief(finding) for finding in found]}
+    return {**head, "findings": [_brief(finding) for finding in findings]}
 
 
 def _for_the_fixer(finding):
@@ -40,8 +40,8 @@ def _for_the_fixer(finding):
 
 
 def _to_fix(scored, line):
-    found = [f for f in scored["findings"] if f["line_id"] == line["id"] and fixable(f)]
-    return _entry(scored, line, found) if any(map(_for_the_fixer, found)) else None
+    findings = fixable_at(scored, line["id"])
+    return _entry(scored, line, findings) if any(map(_for_the_fixer, findings)) else None
 
 
 def lines_to_fix(scored_locales):

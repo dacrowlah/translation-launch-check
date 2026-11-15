@@ -1,9 +1,7 @@
 import re
 
-import report
 import score
-from builders import a_written_file, ok
-from report_support import CANVAS_URL, fixed_now
+from report_support import calls_to, write
 from step_builders import (
     a_checked_run,
     a_ctx,
@@ -42,17 +40,6 @@ def run(fake_tools, ctx, case):
     return {"run_key": out["run_key"], "verdict_checksum": out["verdict_checksum"]}
 
 
-def deliver(fake_tools, ctx, scored, fixes=None):
-    fake_tools.respond("create_canvas", ok({"artifact_url": CANVAS_URL}))
-    fake_tools.respond("send_email", ok({"status": "sent"}))
-    fake_tools.respond("write_content_to_file", a_written_file())
-    return report.impl({**scored, "fixes": fixes}, ctx, fixed_now)
-
-
-def sent(fake_tools, tool, key):
-    return next(params[key] for name, params in fake_tools.calls if name == tool)
-
-
 def real_problem(item):
     return a_review(item, rule_checks=[a_rule_check("R1", "real_problem", EVIL_REASON)])
 
@@ -64,12 +51,12 @@ EVIL = {
 }
 
 
-def test_copy_drafts_and_reasons_render_as_text_in_chat_canvas_and_email(fake_tools, tmp_path):
+def test_copy_drafts_and_reasons_render_as_text_in_chat_and_canvas(fake_tools, tmp_path):
     ctx = a_ctx(tmp_path)
     scored = run(fake_tools, ctx, EVIL)
     fake_tools.respond("localization_check", ok_body(a_tool_report(EVIL["pkg"])))
-    out = deliver(fake_tools, ctx, scored, {"fixes": [a_fix(text=EVIL_FIX)]})
-    outputs = [out["message"], sent(fake_tools, "create_canvas", "content")]
+    out = write(fake_tools, ctx, scored, {"fixes": [a_fix(text=EVIL_FIX)]})
+    outputs = [out["message"], calls_to(fake_tools, "create_canvas")[0]["content"]]
     assert [LIVE.findall(shown) for shown in outputs] == [[], []]
     assert "Jetzt \\[hier klicken\\]\\(https://evil.example/fix\\) gnilleps" in out["message"]
 
@@ -80,8 +67,8 @@ def test_hostile_copy_reaches_the_plain_email_as_inert_text(fake_tools, tmp_path
     ctx = a_ctx(tmp_path)
     scored = run(fake_tools, ctx, EVIL)
     fake_tools.respond("localization_check", ok_body(a_tool_report(EVIL["pkg"])))
-    deliver(fake_tools, ctx, scored, {"fixes": [a_fix(text=EVIL_FIX)]})
-    body = sent(fake_tools, "send_email", "body")
+    write(fake_tools, ctx, scored, {"fixes": [a_fix(text=EVIL_FIX)]})
+    body = calls_to(fake_tools, "send_email")[0]["body"]
     assert RLO not in body and "\\" not in body
     assert "- de-DE L1: Jetzt [hier klicken](https://evil.example/fix) gnilleps (" in body
     translation = EVIL_COPY.replace(RLO, "")
@@ -91,11 +78,12 @@ def test_hostile_copy_reaches_the_plain_email_as_inert_text(fake_tools, tmp_path
 def test_unmatched_reviewer_notes_are_said(fake_tools, tmp_path):
     ctx = a_ctx(tmp_path)
     review = {"review": lambda item: a_review(item, [a_review_finding("L9", "tone", "warning")])}
-    out = deliver(fake_tools, ctx, run(fake_tools, ctx, review))
+    out = write(fake_tools, ctx, run(fake_tools, ctx, review))
     unmatched = "1 reviewer note couldn't be matched to a line"
     assert f"- de-DE: No issues found by automated checks, {unmatched}" in out["message"]
-    assert "Reviewer notes that couldn't be matched to a line: 1." in sent(
-        fake_tools, "create_canvas", "content"
+    assert (
+        "Reviewer notes that couldn't be matched to a line: 1."
+        in calls_to(fake_tools, "create_canvas")[0]["content"]
     )
 
 
@@ -106,7 +94,7 @@ def test_the_human_look_block_is_capped_per_language(fake_tools, tmp_path):
         "pkg": a_package(lines=lines),
         "findings": {("de-DE", f"L{n}"): [UNSURE] for n in range(1, 7)},
     }
-    text = deliver(fake_tools, ctx, run(fake_tools, ctx, case))["message"]
+    text = write(fake_tools, ctx, run(fake_tools, ctx, case))["message"]
     assert text.count("(numbers)") == 5 and "- ...and 1 more in the detailed report." in text
 
 
@@ -121,5 +109,5 @@ def a_big_case():
 
 def test_lines_past_the_fixer_cap_are_said(fake_tools, tmp_path):
     ctx = a_ctx(tmp_path)
-    text = deliver(fake_tools, ctx, run(fake_tools, ctx, a_big_case()))["message"]
+    text = write(fake_tools, ctx, run(fake_tools, ctx, a_big_case()))["message"]
     assert "more lines need a fix but got no suggestion (too many for one run)." in text

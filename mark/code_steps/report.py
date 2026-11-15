@@ -63,18 +63,17 @@ def _emailed(scores, text):
     return send_email(recipient, _subject(scores), text) if allowed else False
 
 
-def _links(scores, fixes, place):
-    corrected = corrected_file(scores, fixes, place["run_key"])
-    return {"canvas": _canvas(scores, fixes, place), "corrected": corrected}
+def _email_note(scores, emailed):
+    return "\n\n" + REPORT["email_failed"] if scores["notify_email"] and not emailed else ""
 
 
 def _delivered(scores, fixes, place):
     """The chat reply in Markdown; the QA-inbox email in plain text, from the same assembly."""
-    links = _links(scores, fixes, place)
+    canvas = _canvas(scores, fixes, place)
+    links = {"canvas": canvas, "corrected": corrected_file(scores, fixes, place["run_key"])}
     text = message(scores, fixes, links, MARKDOWN)
     emailed = _emailed(scores, message(scores, fixes, links, PLAIN))
-    note = "\n\n" + REPORT["email_failed"] if scores["notify_email"] and not emailed else ""
-    return _answer(text + note, links["canvas"]["url"], emailed, scores["outcome"])
+    return _answer(text + _email_note(scores, emailed), canvas["url"], emailed, scores["outcome"])
 
 
 def _scores(input_, ctx):

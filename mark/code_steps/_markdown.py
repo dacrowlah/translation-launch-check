@@ -5,20 +5,17 @@ format and control characters (bidi overrides, zero-width characters) are remove
 route prefix is defused. The email gets the same text unescaped (plain_text). Nothing here
 raises."""
 
-import unicodedata
-
-from _routes import defused
+from _routes import defused, without_controls
 
 MARKDOWN_PUNCTUATION = frozenset("\\`*_[]()!#|~<>&")
-DROPPED_CATEGORIES = ("Cc", "Cf")  # controls; bidi and zero-width format characters
 MAX_SHOWN = 200  # characters of copy per line in the chat reply and the email
 
 
 def plain_text(text):
     """One piece of untrusted text for plain text (the email): controls and format
-    characters dropped, the route prefix defused, nothing escaped."""
-    raw = "" if text is None else defused(str(text))
-    return "".join(char for char in raw if unicodedata.category(char) not in DROPPED_CATEGORIES)
+    characters dropped, then the route prefix defused, nothing escaped."""
+    raw = "" if text is None else str(text)
+    return defused(without_controls(raw))  # stripped first: a hidden "tlc_\u200broute_" too
 
 
 def md_text(text):

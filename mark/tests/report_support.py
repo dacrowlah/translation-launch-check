@@ -35,6 +35,12 @@ def delivered_with(fake_tools, ctx, report_input, written):
     return report.impl(report_input, ctx, fixed_now)
 
 
+def calls_to(fake_tools, tool):
+    """The parameters of every call to `tool`, in order (the email body: calls_to(fake_tools,
+    "send_email")[0]["body"])."""
+    return [params for name, params in fake_tools.calls if name == tool]
+
+
 def names(fake_tools):
     return [call[0] for call in fake_tools.calls]
 

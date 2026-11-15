@@ -4,6 +4,7 @@ from _campaign import campaign_from, clean_campaign
 from _config import RULES
 from _locales import suggest_locale
 from _package import validate_package
+from builders import HIDDEN_PREFIXES
 from step_builders import a_line, a_package, problems_of
 
 
@@ -93,6 +94,12 @@ def test_reserved_prefix_anywhere_in_a_row_any_case(where):
     line = a_line(**{"en-US": "Hi", "de-DE": "Hallo"})
     target = line["texts"] if where in line["texts"] else line
     target[where] = "x TLC_Route_fix"
+    assert 'Row 2 contains the reserved word "tlc_route".' in check(a_package(lines=[line]))
+
+
+@pytest.mark.parametrize("hidden", list(HIDDEN_PREFIXES))
+def test_a_reserved_prefix_split_by_an_invisible_character_is_rejected(hidden):
+    line = a_line(**{"en-US": "Hi", "de-DE": f"Hallo {hidden}"})
     assert 'Row 2 contains the reserved word "tlc_route".' in check(a_package(lines=[line]))
 
 

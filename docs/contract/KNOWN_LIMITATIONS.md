@@ -308,29 +308,33 @@ become limitations or unsure findings, not new parsing rules.
   adds "The report email to the QA inbox couldn't be sent." to that unread reply. Why: the
   report email is sent only by the report step on a successful run; emailing the QA inbox on
   every webhook failure is a possible next step. Not pinned by a test.
-- **A model-filled webhook gate.** A payload counts only on a run whose `trigger_name` equals
-  the configured `webhook_trigger_name` (without it, no run counts as a webhook), and its
-  checksum must verify. Both inputs are filled by the orchestrator model, so a chat user who
-  gets the model to fill both, with the exact name and a correctly checksummed package, still
-  gets a "webhook" run. The worst case is one extra report to the fixed, allow-listed QA inbox,
-  its copy Markdown-escaped (how the email renders it is not verified yet; see "Escaping is
-  for Markdown" below). Why: model-filled inputs can't authenticate; the webhook's auth key is
-  the real sender gate. Not pinned by a test.
+- **A model-filled webhook gate.** A payload counts only on a run whose `trigger_name`
+  equals the configured `webhook_trigger_name` (without it, no run counts as a webhook), and
+  its checksum must verify. Both inputs are filled by the orchestrator model, so a chat user
+  who gets the model to fill both, with the exact name and a correctly checksummed package,
+  still gets a "webhook" run. The worst case is one extra report to the fixed, allow-listed
+  QA inbox, as plain text (see "The email is sent as plain text" below). Why: model-filled
+  inputs can't authenticate; the webhook's auth key is the real sender gate. Not pinned by a
+  test.
 - **A fallback after a sent email.** The report step saves the canvas, builds the message,
   sends the email and only then builds its answer. If that answer were over `run_safely`'s
   250,000-byte cap, or building it raised, the step would return its fallback ("re-run") while
   the QA inbox already had the report. The answer is bounded well below the cap and is built
   from plain values, so this is theoretical; and since email goes only on webhook runs, the
   "re-run" would land in the unread run log. Not pinned by a test.
-- **Escaping is for Markdown.** Untrusted text (copy, campaign name, the tool's and the
-  agents' text) is backslash-escaped for Markdown in the chat reply, the canvas and the email
-  body, which is the chat reply. If `send_email` delivers the body as plain text, readers see
-  the backslashes in ordinary copy (`Jacken \& M\u00e4ntel \(statt 79,99 EUR\)\!`). If it
-  inserts the body as raw HTML, an escaped tag would be live after its backslash. How the
-  platform renders the body is not verified yet; an instance test with an email decides. A
-  link in copy can also be cut short: escaping a `_` or `&` inside a URL ends a renderer's
-  autolink there (the visible text is intact).
-- **Format characters are removed from displayed copy.** The same escaping drops control
+- **The email is sent as plain text; chat and canvas escape for Markdown.** Untrusted text
+  (copy, campaign name, the tool's and the agents' text) is backslash-escaped for Markdown
+  in the chat reply and the canvas. The QA-inbox email is built from the same templates as
+  plain text: markup in copy is kept literally (a `[link](url)` or `**bold**` reads as
+  typed), control and bidi characters are dropped and route tokens defused (also when an
+  invisible character hides inside the prefix), and links are written as "Label: url". How
+  the platform delivers the body (text/plain or HTML) is being verified. If the platform
+  delivers the body as HTML, a tag in copy would be live and line breaks would collapse; an
+  instance test with an email decides. In chat and the canvas, a link in copy can be cut
+  short: escaping a `_` or `&` inside a URL ends a renderer's autolink there (the visible
+  text is intact). Pinned by a test (the exact plain body, and hostile copy arriving as
+  inert text).
+- **Format characters are removed from displayed copy.** Chat, canvas and email drop control
   and format characters, to stop bidi overrides and invisible text. That also drops the
   zero-width joiner, so an emoji sequence (woman, ZWJ, laptop) shows as two emoji, and the
   soft hyphen German headlines sometimes carry. It changes only what the report shows,
@@ -352,6 +356,20 @@ become limitations or unsure findings, not new parsing rules.
   any other severity would read as passing. The shipped tool returns only `blocker`,
   `warning` and `info`, so this is unreachable today, and fixes never change verdicts. Not
   pinned by a test.
+- **A fix that reads as a note.** A suggested fix that explains itself instead of being copy
+  ("TrailPro (statt Trail-Pro-Jacke)") can pass the rule re-check, because the term or
+  wording it looks for is present. Two shapes get the status "reads as a note, not copy -
+  needs a person" and are never applied to the corrected file: an untranslated line whose
+  fix still quotes the old line, and a line whose only problems are do-not-translate terms
+  whose fix grew by more than each term's length plus one. Notes it misses: a note on a
+  mixed line (a do-not-translate term together with a trademark symbol, merge tag or
+  formality problem), and, on a line where a do-not-translate term replaces a translation, a
+  short note that fits the allowance (about the term's length) gets through. Correct fixes
+  it flags, failing safe ("needs a person"): a do-not-translate fix that needs an extra word
+  or particle, such as a Japanese line that dropped the name and needs it back with its
+  particle (the name followed by "nara"). Each miss needs a reviewer's own file; none is in
+  a demo file. Why: the two shapes are what the fixer was seen to produce; a wider rule
+  would refuse correct fixes. Pinned by a test (test_fix_notes.py).
 - **Very short copy of question marks trips the wrong-encoding advice.** A cell with at least
   3 `?` making up at least half its visible characters, such as a `Why???` teaser, gets "...is
   mostly question marks: the file was probably saved in the wrong encoding." Why: that is the
