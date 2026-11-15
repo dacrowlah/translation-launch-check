@@ -26,7 +26,7 @@
         "en-US": "Hi {{first_name}}, members get early access from Thursday. Free returns until Sunday, Nov 29. We saved the best deals for you: https://example.com/bf?utm_source=email&utm_campaign=bf26",
         "de-DE": "Hallo {{vorname}}, als Mitglied erhalten Sie schon ab Donnerstag Vorabzugang. Kostenloser Versand bis Montag, 30. November. Die besten Angebote haben wir dir reserviert: https://example.com/bf?utm_source=email&utm_campaign=bf26",
         "fr-FR": "Bonjour {{first_name}}, accès anticipé pour tous dès jeudi. Retours gratuits jusqu'au dimanche 29 novembre. Prix le plus bas garanti. Nous vous avons réservé les meilleures offres : https://example.com/bf?utm_source=email",
-        "ja-JP": "{{first_name}}様、会員の皆様は木曜日から先行アクセスいただけます。11月29日（日）まで返品無料。あなたのために最高のお買い得品をご用意しました：https://example.com/bf?utm_source=email&utm_campaign=bf26"
+        "ja-JP": "{{first_name}}様、会員の皆様は木曜日から先行アクセスいただけます。11月29日（日）まで返品無料。あなたのために最高のお買い得品を取っておきました：https://example.com/bf?utm_source=email&utm_campaign=bf26"
       }
     },
     {
