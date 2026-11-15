@@ -50,9 +50,16 @@ told.
 
 ### Files that come with a run (verified 2026-11)
 - **Chat attachment:** lands at `ctx["input_dir"]/attachments/<name>`, byte-exact (same
-  SHA-256 as the local file), also for a 5.7 MB CSV, which a code step then parsed from
-  disk. `text_content` is model-written. **Pattern:** read the file from `input_dir`,
-  never copy from `text_content`; large files come in this way, not as step inputs.
+  SHA-256 as the local file) for a UTF-8 file, also for a 5.7 MB CSV, which a code step then
+  parsed from disk. `text_content` is model-written. **Pattern:** read the file from
+  `input_dir`, never copy from `text_content`; large files come in this way, not as step
+  inputs.
+- **A chat attachment that isn't UTF-8 is converted to UTF-8 first** (verified 2026-11-15),
+  by decoding it as Windows-1252: a Western Windows-1252 file arrives correct, a file whose
+  characters were saved as `?` arrives with its `????`, and a Shift_JIS file arrives as
+  mojibake. A "not UTF-8" check on the bytes never fires in chat. **Pattern:** detect a
+  wrong encoding in the text (cells of `????`, mojibake), and check raw bytes only where
+  you read the file yourself.
 - **Email attachment: does not land in `input_dir`** (it is empty). The trigger carries only
   metadata in `email_payload.attachments[]`: `{url, file_id, filename, size_bytes, size_mb,
   content_type}`; the `url` is an internal storage link that a code step cannot fetch (no

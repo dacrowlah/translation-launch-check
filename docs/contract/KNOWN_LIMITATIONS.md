@@ -40,15 +40,26 @@ characters are written as `\uXXXX` escapes.
   which keeps every check and the report consistent, and a seasonal campaign's string table
   fits easily; a bigger one can be split by rows. Not pinned as a limitation; the bounds
   themselves are tested.
-- **UTF-8 only.** The workflow refuses an attached file that is not UTF-8 (Windows-1252, for
-  example): "The file isn't UTF-8 text." / "Save it as CSV UTF-8 and attach it again." A
-  UTF-8 byte-order mark is fine. A file whose characters were already replaced by `?` when it
-  was saved gets the same advice, per cell that is mostly question marks (at least 3, and at
-  least half its visible characters). The tool reads JSON request bodies, and a body declared
-  in a charset that is not a UTF encoding gets `invalid_request`. Why: spreadsheet and TMS
-  exports can all write UTF-8, and guessing a legacy encoding would garble exactly the
-  characters the checks compare (currency signs, accents, Japanese). The workflow's checks
-  are tested; the tool's charset refusal is not pinned by a test.
+- **UTF-8 only.** A file that isn't UTF-8 is refused with "Save it as CSV UTF-8 and attach it
+  again." How it is caught depends on how it arrives. Mark converts a chat attachment that
+  isn't UTF-8 to UTF-8 before the workflow runs, by decoding it as Windows-1252, so the
+  workflow never sees the original bytes:
+  - a Windows-1252 file with only Western text is read correctly and checked (no refusal);
+  - a file whose characters were already replaced by `?` when it was saved is refused per
+    cell that is mostly question marks (at least 3, and at least half its visible
+    characters): "...the file was probably saved in the wrong encoding.";
+  - a Shift_JIS file arrives with garbled Japanese; today its ja-JP column gets language
+    blockers, and a rule that refuses it with the wrong-encoding message is being added.
+
+  The webhook sender reads the file's raw bytes and refuses one that isn't UTF-8: "The file
+  isn't UTF-8 text." A UTF-8 byte-order mark is fine either way. The tool reads JSON request
+  bodies, and a body declared in a charset that is not a UTF encoding gets
+  `invalid_request`. Why: spreadsheet and TMS exports can all write UTF-8. The workflow
+  makes no guess of its own, since a wrong guess garbles exactly the characters the checks
+  compare (currency signs, accents, Japanese); Mark's Windows-1252 conversion of chat
+  attachments happens before our code and is outside its control. The workflow's checks are
+  tested; the tool's charset refusal is not pinned by a test.
+
 - **Six markets.** The master is en-US; the targets with rules are de-DE, de-CH, fr-FR,
   en-GB and ja-JP. Any other well-formed locale is returned as `unsupported_locale`, never
   checked, never clean. Adding a locale of a language the rules already cover (de-AT) is a

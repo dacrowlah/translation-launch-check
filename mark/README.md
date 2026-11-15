@@ -146,13 +146,21 @@ word the report its own way: show the canvas.
    de-CH writes the sharp s as ss, in the greeting and in "Bahnhofstrasse". The de-CH price
    in CHF, where the master says USD, is kept and flagged for a person ("confirm the local
    price").
-5. **Encodings** (`demo/encodings/`, see its README):
+5. **Encodings** (`demo/encodings/`, see its README). Mark converts a chat attachment that
+   isn't UTF-8 to UTF-8 by decoding it as Windows-1252 before the workflow runs, so in chat
+   a wrong encoding shows in the text:
    - file 3 (German Excel: semicolons and a byte-order mark) is accepted: **Ready**;
    - file 4 (Excel's default Windows-1252, the Japanese already saved as "????") is refused:
      "...mostly question marks: the file was probably saved in the wrong encoding." / "Save
-     it as CSV UTF-8 and attach it again."
-   - In the tests, files 1-3 parse to the same package, and files 4-6 get "The file isn't
-     UTF-8 text." when their raw bytes reach the parser.
+     it as CSV UTF-8 and attach it again.";
+   - file 5 (Windows-1252, German and French only) is accepted and checked, the umlauts and
+     accents correct: Mark's conversion is the right one for it;
+   - file 6 (Shift_JIS) arrives with garbled Japanese and is refused with the
+     wrong-encoding message (after the mojibake rule ships).
+
+   Through the webhook sender, which reads the file's raw bytes, files 4-6 are refused:
+   "The file isn't UTF-8 text."
+
 6. **Webhook:** `python scripts/send_package.py demo/black-friday-errors.csv` gives the same
    verdicts as chat, a saved canvas and the report email in the QA inbox; show the run in
    the run log. (How the email body renders is still being checked.)
