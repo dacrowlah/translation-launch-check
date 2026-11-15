@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dateRows, numberRows, rows, urlRows, valueRows } from "./rows";
+import { dateRows, numberRows, rows, urlRows, valueRows } from "./rows.js";
 
 const finding = (expected: string | null, found: string | null) => ({
   check: "numbers" as const,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { tokensOf } from "../../support/builders";
-import { valueRows } from "../../support/rows";
+import { tokensOf } from "../../support/builders.js";
+import { valueRows } from "../../support/rows.js";
 
 const NONE = [[], [], []];
 const MASTER = "Spend \u00a510,000 until 8 PM";

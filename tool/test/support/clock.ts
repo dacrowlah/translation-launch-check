@@ -1,4 +1,4 @@
-import type { Clock } from "../../src/domain/ports/clock";
+import type { Clock } from "../../src/domain/ports/clock.js";
 
 export const FAKE_NOW = "2026-11-12";
 

@@ -1,5 +1,5 @@
-import { mergeTagName } from "../tokens/merge-tags";
-import { listCheck } from "./compare";
+import { mergeTagName } from "../tokens/merge-tags.js";
+import { listCheck } from "./compare.js";
 
 export const MERGE_TAGS_DETAIL = "A merge tag is missing, renamed or extra.";
 

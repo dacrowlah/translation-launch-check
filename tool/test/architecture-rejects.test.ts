@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { layerViolations } from "./support/architecture";
+import { layerViolations } from "./support/architecture.js";
 
 const REJECTED: [string, string, string, string][] = [
   [

@@ -1,19 +1,19 @@
 import { ToolsService } from "@optimizely-opal/opal-tools-sdk";
 import express, { type ErrorRequestHandler, type Express, type RequestHandler } from "express";
 import rulesJson from "../config/rules.json" with { type: "json" };
-import type { Clock } from "./domain/ports/clock";
-import type { LanguageDetector } from "./domain/ports/language-detector";
-import type { Logger } from "./domain/ports/logger";
-import type { Stopwatch } from "./domain/ports/stopwatch";
-import type { Rules } from "./domain/rules";
-import { ConsoleLogger, quietConsole } from "./infrastructure/console-logger";
-import { EldLanguageDetector } from "./infrastructure/eld-detector";
-import { parseRules } from "./infrastructure/rules-schema";
-import { SystemClock } from "./infrastructure/system-clock";
-import { SystemStopwatch } from "./infrastructure/system-stopwatch";
-import { copyFitCheckTool } from "./presentation/copy-fit-check-tool";
-import { localizationCheckTool } from "./presentation/localization-check-tool";
-import { registerOn, routesOf, type ToolDefinition } from "./presentation/tool-definition";
+import type { Clock } from "./domain/ports/clock.js";
+import type { LanguageDetector } from "./domain/ports/language-detector.js";
+import type { Logger } from "./domain/ports/logger.js";
+import type { Stopwatch } from "./domain/ports/stopwatch.js";
+import type { Rules } from "./domain/rules.js";
+import { ConsoleLogger, quietConsole } from "./infrastructure/console-logger.js";
+import { EldLanguageDetector } from "./infrastructure/eld-detector.js";
+import { parseRules } from "./infrastructure/rules-schema.js";
+import { SystemClock } from "./infrastructure/system-clock.js";
+import { SystemStopwatch } from "./infrastructure/system-stopwatch.js";
+import { copyFitCheckTool } from "./presentation/copy-fit-check-tool.js";
+import { localizationCheckTool } from "./presentation/localization-check-tool.js";
+import { registerOn, routesOf, type ToolDefinition } from "./presentation/tool-definition.js";
 
 export interface AppConfig {
   readonly token: string | undefined;

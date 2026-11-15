@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { checkLocaleSpelling } from "../../../src/domain/checks/locale-spelling";
-import { spellingFix } from "../../../src/domain/checks/spelling";
-import { aPair, ctx } from "../../support/builders";
-import { testRules } from "../../support/rules";
+import { checkLocaleSpelling } from "../../../src/domain/checks/locale-spelling.js";
+import { spellingFix } from "../../../src/domain/checks/spelling.js";
+import { aPair, ctx } from "../../support/builders.js";
+import { testRules } from "../../support/rules.js";
 
 const gb = (text: string) => spellingFix(text, "en-GB", testRules());
 

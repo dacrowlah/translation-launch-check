@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { corpusAreas, valueFindings } from "../support/corpus";
+import { corpusAreas, valueFindings } from "../support/corpus.js";
 
 /**
  * Every reproduction from the review rounds, one literal row each, through the use case on

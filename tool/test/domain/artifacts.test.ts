@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { copyFitArtifacts, findArtifacts } from "../../src/domain/artifacts";
-import { testRules } from "../support/rules";
+import { copyFitArtifacts, findArtifacts } from "../../src/domain/artifacts.js";
+import { testRules } from "../support/rules.js";
 
 const MASTER = "Hi {{first_name}}";
 

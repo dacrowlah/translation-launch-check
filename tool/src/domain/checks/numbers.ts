@@ -6,7 +6,7 @@ import {
   type LinePair,
   type Row,
   type Spec,
-} from "./compare";
+} from "./compare.js";
 
 export const NUMBERS_DETAIL = "A number differs from the master.";
 const SPEC: Spec = { check: "numbers", detail: NUMBERS_DETAIL };

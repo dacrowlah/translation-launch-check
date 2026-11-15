@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { protectedSpans } from "../../../src/domain/checks/spans";
-import { visibleIn } from "../../support/builders";
-import { testRules } from "../../support/rules";
+import { protectedSpans } from "../../../src/domain/checks/spans.js";
+import { visibleIn } from "../../support/builders.js";
+import { testRules } from "../../support/rules.js";
 
 const TD = '<td align="center" style="color:#333">Our favorite colors</td>';
 

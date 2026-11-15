@@ -1,4 +1,4 @@
-import { listCheck } from "./compare";
+import { listCheck } from "./compare.js";
 
 export const PROMO_CODES_DETAIL = "A promo code differs from the master.";
 

@@ -1,8 +1,8 @@
-import type { LocaleRule } from "../rules";
-import type { CalendarPatterns } from "./date-patterns";
-import type { DateToken, Slash } from "./dates";
-import { nameKey } from "./per-language";
-import type { Groups, Part } from "./take";
+import type { LocaleRule } from "../rules.js";
+import type { CalendarPatterns } from "./date-patterns.js";
+import type { DateToken, Slash } from "./dates.js";
+import { nameKey } from "./per-language.js";
+import type { Groups, Part } from "./take.js";
 
 export type Order = NonNullable<LocaleRule["date_order"]>;
 

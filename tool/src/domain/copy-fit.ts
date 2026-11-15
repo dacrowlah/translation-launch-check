@@ -1,7 +1,7 @@
-import { copyFitArtifacts } from "./artifacts";
-import type { ChannelRule, Rules } from "./rules";
-import { smsEncoding, smsSegments, type SmsEncoding } from "./sms";
-import type { LengthInfo, Severity, Unit } from "./types";
+import { copyFitArtifacts } from "./artifacts.js";
+import type { ChannelRule, Rules } from "./rules.js";
+import { smsEncoding, smsSegments, type SmsEncoding } from "./sms.js";
+import type { LengthInfo, Severity, Unit } from "./types.js";
 
 /** Double-width characters (Google Ads counts them 2): CJK, Hangul, full-width forms. */
 const WIDE =

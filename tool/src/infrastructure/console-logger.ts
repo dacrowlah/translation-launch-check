@@ -1,4 +1,4 @@
-import type { LogEvent, Logger } from "../domain/ports/logger";
+import type { LogEvent, Logger } from "../domain/ports/logger.js";
 
 /** One JSON line per event on stdout. */
 export class ConsoleLogger implements Logger {

@@ -3,8 +3,8 @@ import {
   hourMinutes,
   isCandidate,
   minuteSeparator,
-} from "../../../src/domain/tokens/clock-formats";
-import { testLocale, testRules } from "../../support/rules";
+} from "../../../src/domain/tokens/clock-formats.js";
+import { testLocale, testRules } from "../../support/rules.js";
 
 const whole = (source: string) => new RegExp(`^(?:${source})$`, "u");
 

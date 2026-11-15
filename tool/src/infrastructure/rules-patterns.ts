@@ -1,4 +1,4 @@
-import { PLACE } from "../domain/tokens/date-forms";
+import { PLACE } from "../domain/tokens/date-forms.js";
 
 export const compiles = (source: string): boolean => {
   try {

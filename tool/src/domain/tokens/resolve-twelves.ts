@@ -1,7 +1,7 @@
-import { countsOf, type Counts } from "./tally";
-import { fitOf, secondFitsBetter } from "./twelve-fit";
-import { placed, type Placed, type Twelve } from "./times";
-import type { Tokens } from "./tokenize";
+import { countsOf, type Counts } from "./tally.js";
+import { fitOf, secondFitsBetter } from "./twelve-fit.js";
+import { placed, type Placed, type Twelve } from "./times.js";
+import type { Tokens } from "./tokenize.js";
 
 /** The times of two-way twelves by their default reading. */
 export const usualTimes = (twelves: readonly Twelve[]): string[] =>

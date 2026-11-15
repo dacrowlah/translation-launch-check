@@ -1,5 +1,5 @@
-import type { LocaleRule, Rules } from "../rules";
-import { tokenize } from "./tokenize";
+import type { LocaleRule, Rules } from "../rules.js";
+import { tokenize } from "./tokenize.js";
 
 /** Why a pattern did not compile: the engine's reason, without the pattern itself. */
 const reasonOf = (error: unknown): string =>

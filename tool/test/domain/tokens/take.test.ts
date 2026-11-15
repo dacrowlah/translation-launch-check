@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { gapsBetween, interleaved, takeWith } from "../../../src/domain/tokens/take";
+import { gapsBetween, interleaved, takeWith } from "../../../src/domain/tokens/take.js";
 
 describe("takeWith", () => {
   it("takes_each_read_match_and_leaves_one_space", () => {

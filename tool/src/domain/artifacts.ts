@@ -1,8 +1,8 @@
-import { multisetDiff } from "./checks/compare";
-import type { Rules } from "./rules";
-import { extractMergeTags, mergeTagName, normalizedOnlyTags } from "./tokens/merge-tags";
-import { escape } from "./tokens/regex";
-import { unique } from "./tokens/tally";
+import { multisetDiff } from "./checks/compare.js";
+import type { Rules } from "./rules.js";
+import { extractMergeTags, mergeTagName, normalizedOnlyTags } from "./tokens/merge-tags.js";
+import { escape } from "./tokens/regex.js";
+import { unique } from "./tokens/tally.js";
 
 const matchesOf = (text: string, patterns: readonly string[], flags: string): string[] =>
   patterns.flatMap((pattern) => [...text.matchAll(new RegExp(pattern, flags))].map((m) => m[0]));

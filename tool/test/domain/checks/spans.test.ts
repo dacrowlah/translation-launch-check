@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { rewriteVisible, withoutSpans } from "../../../src/domain/checks/spans";
-import { spellingFix } from "../../../src/domain/checks/spelling";
-import { LATIN_WORD } from "../../../src/domain/checks/words";
-import { respelled } from "../../support/builders";
-import { testRules } from "../../support/rules";
+import { rewriteVisible, withoutSpans } from "../../../src/domain/checks/spans.js";
+import { spellingFix } from "../../../src/domain/checks/spelling.js";
+import { LATIN_WORD } from "../../../src/domain/checks/words.js";
+import { respelled } from "../../support/builders.js";
+import { testRules } from "../../support/rules.js";
 
 const TD = '<td align="center" style="color:#333">Our favorite colors</td>';
 const swiss = (text: string) =>

@@ -1,6 +1,6 @@
-import type { Spaced } from "./numbers";
-import { countOf, countsOf, withinRoom } from "./tally";
-import type { Tokens } from "./tokenize";
+import type { Spaced } from "./numbers.js";
+import { countOf, countsOf, withinRoom } from "./tally.js";
+import type { Tokens } from "./tokenize.js";
 
 /** The other side's values a plain-space group may stand for: numbers, groups and prices. */
 const numberValuesOf = (side: Tokens): string[] => [

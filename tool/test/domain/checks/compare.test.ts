@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { diffRows, multisetDiff, resultOf } from "../../../src/domain/checks/compare";
-import { testRules } from "../../support/rules";
+import { diffRows, multisetDiff, resultOf } from "../../../src/domain/checks/compare.js";
+import { testRules } from "../../support/rules.js";
 
 const lower = (item: string): string => item.toLowerCase();
 

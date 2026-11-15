@@ -1,9 +1,15 @@
-import type { LocaleRule, Rules } from "../rules";
-import { allNames, fullNames, rangeConnectors, weekdayNames, type Entries } from "./calendar-names";
-import { dotted, SLASHES, weekdayAfter, WEEKDAY_END, written } from "./date-forms";
-import { rangeForms } from "./date-ranges";
-import { listOf, nameKey } from "./per-language";
-import { alternation } from "./regex";
+import type { LocaleRule, Rules } from "../rules.js";
+import {
+  allNames,
+  fullNames,
+  rangeConnectors,
+  weekdayNames,
+  type Entries,
+} from "./calendar-names.js";
+import { dotted, SLASHES, weekdayAfter, WEEKDAY_END, written } from "./date-forms.js";
+import { rangeForms } from "./date-ranges.js";
+import { listOf, nameKey } from "./per-language.js";
+import { alternation } from "./regex.js";
 
 /** The date and weekday patterns and name tables of one locale. */
 export interface CalendarPatterns {

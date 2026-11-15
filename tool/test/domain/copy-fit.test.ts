@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { fitItem, lengthInfo, measure, type CopyFitResult } from "../../src/domain/copy-fit";
-import type { Rules } from "../../src/domain/rules";
-import { testRules } from "../support/rules";
+import { fitItem, lengthInfo, measure, type CopyFitResult } from "../../src/domain/copy-fit.js";
+import type { Rules } from "../../src/domain/rules.js";
+import { testRules } from "../support/rules.js";
 
 const HEADLINE_31 = { channel: "google_ads", field: "headline", text: "x".repeat(31) };
 

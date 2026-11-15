@@ -1,7 +1,7 @@
-import type { LocaleRule, Rules } from "../rules";
-import { compile } from "./compiled";
-import { normalizeGrouped, normalizeNumber, plainParts, readAmount } from "./number-patterns";
-import { takeWith } from "./take";
+import type { LocaleRule, Rules } from "../rules.js";
+import { compile } from "./compiled.js";
+import { normalizeGrouped, normalizeNumber, plainParts, readAmount } from "./number-patterns.js";
+import { takeWith } from "./take.js";
 
 /** "10 000": the whole number, or its parts, as the other side of the line decides. */
 export interface Spaced {

@@ -1,5 +1,5 @@
-import { ENCODED_AMPERSAND, URL_SOURCE } from "./link-patterns";
-import { takeParts, type Part } from "./take";
+import { ENCODED_AMPERSAND, URL_SOURCE } from "./link-patterns.js";
+import { takeParts, type Part } from "./take.js";
 
 /** query: every key=value pair in order, repeated keys included. */
 export interface Url {

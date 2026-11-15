@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { SystemClock } from "../../src/infrastructure/system-clock";
+import { SystemClock } from "../../src/infrastructure/system-clock.js";
 
 afterEach(() => vi.useRealTimers());
 

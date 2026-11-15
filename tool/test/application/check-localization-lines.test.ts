@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { checkLocalization } from "../../src/application/check-localization";
-import type { LocalizationPackage, LocaleReport } from "../../src/domain/types";
-import { aDeps, aLine, aPackage } from "../support/builders";
+import { checkLocalization } from "../../src/application/check-localization.js";
+import type { LocalizationPackage, LocaleReport } from "../../src/domain/types.js";
+import { aDeps, aLine, aPackage } from "../support/builders.js";
 
 const line = (id: string, en: string, de: string) =>
   aLine({ id, texts: { "en-US": en, "de-DE": de } });

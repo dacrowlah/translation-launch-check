@@ -1,9 +1,9 @@
-import { checkCopyFit } from "../application/check-copy-fit";
-import type { CopyFitItem } from "../domain/copy-fit";
-import type { Rules } from "../domain/rules";
-import { safeHandler, type Telemetry } from "./safe-handler";
-import { copyFitSchema, copyFitShape } from "./schemas";
-import type { ToolDefinition } from "./tool-definition";
+import { checkCopyFit } from "../application/check-copy-fit.js";
+import type { CopyFitItem } from "../domain/copy-fit.js";
+import type { Rules } from "../domain/rules.js";
+import { safeHandler, type Telemetry } from "./safe-handler.js";
+import { copyFitSchema, copyFitShape } from "./schemas.js";
+import type { ToolDefinition } from "./tool-definition.js";
 
 const NAME = "copy_fit_check";
 const DESCRIPTION =

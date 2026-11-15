@@ -1,5 +1,5 @@
-import type { Rules } from "./rules";
-import type { CheckId, Finding } from "./types";
+import type { Rules } from "./rules.js";
+import type { CheckId, Finding } from "./types.js";
 
 export interface FindingText {
   readonly detail: string;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { smsEncoding } from "../../src/domain/sms";
+import { smsEncoding } from "../../src/domain/sms.js";
 
 describe("smsEncoding", () => {
   it.each([

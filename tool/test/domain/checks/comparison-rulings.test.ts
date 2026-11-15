@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { checkDates } from "../../../src/domain/checks/dates";
-import { checkCurrency } from "../../../src/domain/checks/money";
-import { checkTrademarks } from "../../../src/domain/checks/trademarks";
-import { checkUrls } from "../../../src/domain/checks/urls";
-import { aPair, ctx } from "../../support/builders";
-import { rows } from "../../support/rows";
+import { checkDates } from "../../../src/domain/checks/dates.js";
+import { checkCurrency } from "../../../src/domain/checks/money.js";
+import { checkTrademarks } from "../../../src/domain/checks/trademarks.js";
+import { checkUrls } from "../../../src/domain/checks/urls.js";
+import { aPair, ctx } from "../../support/builders.js";
+import { rows } from "../../support/rows.js";
 
 describe("dates semantics", () => {
   it("a_date_without_a_weekday_is_not_a_weekday_mismatch", () => {

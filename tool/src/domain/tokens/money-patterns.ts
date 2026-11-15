@@ -1,9 +1,9 @@
-import type { LocaleRule, Rules } from "../rules";
-import { currencyNames } from "./currency";
-import { bareChain, multiplierChain, multiplierNames } from "./multipliers";
-import { numberPattern, percentSource, rangeLink, spacedSource } from "./number-patterns";
-import { LATIN, SPACE } from "./regex";
-import { currencyAhead } from "./weekday-currency";
+import type { LocaleRule, Rules } from "../rules.js";
+import { currencyNames } from "./currency.js";
+import { bareChain, multiplierChain, multiplierNames } from "./multipliers.js";
+import { numberPattern, percentSource, rangeLink, spacedSource } from "./number-patterns.js";
+import { LATIN, SPACE } from "./regex.js";
+import { currencyAhead } from "./weekday-currency.js";
 
 const GAP = `${SPACE}?`;
 

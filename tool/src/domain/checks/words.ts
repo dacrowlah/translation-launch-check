@@ -1,4 +1,4 @@
-import { alternatives, LATIN, termSource } from "../tokens/regex";
+import { alternatives, LATIN, termSource } from "../tokens/regex.js";
 
 export const LATIN_WORD = `${LATIN}+`;
 

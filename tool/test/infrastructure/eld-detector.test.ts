@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { letterCount, stripForLanguage } from "../../src/domain/checks/language-text";
-import { EldLanguageDetector } from "../../src/infrastructure/eld-detector";
-import { latinCases, paragraph } from "../support/language-cases";
-import { describeLanguageDetectorContract } from "../support/language-detector.contract";
-import { testRules } from "../support/rules";
+import { letterCount, stripForLanguage } from "../../src/domain/checks/language-text.js";
+import { EldLanguageDetector } from "../../src/infrastructure/eld-detector.js";
+import { latinCases, paragraph } from "../support/language-cases.js";
+import { describeLanguageDetectorContract } from "../support/language-detector.contract.js";
+import { testRules } from "../support/rules.js";
 
 const CANDIDATES = ["en", "de", "fr"];
 

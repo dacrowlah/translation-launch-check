@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { inLocale, tokensOf } from "../../support/builders";
-import { extractNumbers } from "../../../src/domain/tokens/numbers";
-import { numberRows } from "../../support/rows";
+import { inLocale, tokensOf } from "../../support/builders.js";
+import { extractNumbers } from "../../../src/domain/tokens/numbers.js";
+import { numberRows } from "../../support/rows.js";
 
 const CUSTOMERS = "Over 10,000 happy customers";
 

@@ -1,11 +1,11 @@
 import type { Server } from "node:http";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { ConsoleLogger } from "../../src/infrastructure/console-logger";
-import { startApp, TOKEN } from "../support/app";
-import { globalConsole } from "../support/console";
-import { aBody, postText, postTo } from "../support/http";
-import { SwitchableDetector } from "../support/language-detector";
-import { aLogEvent } from "../support/telemetry";
+import { ConsoleLogger } from "../../src/infrastructure/console-logger.js";
+import { startApp, TOKEN } from "../support/app.js";
+import { globalConsole } from "../support/console.js";
+import { aBody, postText, postTo } from "../support/http.js";
+import { SwitchableDetector } from "../support/language-detector.js";
+import { aLogEvent } from "../support/telemetry.js";
 
 const CHANNELS = ["log", "info", "debug", "warn", "error"] as const;
 const realConsole = Object.fromEntries(CHANNELS.map((c) => [c, globalConsole()[c]]));

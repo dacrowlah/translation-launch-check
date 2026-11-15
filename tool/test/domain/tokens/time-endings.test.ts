@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { numberRows } from "../../support/rows";
+import { numberRows } from "../../support/rows.js";
 
 describe("a clock time may end before a colon", () => {
   it.each([

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { FAKE_NOW, FakeClock } from "./clock";
+import { FAKE_NOW, FakeClock } from "./clock.js";
 
 describe("FakeClock", () => {
   it("starts_at_the_nonzero_fake_date", () => {

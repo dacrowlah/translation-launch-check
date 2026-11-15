@@ -1,6 +1,6 @@
-import type { LocaleRule, Rules } from "../rules";
-import { listOf, ofLanguage } from "./per-language";
-import { alternation } from "./regex";
+import type { LocaleRule, Rules } from "../rules.js";
+import { listOf, ofLanguage } from "./per-language.js";
+import { alternation } from "./regex.js";
 
 /** The language's number multipliers ("\u4e07" is 10,000), each a power of ten. */
 const tableOf = (locale: LocaleRule, rules: Rules): Readonly<Record<string, number>> =>

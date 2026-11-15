@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { extractDates, extractWeekdays } from "../../../src/domain/tokens/dates";
-import { aDate, inLocale } from "../../support/builders";
+import { extractDates, extractWeekdays } from "../../../src/domain/tokens/dates.js";
+import { aDate, inLocale } from "../../support/builders.js";
 
 const read = inLocale(extractDates);
 const weekdays = (locale: string, text: string) => inLocale(extractWeekdays)(locale, text).weekdays;

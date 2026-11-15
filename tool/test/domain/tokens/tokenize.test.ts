@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { aDate, tokensOf } from "../../support/builders";
+import { aDate, tokensOf } from "../../support/builders.js";
 
 const date = (month: number, day: number, weekday: number | null) => aDate({ month, day, weekday });
 

@@ -1,3 +1,3 @@
-import { defaultApp } from "../src/main";
+import { defaultApp } from "../src/main.js";
 
 export default defaultApp();

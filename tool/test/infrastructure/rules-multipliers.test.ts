@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { parseRules } from "../../src/infrastructure/rules-schema";
-import { rawRules } from "../support/rules";
+import { parseRules } from "../../src/infrastructure/rules-schema.js";
+import { rawRules } from "../support/rules.js";
 
 const withMultipliers = (multipliers: unknown) =>
   parseRules({ ...rawRules(), number_multipliers: multipliers });

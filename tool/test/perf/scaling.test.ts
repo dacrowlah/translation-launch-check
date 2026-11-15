@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { growth, LINEAR_GROWTH, SCALING_TIMEOUT } from "../support/scaling";
+import { growth, LINEAR_GROWTH, SCALING_TIMEOUT } from "../support/scaling.js";
 
 /** n rounds of cheap work, or n * n rounds; the result is kept so the loop is not skipped. */
 let sink = 0;

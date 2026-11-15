@@ -1,4 +1,4 @@
-import type { Clock } from "../domain/ports/clock";
+import type { Clock } from "../domain/ports/clock.js";
 
 const ISO_DATE_LENGTH = 10;
 

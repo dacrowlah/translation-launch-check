@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { visibleText } from "../../../src/domain/checks/spans";
-import { linksIn } from "../../support/builders";
-import { testRules } from "../../support/rules";
-import { urlRows } from "../../support/rows";
+import { visibleText } from "../../../src/domain/checks/spans.js";
+import { linksIn } from "../../support/builders.js";
+import { testRules } from "../../support/rules.js";
+import { urlRows } from "../../support/rows.js";
 
 const linkRows = (master: string, target: string, locale = "ja-JP") =>
   urlRows(master, target, locale);

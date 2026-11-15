@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { tokensOf } from "../../support/builders";
-import { numberRows } from "../../support/rows";
+import { tokensOf } from "../../support/builders.js";
+import { numberRows } from "../../support/rows.js";
 
 describe("a percent sign written once after a range covers both ends", () => {
   it.each([

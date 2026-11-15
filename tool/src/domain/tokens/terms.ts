@@ -1,6 +1,6 @@
-import type { Rules } from "../rules";
-import { perRules } from "./per-rules";
-import { alternatives, longestFirst, termSource } from "./regex";
+import type { Rules } from "../rules.js";
+import { perRules } from "./per-rules.js";
+import { alternatives, longestFirst, termSource } from "./regex.js";
 
 /** A term's words may be joined by spaces, no-break spaces or hyphens ("Black-Friday"). */
 export const termsPattern = (terms: readonly string[]): RegExp =>

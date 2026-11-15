@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { checkLength } from "../../src/domain/checks/length";
-import { fitItem } from "../../src/domain/copy-fit";
-import type { ChannelRule } from "../../src/domain/rules";
-import { aPair, ctx } from "../support/builders";
-import { testRules } from "../support/rules";
+import { checkLength } from "../../src/domain/checks/length.js";
+import { fitItem } from "../../src/domain/copy-fit.js";
+import type { ChannelRule } from "../../src/domain/rules.js";
+import { aPair, ctx } from "../support/builders.js";
+import { testRules } from "../support/rules.js";
 
 const LIMITED = testRules()
   .channels.filter((rule) => rule.limit !== null)

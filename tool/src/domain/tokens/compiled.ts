@@ -1,9 +1,9 @@
-import type { LocaleRule, Rules } from "../rules";
-import { calendarPatterns, type CalendarPatterns } from "./date-patterns";
-import { moneySource } from "./money-patterns";
-import { numbersSource } from "./number-patterns";
-import { perRules, stored } from "./per-rules";
-import { clockPatterns, type ClockPatterns } from "./time-patterns";
+import type { LocaleRule, Rules } from "../rules.js";
+import { calendarPatterns, type CalendarPatterns } from "./date-patterns.js";
+import { moneySource } from "./money-patterns.js";
+import { numbersSource } from "./number-patterns.js";
+import { perRules, stored } from "./per-rules.js";
+import { clockPatterns, type ClockPatterns } from "./time-patterns.js";
 
 /** Everything tokenizing needs for one locale, compiled once per rules and locale. */
 export interface Compiled {

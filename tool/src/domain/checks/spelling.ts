@@ -1,7 +1,7 @@
-import type { Rules } from "../rules";
-import { escapeInClass } from "../tokens/regex";
-import { rewriteOutside } from "./spans";
-import { keepCase, LATIN_WORD, wholeWordSource } from "./words";
+import type { Rules } from "../rules.js";
+import { escapeInClass } from "../tokens/regex.js";
+import { rewriteOutside } from "./spans.js";
+import { keepCase, LATIN_WORD, wholeWordSource } from "./words.js";
 
 type Fix = (word: string) => string;
 type Change = [from: string, to: string];

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { usualTimes } from "../../../src/domain/tokens/resolve-twelves";
-import { tokensOf } from "../../support/builders";
-import { numberRows } from "../../support/rows";
+import { usualTimes } from "../../../src/domain/tokens/resolve-twelves.js";
+import { tokensOf } from "../../support/builders.js";
+import { numberRows } from "../../support/rows.js";
 
 const jaRows = (master: string, target: string) => numberRows(master, target, "ja-JP");
 const LUNCH = "\u30e9\u30f3\u30c1\u5348\u5f8c12\u6642\uff5e1\u6642";

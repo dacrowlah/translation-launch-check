@@ -1,6 +1,6 @@
-import { params, type Url } from "../tokens/urls";
-import { pairUrls, type UrlPair } from "./url-pairing";
-import { diffRows, resultOf, type MultiCheck, type Row, type Spec } from "./compare";
+import { params, type Url } from "../tokens/urls.js";
+import { pairUrls, type UrlPair } from "./url-pairing.js";
+import { diffRows, resultOf, type MultiCheck, type Row, type Spec } from "./compare.js";
 
 export const URL_PARAMS_DETAIL =
   "A link is missing, points elsewhere, or lost a tracking parameter.";

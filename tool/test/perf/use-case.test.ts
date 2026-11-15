@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { checkLocalization } from "../../src/application/check-localization";
-import { aLine, aPackage } from "../support/builders";
-import { FakeClock } from "../support/clock";
-import { FakeLanguageDetector } from "../support/language-detector";
-import { testRules } from "../support/rules";
-import { cpuMs, growth, LINEAR_GROWTH, SCALING_TIMEOUT } from "../support/scaling";
+import { checkLocalization } from "../../src/application/check-localization.js";
+import { aLine, aPackage } from "../support/builders.js";
+import { FakeClock } from "../support/clock.js";
+import { FakeLanguageDetector } from "../support/language-detector.js";
+import { testRules } from "../support/rules.js";
+import { cpuMs, growth, LINEAR_GROWTH, SCALING_TIMEOUT } from "../support/scaling.js";
 
 const LOCALES = ["de-DE", "fr-FR", "ja-JP", "en-GB", "de-CH"];
 /** A package of `count` lines, the master and 5 targets, with the cells `cellOf(i)`. */

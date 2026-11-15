@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { isoDate, nextOccurrence, weekdayOf } from "../../../src/domain/tokens/calendar";
-import { FAKE_NOW } from "../../support/clock";
+import { isoDate, nextOccurrence, weekdayOf } from "../../../src/domain/tokens/calendar.js";
+import { FAKE_NOW } from "../../support/clock.js";
 
 describe("calendar", () => {
   it("next_occurrence_counts_today", () => {

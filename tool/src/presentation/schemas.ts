@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { LOCALE_CODE } from "../domain/locale-code";
-import type { Limits, Rules } from "../domain/rules";
+import { LOCALE_CODE } from "../domain/locale-code.js";
+import type { Limits, Rules } from "../domain/rules.js";
 
 const NAME_MAX = 40;
 const CAMPAIGN_MAX = 100;

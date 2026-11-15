@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { makeFinding } from "../../src/domain/finding";
-import { testRules } from "../support/rules";
+import { makeFinding } from "../../src/domain/finding.js";
+import { testRules } from "../support/rules.js";
 
 describe("makeFinding", () => {
   it("makeFinding_takes_severity_from_rules", () => {

@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import type { Rules } from "../../../src/domain/rules";
-import { compile } from "../../../src/domain/tokens/compiled";
-import { tokenize } from "../../../src/domain/tokens/tokenize";
-import { testLocale, testRules } from "../../support/rules";
+import type { Rules } from "../../../src/domain/rules.js";
+import { compile } from "../../../src/domain/tokens/compiled.js";
+import { tokenize } from "../../../src/domain/tokens/tokenize.js";
+import { testLocale, testRules } from "../../support/rules.js";
 
 const read = (rules: Rules, locale: string, text: string) => {
   const found = tokenize(text, testLocale(locale), rules);

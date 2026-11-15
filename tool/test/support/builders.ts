@@ -1,19 +1,19 @@
-import type { CheckDeps } from "../../src/application/check-localization";
-import type { LinePair, LocaleContext } from "../../src/domain/checks/compare";
-import { rewriteVisible, visibleText } from "../../src/domain/checks/spans";
-import { wholeWordSource } from "../../src/domain/checks/words";
-import type { LanguageDetector } from "../../src/domain/ports/language-detector";
-import type { LocaleRule, Rules } from "../../src/domain/rules";
-import type { DateToken } from "../../src/domain/tokens/dates";
-import { resolvePair } from "../../src/domain/tokens/resolve-pair";
-import { usualTimes } from "../../src/domain/tokens/resolve-twelves";
-import { extractTimes } from "../../src/domain/tokens/times";
-import { readable, tokenize, type Tokens } from "../../src/domain/tokens/tokenize";
-import { extractUrls } from "../../src/domain/tokens/urls";
-import type { LocalizationPackage, PackageLine } from "../../src/domain/types";
-import { FAKE_NOW, FakeClock } from "./clock";
-import { FakeLanguageDetector } from "./language-detector";
-import { testLocale, testRules } from "./rules";
+import type { CheckDeps } from "../../src/application/check-localization.js";
+import type { LinePair, LocaleContext } from "../../src/domain/checks/compare.js";
+import { rewriteVisible, visibleText } from "../../src/domain/checks/spans.js";
+import { wholeWordSource } from "../../src/domain/checks/words.js";
+import type { LanguageDetector } from "../../src/domain/ports/language-detector.js";
+import type { LocaleRule, Rules } from "../../src/domain/rules.js";
+import type { DateToken } from "../../src/domain/tokens/dates.js";
+import { resolvePair } from "../../src/domain/tokens/resolve-pair.js";
+import { usualTimes } from "../../src/domain/tokens/resolve-twelves.js";
+import { extractTimes } from "../../src/domain/tokens/times.js";
+import { readable, tokenize, type Tokens } from "../../src/domain/tokens/tokenize.js";
+import { extractUrls } from "../../src/domain/tokens/urls.js";
+import type { LocalizationPackage, PackageLine } from "../../src/domain/types.js";
+import { FAKE_NOW, FakeClock } from "./clock.js";
+import { FakeLanguageDetector } from "./language-detector.js";
+import { testLocale, testRules } from "./rules.js";
 
 const BASE_LINE: PackageLine = { id: "L1", channel: "email", field: "body", texts: {} };
 

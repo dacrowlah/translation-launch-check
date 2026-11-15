@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { linksIn } from "../../support/builders";
-import { urlRows } from "../../support/rows";
+import { linksIn } from "../../support/builders.js";
+import { urlRows } from "../../support/rows.js";
 
 const KW = "https://example.jp/s?kw=";
 const OSECHI = "\u304a\u305b\u3061";

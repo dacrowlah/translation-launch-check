@@ -1,8 +1,8 @@
-import { checkLocalization, type CheckDeps } from "../application/check-localization";
-import type { LocalizationPackage } from "../domain/types";
-import { safeHandler, type Telemetry } from "./safe-handler";
-import { localizationSchema, localizationShape } from "./schemas";
-import type { ToolDefinition } from "./tool-definition";
+import { checkLocalization, type CheckDeps } from "../application/check-localization.js";
+import type { LocalizationPackage } from "../domain/types.js";
+import { safeHandler, type Telemetry } from "./safe-handler.js";
+import { localizationSchema, localizationShape } from "./schemas.js";
+import type { ToolDefinition } from "./tool-definition.js";
 
 const NAME = "localization_check";
 const WHAT_AND_WHEN =

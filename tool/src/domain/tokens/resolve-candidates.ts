@@ -1,6 +1,6 @@
-import { countOf, countsOf, withinRoom, type Counts } from "./tally";
-import type { Candidate } from "./times";
-import type { Tokens } from "./tokenize";
+import { countOf, countsOf, withinRoom, type Counts } from "./tally.js";
+import type { Candidate } from "./times.js";
+import type { Tokens } from "./tokenize.js";
 
 type Side = Pick<Tokens, "times" | "candidates" | "numbers">;
 

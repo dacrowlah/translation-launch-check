@@ -1,4 +1,4 @@
-import type { CheckId, Severity, Unit } from "./types";
+import type { CheckId, Severity, Unit } from "./types.js";
 
 type Strings = readonly string[];
 type Table = Readonly<Record<string, string>>;

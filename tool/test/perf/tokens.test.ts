@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { visibleText } from "../../src/domain/checks/spans";
-import { resolvePair } from "../../src/domain/tokens/resolve-pair";
-import { extractMoney } from "../../src/domain/tokens/money";
-import { takeWith } from "../../src/domain/tokens/take";
-import { tokensOf } from "../support/builders";
-import { testLocale, testRules } from "../support/rules";
-import { growth, LINEAR_GROWTH, SCALING_TIMEOUT } from "../support/scaling";
+import { visibleText } from "../../src/domain/checks/spans.js";
+import { resolvePair } from "../../src/domain/tokens/resolve-pair.js";
+import { extractMoney } from "../../src/domain/tokens/money.js";
+import { takeWith } from "../../src/domain/tokens/take.js";
+import { tokensOf } from "../support/builders.js";
+import { testLocale, testRules } from "../support/rules.js";
+import { growth, LINEAR_GROWTH, SCALING_TIMEOUT } from "../support/scaling.js";
 
 describe("token readers scale linearly", () => {
   it(

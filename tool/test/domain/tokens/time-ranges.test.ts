@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { timesIn } from "../../support/builders";
-import { numberRows } from "../../support/rows";
+import { timesIn } from "../../support/builders.js";
+import { numberRows } from "../../support/rows.js";
 
 describe("time ranges share the last time's suffix", () => {
   it.each([

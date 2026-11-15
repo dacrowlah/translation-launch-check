@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { timesIn, tokensOf } from "../../support/builders";
-import { numberRows } from "../../support/rows";
+import { timesIn, tokensOf } from "../../support/builders.js";
+import { numberRows } from "../../support/rows.js";
 
 const valuesOf = (locale: string, text: string) => {
   const found = tokensOf(locale, text);

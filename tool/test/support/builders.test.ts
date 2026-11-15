@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { inLocale, linksIn, respelled, timesIn } from "./builders";
-import { extractMoney } from "../../src/domain/tokens/money";
+import { inLocale, linksIn, respelled, timesIn } from "./builders.js";
+import { extractMoney } from "../../src/domain/tokens/money.js";
 
 describe("linksIn", () => {
   it("lists_each_link_of_a_text_as_written", () => {

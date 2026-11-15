@@ -1,6 +1,6 @@
-import type { Money, SpacedMoney } from "./money";
-import { countOf, countsOf, withinRoom, type Counts } from "./tally";
-import type { Tokens } from "./tokenize";
+import type { Money, SpacedMoney } from "./money.js";
+import { countOf, countsOf, withinRoom, type Counts } from "./tally.js";
+import type { Tokens } from "./tokenize.js";
 
 const keyOf = (m: Money): string => `${m.amount} ${m.currency}`;
 

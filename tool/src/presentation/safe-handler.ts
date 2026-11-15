@@ -1,6 +1,6 @@
 import type { z } from "zod";
-import type { Logger, ToolEvent } from "../domain/ports/logger";
-import type { Stopwatch } from "../domain/ports/stopwatch";
+import type { Logger, ToolEvent } from "../domain/ports/logger.js";
+import type { Stopwatch } from "../domain/ports/stopwatch.js";
 
 /** Rejects a Promise result at compile time (anything PromiseLike collapses to never). */
 type Sync<R> = R extends PromiseLike<unknown> ? never : unknown;

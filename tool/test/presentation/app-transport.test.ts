@@ -1,8 +1,8 @@
 import type { Server } from "node:http";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { startApp, TOKEN } from "../support/app";
-import { discoveryOf, outcome, postText, postTo, send } from "../support/http";
-import { RecordingLogger } from "../support/logger";
+import { startApp, TOKEN } from "../support/app.js";
+import { discoveryOf, outcome, postText, postTo, send } from "../support/http.js";
+import { RecordingLogger } from "../support/logger.js";
 
 const logger = new RecordingLogger();
 const servers: Server[] = [];

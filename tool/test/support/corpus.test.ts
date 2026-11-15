@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { corpusAreas, corpusGroupsOf, rowKeys, valueFindings } from "./corpus";
+import { corpusAreas, corpusGroupsOf, rowKeys, valueFindings } from "./corpus.js";
 
 describe("valueFindings", () => {
   it("lists_a_value_finding_as_check_expected_and_found", () => {

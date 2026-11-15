@@ -1,9 +1,9 @@
-import type { DateToken, Slash } from "./dates";
-import { resolveCandidates } from "./resolve-candidates";
-import { spacedPrices } from "./resolve-money";
-import { spacedNumbers } from "./resolve-spaced";
-import { withTwelves } from "./resolve-twelves";
-import type { Tokens } from "./tokenize";
+import type { DateToken, Slash } from "./dates.js";
+import { resolveCandidates } from "./resolve-candidates.js";
+import { spacedPrices } from "./resolve-money.js";
+import { spacedNumbers } from "./resolve-spaced.js";
+import { withTwelves } from "./resolve-twelves.js";
+import type { Tokens } from "./tokenize.js";
 
 const key = (date: DateToken): string => `${date.month}/${date.day}`;
 const digits = (slash: Slash): string => slash.numbers.join("/");

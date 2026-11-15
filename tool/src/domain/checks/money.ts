@@ -1,6 +1,13 @@
-import type { Money } from "../tokens/money";
-import { unique } from "../tokens/tally";
-import { diffRows, multisetDiff, resultOf, type MultiCheck, type Row, type Spec } from "./compare";
+import type { Money } from "../tokens/money.js";
+import { unique } from "../tokens/tally.js";
+import {
+  diffRows,
+  multisetDiff,
+  resultOf,
+  type MultiCheck,
+  type Row,
+  type Spec,
+} from "./compare.js";
 
 export const CURRENCY_AMOUNT_DETAIL = "A price differs from the master.";
 export const CURRENCY_CODE_DETAIL =

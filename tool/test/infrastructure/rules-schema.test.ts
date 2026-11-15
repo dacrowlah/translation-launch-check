@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
-import { parseRules } from "../../src/infrastructure/rules-schema";
-import { rawRules, testRules } from "../support/rules";
+import { parseRules } from "../../src/infrastructure/rules-schema.js";
+import { rawRules, testRules } from "../support/rules.js";
 
 const severities = (): Record<string, unknown> =>
   rawRules()["severities"] as Record<string, unknown>;

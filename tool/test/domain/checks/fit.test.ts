@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { checkLength } from "../../../src/domain/checks/length";
-import { checkLengthRatio } from "../../../src/domain/checks/length-ratio";
-import { checkMergeTags } from "../../../src/domain/checks/merge-tags";
-import { checkTemplateLeftovers } from "../../../src/domain/checks/template-leftovers";
-import type { LocaleContext } from "../../../src/domain/checks/compare";
-import { aPair, ctx } from "../../support/builders";
-import { rows } from "../../support/rows";
-import { testRules } from "../../support/rules";
+import { checkLength } from "../../../src/domain/checks/length.js";
+import { checkLengthRatio } from "../../../src/domain/checks/length-ratio.js";
+import { checkMergeTags } from "../../../src/domain/checks/merge-tags.js";
+import { checkTemplateLeftovers } from "../../../src/domain/checks/template-leftovers.js";
+import type { LocaleContext } from "../../../src/domain/checks/compare.js";
+import { aPair, ctx } from "../../support/builders.js";
+import { rows } from "../../support/rows.js";
+import { testRules } from "../../support/rules.js";
 
 const ADS = { channel: "google_ads", field: "headline" };
 const NONE = { applicable: false, findings: [] };

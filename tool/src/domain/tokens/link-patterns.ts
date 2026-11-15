@@ -1,5 +1,5 @@
-import { REFERENCE } from "./references";
-import { anyCase } from "./regex";
+import { REFERENCE } from "./references.js";
+import { anyCase } from "./regex.js";
 
 /** An encoded ampersand ("&amp;", "&#38;", "&#038;", "&#x26;") is part of a link's query. */
 export const ENCODED_AMPERSAND = "&(?:amp|#0*38|#[xX]0*26);";

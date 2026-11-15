@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { extractUrls } from "../../../src/domain/tokens/urls";
-import { linksIn, visibleIn } from "../../support/builders";
-import { urlRows } from "../../support/rows";
+import { extractUrls } from "../../../src/domain/tokens/urls.js";
+import { linksIn, visibleIn } from "../../support/builders.js";
+import { urlRows } from "../../support/rows.js";
 
 describe("a link in running text ends at hiragana, CJK punctuation or a space", () => {
   it.each([

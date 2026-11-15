@@ -1,8 +1,8 @@
-import type { LocaleRule, Rules } from "../rules";
-import { allNames, weekdayNames } from "./calendar-names";
-import { noPrefixCurrency } from "./price-guards";
-import { listOf } from "./per-language";
-import { alternation, anyOfSources } from "./regex";
+import type { LocaleRule, Rules } from "../rules.js";
+import { allNames, weekdayNames } from "./calendar-names.js";
+import { noPrefixCurrency } from "./price-guards.js";
+import { listOf } from "./per-language.js";
+import { alternation, anyOfSources } from "./regex.js";
 
 /** A day or month number, one or two digits, as `group`. */
 export const dayOrMonth = (group: string): string => String.raw`(?<${group}>\d{1,2})`;

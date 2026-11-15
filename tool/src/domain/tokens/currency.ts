@@ -1,5 +1,5 @@
-import type { LocaleRule, Rules } from "../rules";
-import { alternation, escape } from "./regex";
+import type { LocaleRule, Rules } from "../rules.js";
+import { alternation, escape } from "./regex.js";
 
 /** The shared currency table with the locale's own entries ("Fr." only in de-CH). */
 export const currenciesOf = (

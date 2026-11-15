@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { SystemStopwatch } from "../../src/infrastructure/system-stopwatch";
+import { SystemStopwatch } from "../../src/infrastructure/system-stopwatch.js";
 
 afterEach(() => vi.useRealTimers());
 

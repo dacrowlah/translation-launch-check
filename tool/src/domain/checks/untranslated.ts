@@ -1,5 +1,5 @@
-import { listOf } from "../tokens/per-language";
-import type { Tokens } from "../tokens/tokenize";
+import { listOf } from "../tokens/per-language.js";
+import type { Tokens } from "../tokens/tokenize.js";
 import {
   resultOf,
   type LinePair,
@@ -7,8 +7,8 @@ import {
   type LocaleContext,
   type Row,
   type Spec,
-} from "./compare";
-import { wholeWords } from "./words";
+} from "./compare.js";
+import { wholeWords } from "./words.js";
 
 export const UNTRANSLATED_DETAIL = "The line is the same as the master.";
 

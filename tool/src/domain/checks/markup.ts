@@ -1,4 +1,4 @@
-import { diffRows, resultOf, type LineCheck, type Spec } from "./compare";
+import { diffRows, resultOf, type LineCheck, type Spec } from "./compare.js";
 
 export const MARKUP_DETAIL = "An HTML tag is missing, extra or left unclosed.";
 

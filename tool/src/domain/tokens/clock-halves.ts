@@ -1,6 +1,6 @@
-import type { TwelveOClock } from "../rules";
-import { MINUTES_PER_DAY, minutesOf, NOON, twelveHour } from "./clock-values";
-import type { Groups } from "./take";
+import type { TwelveOClock } from "../rules.js";
+import { MINUTES_PER_DAY, minutesOf, NOON, twelveHour } from "./clock-values.js";
+import type { Groups } from "./take.js";
 
 const AM: Groups = { am: "am" };
 const PM: Groups = { pm: "pm" };

@@ -1,14 +1,14 @@
-import type { LocaleRule, Rules } from "../rules";
-import { extractDates, extractWeekdays, type DateToken, type Slash } from "./dates";
-import { extractMergeTags } from "./merge-tags";
-import { extractMoney, type Money, type SpacedMoney } from "./money";
-import { extractNumbers, type Spaced } from "./numbers";
-import { extractPromoCodes, promoPattern } from "./promo-codes";
-import { decodeReferences } from "./references";
-import { NO_BREAK_SPACES } from "./regex";
-import { dntPattern } from "./terms";
-import { extractTimes, type Candidate, type Twelve } from "./times";
-import { extractUrls, type Url } from "./urls";
+import type { LocaleRule, Rules } from "../rules.js";
+import { extractDates, extractWeekdays, type DateToken, type Slash } from "./dates.js";
+import { extractMergeTags } from "./merge-tags.js";
+import { extractMoney, type Money, type SpacedMoney } from "./money.js";
+import { extractNumbers, type Spaced } from "./numbers.js";
+import { extractPromoCodes, promoPattern } from "./promo-codes.js";
+import { decodeReferences } from "./references.js";
+import { NO_BREAK_SPACES } from "./regex.js";
+import { dntPattern } from "./terms.js";
+import { extractTimes, type Candidate, type Twelve } from "./times.js";
+import { extractUrls, type Url } from "./urls.js";
 
 export interface Tokens {
   readonly urls: Url[];

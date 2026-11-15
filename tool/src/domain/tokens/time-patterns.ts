@@ -1,4 +1,4 @@
-import type { LocaleRule, Rules, TimeFormat, TwelveOClock } from "../rules";
+import type { LocaleRule, Rules, TimeFormat, TwelveOClock } from "../rules.js";
 import {
   anyClock,
   formatSourceOf,
@@ -6,10 +6,10 @@ import {
   isCandidate,
   minuteSeparator,
   timeConnectorList,
-} from "./clock-formats";
-import { noPrefixCurrency, noPriceRangeEnd } from "./price-guards";
-import { listOf, nameKey, ofLanguage } from "./per-language";
-import { alternation, anyOfSources, LATIN } from "./regex";
+} from "./clock-formats.js";
+import { noPrefixCurrency, noPriceRangeEnd } from "./price-guards.js";
+import { listOf, nameKey, ofLanguage } from "./per-language.js";
+import { alternation, anyOfSources, LATIN } from "./regex.js";
 
 /** The clock-time pattern of one language, its time words ("midnight" -> "00:00") and 12. */
 export interface ClockPatterns {

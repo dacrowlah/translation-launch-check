@@ -1,7 +1,7 @@
-import type { Rules } from "../rules";
-import { resultOf, type LineCheck, type Row, type Spec } from "./compare";
-import { withoutSpans } from "./spans";
-import { bounded, wholeWords } from "./words";
+import type { Rules } from "../rules.js";
+import { resultOf, type LineCheck, type Row, type Spec } from "./compare.js";
+import { withoutSpans } from "./spans.js";
+import { bounded, wholeWords } from "./words.js";
 
 export const TIME_ZONE_DETAIL = "A time or deadline has no time zone.";
 

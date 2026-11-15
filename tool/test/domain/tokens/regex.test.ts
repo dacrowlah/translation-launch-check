@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { findArtifacts } from "../../../src/domain/artifacts";
-import { mergeTagSource } from "../../../src/domain/tokens/merge-tags";
-import { promoPattern } from "../../../src/domain/tokens/promo-codes";
+import { findArtifacts } from "../../../src/domain/artifacts.js";
+import { mergeTagSource } from "../../../src/domain/tokens/merge-tags.js";
+import { promoPattern } from "../../../src/domain/tokens/promo-codes.js";
 import {
   alternation,
   alternatives,
@@ -10,8 +10,8 @@ import {
   escape,
   longestFirst,
   termSource,
-} from "../../../src/domain/tokens/regex";
-import { testRules } from "../../support/rules";
+} from "../../../src/domain/tokens/regex.js";
+import { testRules } from "../../support/rules.js";
 
 const whole = (source: string) => new RegExp(`^(?:${source})$`, "u");
 

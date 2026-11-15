@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { checkNumbers } from "../../../src/domain/checks/numbers";
-import { checkUrls } from "../../../src/domain/checks/urls";
-import { decodeReferences } from "../../../src/domain/tokens/references";
-import { extractUrls } from "../../../src/domain/tokens/urls";
-import { aPair, ctx } from "../../support/builders";
-import { rows } from "../../support/rows";
+import { checkNumbers } from "../../../src/domain/checks/numbers.js";
+import { checkUrls } from "../../../src/domain/checks/urls.js";
+import { decodeReferences } from "../../../src/domain/tokens/references.js";
+import { extractUrls } from "../../../src/domain/tokens/urls.js";
+import { aPair, ctx } from "../../support/builders.js";
+import { rows } from "../../support/rows.js";
 
 const percentRows = (target: string, locale: string) =>
   rows(checkNumbers(aPair("Save 20% today!", target, locale), ctx(locale)));

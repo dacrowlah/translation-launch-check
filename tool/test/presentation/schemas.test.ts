@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { z } from "zod";
-import type { Rules } from "../../src/domain/rules";
-import { copyFitSchema, localizationSchema } from "../../src/presentation/schemas";
-import { testRules } from "../support/rules";
+import type { Rules } from "../../src/domain/rules.js";
+import { copyFitSchema, localizationSchema } from "../../src/presentation/schemas.js";
+import { testRules } from "../support/rules.js";
 
 const TARGETS = ["de-DE", "fr-FR", "ja-JP", "en-GB", "de-CH", "it-IT"];
 const EMOJI = "\u{1f600}";

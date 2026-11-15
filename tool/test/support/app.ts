@@ -1,7 +1,7 @@
-import { createApp, type AppConfig } from "../../src/main";
-import { aDeps } from "./builders";
-import { listen } from "./http";
-import { aTelemetry } from "./telemetry";
+import { createApp, type AppConfig } from "../../src/main.js";
+import { aDeps } from "./builders.js";
+import { listen } from "./http.js";
+import { aTelemetry } from "./telemetry.js";
 
 export const TOKEN = "t".repeat(32);
 

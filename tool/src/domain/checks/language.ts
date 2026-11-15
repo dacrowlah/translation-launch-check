@@ -1,7 +1,12 @@
-import { makeFinding } from "../finding";
-import type { CheckId, CheckResult } from "../types";
-import type { LineCheck, LocaleContext } from "./compare";
-import { candidateLanguages, japaneseShare, letterCount, stripForLanguage } from "./language-text";
+import { makeFinding } from "../finding.js";
+import type { CheckId, CheckResult } from "../types.js";
+import type { LineCheck, LocaleContext } from "./compare.js";
+import {
+  candidateLanguages,
+  japaneseShare,
+  letterCount,
+  stripForLanguage,
+} from "./language-text.js";
 
 const NAMES: Record<string, string> = { en: "English", de: "German", fr: "French", ja: "Japanese" };
 const NOT_APPLICABLE: CheckResult = { applicable: false, findings: [] };

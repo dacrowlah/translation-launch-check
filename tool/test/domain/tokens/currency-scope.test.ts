@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { timesIn, tokensOf } from "../../support/builders";
-import { numberRows, valueRows } from "../../support/rows";
+import { timesIn, tokensOf } from "../../support/builders.js";
+import { numberRows, valueRows } from "../../support/rows.js";
 
 const NONE = [[], [], []];
 

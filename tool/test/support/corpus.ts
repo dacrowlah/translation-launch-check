@@ -1,8 +1,8 @@
 import { readdirSync, readFileSync } from "node:fs";
-import { checkLocalization } from "../../src/application/check-localization";
-import type { CheckId, LineReport, LocalizationReport } from "../../src/domain/types";
-import { aDeps, aLine, aPackage } from "./builders";
-import { testRules } from "./rules";
+import { checkLocalization } from "../../src/application/check-localization.js";
+import type { CheckId, LineReport, LocalizationReport } from "../../src/domain/types.js";
+import { aDeps, aLine, aPackage } from "./builders.js";
+import { testRules } from "./rules.js";
 
 /** The value checks the corpus compares; the line's spelling_fix joins them as a row. */
 export const CORPUS_CHECKS: readonly CheckId[] = [

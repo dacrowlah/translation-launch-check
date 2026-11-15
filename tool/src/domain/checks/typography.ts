@@ -1,7 +1,7 @@
-import type { LocaleRule } from "../rules";
-import { escapeInClass } from "../tokens/regex";
-import { resultOf, type LineCheck, type Row, type Spec } from "./compare";
-import { withoutSpans } from "./spans";
+import type { LocaleRule } from "../rules.js";
+import { escapeInClass } from "../tokens/regex.js";
+import { resultOf, type LineCheck, type Row, type Spec } from "./compare.js";
+import { withoutSpans } from "./spans.js";
 
 export const TYPOGRAPHY_DETAIL = "French spacing is missing before ; : ! ? or inside guillemets.";
 

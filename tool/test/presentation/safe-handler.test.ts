@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
-import { safeHandler, type Handled } from "../../src/presentation/safe-handler";
-import { aLogEvent, aTelemetry } from "../support/telemetry";
+import { safeHandler, type Handled } from "../../src/presentation/safe-handler.js";
+import { aLogEvent, aTelemetry } from "../support/telemetry.js";
 
 const schema = z.object({ n: z.number() });
 const COUNTS = { lines: 1, locales: 0 };

@@ -1,7 +1,13 @@
-import { channelRule, fitsLimit, lengthCheckOf, lengthInfo, type LengthCheck } from "../copy-fit";
-import type { Rules } from "../rules";
-import type { CheckResult, LengthInfo, PackageLine, Unit } from "../types";
-import { resultOf, type MultiCheck, type Row } from "./compare";
+import {
+  channelRule,
+  fitsLimit,
+  lengthCheckOf,
+  lengthInfo,
+  type LengthCheck,
+} from "../copy-fit.js";
+import type { Rules } from "../rules.js";
+import type { CheckResult, LengthInfo, PackageLine, Unit } from "../types.js";
+import { resultOf, type MultiCheck, type Row } from "./compare.js";
 
 const OVER: Readonly<Record<LengthCheck, string>> = {
   length_hard: "The text is longer than the channel allows",

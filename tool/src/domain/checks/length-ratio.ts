@@ -1,5 +1,5 @@
-import { measure } from "../copy-fit";
-import { resultOf, type LineCheck, type Row, type Spec } from "./compare";
+import { measure } from "../copy-fit.js";
+import { resultOf, type LineCheck, type Row, type Spec } from "./compare.js";
 
 export const LENGTH_RATIO_DETAIL = "The translation is much longer than the master.";
 

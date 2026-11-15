@@ -1,10 +1,10 @@
 import { z } from "zod";
-import type { Rules } from "../domain/rules";
-import { patternIssues } from "../domain/tokens/pattern-issues";
-import { LOCALE_CODE } from "../domain/locale-code";
-import { ALL_CHECK_IDS } from "../domain/types";
-import { crossIssues } from "./rules-cross-checks";
-import { compiles, isTemplate } from "./rules-patterns";
+import type { Rules } from "../domain/rules.js";
+import { patternIssues } from "../domain/tokens/pattern-issues.js";
+import { LOCALE_CODE } from "../domain/locale-code.js";
+import { ALL_CHECK_IDS } from "../domain/types.js";
+import { crossIssues } from "./rules-cross-checks.js";
+import { compiles, isTemplate } from "./rules-patterns.js";
 
 const strings = z.array(z.string());
 const table = z.record(z.string(), z.string());

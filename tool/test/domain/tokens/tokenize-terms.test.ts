@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { tokensOf } from "../../support/builders";
+import { tokensOf } from "../../support/builders.js";
 
 describe("do-not-translate terms in the tokenizer", () => {
   it("a_term_is_no_weekday_and_a_weekday_beside_it_still_is", () => {

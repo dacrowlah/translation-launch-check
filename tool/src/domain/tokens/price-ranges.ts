@@ -1,5 +1,5 @@
-import type { Money } from "./money";
-import type { Groups } from "./take";
+import type { Money } from "./money.js";
+import type { Groups } from "./take.js";
 
 /** Prices an amount as written, with its multiplier chain, in the match's currency. */
 export type Pricer = (raw: string, chain?: string) => Money;

@@ -1,9 +1,9 @@
-import type { LocaleRule, Rules } from "../rules";
-import { compile } from "./compiled";
-import { currencyCodeOf } from "./currency";
-import { plainParts, readAmount } from "./number-patterns";
-import { rangeOf, type Numeral, type Pricer } from "./price-ranges";
-import { takeParts, type Groups, type Part } from "./take";
+import type { LocaleRule, Rules } from "../rules.js";
+import { compile } from "./compiled.js";
+import { currencyCodeOf } from "./currency.js";
+import { plainParts, readAmount } from "./number-patterns.js";
+import { rangeOf, type Numeral, type Pricer } from "./price-ranges.js";
+import { takeParts, type Groups, type Part } from "./take.js";
 
 /** amount: the normalized decimal string ("1299.5", every decimal place kept); currency: ISO. */
 export interface Money {

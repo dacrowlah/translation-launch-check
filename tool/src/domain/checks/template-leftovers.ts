@@ -1,5 +1,5 @@
-import { findArtifacts } from "../artifacts";
-import { resultOf, type LineCheck, type Row, type Spec } from "./compare";
+import { findArtifacts } from "../artifacts.js";
+import { resultOf, type LineCheck, type Row, type Spec } from "./compare.js";
 
 export const TEMPLATE_LEFTOVERS_DETAIL = "Placeholder or prompt text was left in the copy.";
 

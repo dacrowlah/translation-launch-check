@@ -1,4 +1,4 @@
-import type { Stopwatch } from "../../src/domain/ports/stopwatch";
+import type { Stopwatch } from "../../src/domain/ports/stopwatch.js";
 
 /** Every call takes exactly `elapsed` milliseconds. */
 export class FakeStopwatch implements Stopwatch {

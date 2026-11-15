@@ -1,11 +1,11 @@
-import type { Rules } from "../rules";
-import { mergeTagSource } from "../tokens/merge-tags";
-import { perRules } from "../tokens/per-rules";
-import { decodeReference } from "../tokens/references";
-import { anyOfSources, NO_BREAK_SPACES } from "../tokens/regex";
-import { cutOf, gapsBetween, interleaved, takeWith } from "../tokens/take";
-import { BREAK, LINKS, MARKUP } from "./span-sources";
-import { dntSource } from "../tokens/terms";
+import type { Rules } from "../rules.js";
+import { mergeTagSource } from "../tokens/merge-tags.js";
+import { perRules } from "../tokens/per-rules.js";
+import { decodeReference } from "../tokens/references.js";
+import { anyOfSources, NO_BREAK_SPACES } from "../tokens/regex.js";
+import { cutOf, gapsBetween, interleaved, takeWith } from "../tokens/take.js";
+import { BREAK, LINKS, MARKUP } from "./span-sources.js";
+import { dntSource } from "../tokens/terms.js";
 
 /** glued: a token that text may touch ("{{name}}s"); tags and references are word breaks. */
 interface Segment {

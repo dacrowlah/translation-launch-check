@@ -1,4 +1,4 @@
-import { params, type Url } from "../tokens/urls";
+import { params, type Url } from "../tokens/urls.js";
 
 export type UrlPair = [Url | undefined, Url | undefined];
 type Same = (a: Url, b: Url) => boolean;

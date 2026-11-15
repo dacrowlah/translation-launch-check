@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { LanguageDetector } from "../../src/domain/ports/language-detector";
-import { paragraph } from "./language-cases";
+import type { LanguageDetector } from "../../src/domain/ports/language-detector.js";
+import { paragraph } from "./language-cases.js";
 
 const CANDIDATES = ["de", "fr", "en"];
 

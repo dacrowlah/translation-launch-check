@@ -1,6 +1,6 @@
-import type { Rules } from "../rules";
-import { perRules } from "./per-rules";
-import { takeWith } from "./take";
+import type { Rules } from "../rules.js";
+import { perRules } from "./per-rules.js";
+import { takeWith } from "./take.js";
 
 export const promoPattern = perRules((rules) => new RegExp(rules.promo_code_pattern, "gu"));
 

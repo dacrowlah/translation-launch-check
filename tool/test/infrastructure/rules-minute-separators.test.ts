@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { parseRules } from "../../src/infrastructure/rules-schema";
-import { rawRules, testRules } from "../support/rules";
+import { parseRules } from "../../src/infrastructure/rules-schema.js";
+import { rawRules, testRules } from "../support/rules.js";
 
 const withSeparators = (separators: unknown) =>
   parseRules({ ...rawRules(), time_minute_separators: separators });

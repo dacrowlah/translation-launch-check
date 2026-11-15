@@ -1,8 +1,8 @@
-import type { Lexicon, Rules } from "../rules";
-import type { CheckResult } from "../types";
-import { resultOf, type LineCheck, type Row, type Spec } from "./compare";
-import { unique } from "../tokens/tally";
-import { withoutSpans } from "./spans";
+import type { Lexicon, Rules } from "../rules.js";
+import type { CheckResult } from "../types.js";
+import { resultOf, type LineCheck, type Row, type Spec } from "./compare.js";
+import { unique } from "../tokens/tally.js";
+import { withoutSpans } from "./spans.js";
 
 export const FORMALITY_DETAIL = "The line uses the informal register in a formal locale.";
 

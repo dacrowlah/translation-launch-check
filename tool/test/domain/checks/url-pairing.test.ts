@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { pairUrls } from "../../../src/domain/checks/url-pairing";
-import { extractUrls } from "../../../src/domain/tokens/urls";
+import { pairUrls } from "../../../src/domain/checks/url-pairing.js";
+import { extractUrls } from "../../../src/domain/tokens/urls.js";
 
 const links = (text: string) => Object.freeze(extractUrls(text).urls.map((u) => Object.freeze(u)));
 const raws = (pairs: ReturnType<typeof pairUrls>) => pairs.map(([m, t]) => [m?.raw, t?.raw]);

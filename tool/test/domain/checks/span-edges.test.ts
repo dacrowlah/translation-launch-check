@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { protectedSpans } from "../../../src/domain/checks/spans";
-import type { Rules } from "../../../src/domain/rules";
-import { respelled, visibleIn } from "../../support/builders";
-import { testRules } from "../../support/rules";
+import { protectedSpans } from "../../../src/domain/checks/spans.js";
+import type { Rules } from "../../../src/domain/rules.js";
+import { respelled, visibleIn } from "../../support/builders.js";
+import { testRules } from "../../support/rules.js";
 
 const spans = (text: string, rules: Rules = testRules()) => protectedSpans(text, rules);
 

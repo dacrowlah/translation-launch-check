@@ -1,9 +1,9 @@
-import { makeFinding } from "../finding";
-import type { LanguageDetector } from "../ports/language-detector";
-import type { LocaleRule, Rules } from "../rules";
-import { countOf, countsOf, occurrences } from "../tokens/tally";
-import type { Tokens } from "../tokens/tokenize";
-import type { CheckId, CheckResult, Finding, PackageLine } from "../types";
+import { makeFinding } from "../finding.js";
+import type { LanguageDetector } from "../ports/language-detector.js";
+import type { LocaleRule, Rules } from "../rules.js";
+import { countOf, countsOf, occurrences } from "../tokens/tally.js";
+import type { Tokens } from "../tokens/tokenize.js";
+import type { CheckId, CheckResult, Finding, PackageLine } from "../types.js";
 
 export interface LinePair {
   readonly line: PackageLine;

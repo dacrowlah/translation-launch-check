@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { checkDates } from "../../../src/domain/checks/dates";
-import { checkCurrency } from "../../../src/domain/checks/money";
-import { checkNumbers } from "../../../src/domain/checks/numbers";
-import { extractMoney } from "../../../src/domain/tokens/money";
-import { aPair, ctx, inLocale, tokensOf } from "../../support/builders";
-import { rows } from "../../support/rows";
+import { checkDates } from "../../../src/domain/checks/dates.js";
+import { checkCurrency } from "../../../src/domain/checks/money.js";
+import { checkNumbers } from "../../../src/domain/checks/numbers.js";
+import { extractMoney } from "../../../src/domain/tokens/money.js";
+import { aPair, ctx, inLocale, tokensOf } from "../../support/builders.js";
+import { rows } from "../../support/rows.js";
 
 const read = inLocale(extractMoney);
 const MEMBERS = "Now only $49 for members.";

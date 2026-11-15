@@ -1,9 +1,9 @@
-import type { LocaleRule, Rules } from "../rules";
-import { currencyNames } from "./currency";
-import { link, plainAmount } from "./money-patterns";
-import { multiplierNames } from "./multipliers";
-import { SPACE } from "./regex";
-import { currencyAhead } from "./weekday-currency";
+import type { LocaleRule, Rules } from "../rules.js";
+import { currencyNames } from "./currency.js";
+import { link, plainAmount } from "./money-patterns.js";
+import { multiplierNames } from "./multipliers.js";
+import { SPACE } from "./regex.js";
+import { currencyAhead } from "./weekday-currency.js";
 
 /** A currency that may stand before its amount: not a weekday-like one used as the weekday. */
 const prefixCurrency = (locale: LocaleRule, rules: Rules): string =>

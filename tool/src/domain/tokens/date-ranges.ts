@@ -1,4 +1,4 @@
-import type { LocaleRule, Rules } from "../rules";
+import type { LocaleRule, Rules } from "../rules.js";
 import {
   DAY,
   dayOrMonth,
@@ -10,13 +10,13 @@ import {
   weekdayAfter,
   WEEKDAY_END,
   written,
-} from "./date-forms";
-import { rangeConnectors, weekdayNames } from "./calendar-names";
-import { orderOf } from "./date-reader";
-import { listOf } from "./per-language";
-import { NEVER } from "./regex";
-import { anyClock, minuteSeparator } from "./clock-formats";
-import { noClockAhead } from "./time-patterns";
+} from "./date-forms.js";
+import { rangeConnectors, weekdayNames } from "./calendar-names.js";
+import { orderOf } from "./date-reader.js";
+import { listOf } from "./per-language.js";
+import { NEVER } from "./regex.js";
+import { anyClock, minuteSeparator } from "./clock-formats.js";
+import { noClockAhead } from "./time-patterns.js";
 
 /** The last day of a range is no percentage ("Nov 27 - 30%") and no clock time ("11:59"). */
 const lastDayEnd = (locale: LocaleRule, rules: Rules): string =>

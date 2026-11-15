@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { checkCopyFit } from "../../src/application/check-copy-fit";
-import { testRules } from "../support/rules";
+import { checkCopyFit } from "../../src/application/check-copy-fit.js";
+import { testRules } from "../support/rules.js";
 
 describe("checkCopyFit", () => {
   it("copy_fit_keeps_item_order", () => {

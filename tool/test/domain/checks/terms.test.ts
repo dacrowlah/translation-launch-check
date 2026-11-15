@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { checkGlossary } from "../../../src/domain/checks/glossary";
-import { aPair, ctx } from "../../support/builders";
+import { checkGlossary } from "../../../src/domain/checks/glossary.js";
+import { aPair, ctx } from "../../support/builders.js";
 
 describe("do-not-translate terms", () => {
   it.each(["Black\u00a0Friday Angebote", "Black-Friday Angebote", "Black \u202f Friday"])(

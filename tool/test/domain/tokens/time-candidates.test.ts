@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { numberRows } from "../../support/rows";
+import { numberRows } from "../../support/rows.js";
 
 describe("candidates pair by value first", () => {
   it.each([

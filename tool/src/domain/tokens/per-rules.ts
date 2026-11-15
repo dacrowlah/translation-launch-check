@@ -1,4 +1,4 @@
-import type { Rules } from "../rules";
+import type { Rules } from "../rules.js";
 
 /** Stores the value under the key and returns it. */
 export const stored = <K extends object, T>(cache: WeakMap<K, T>, key: K, value: T): T => {

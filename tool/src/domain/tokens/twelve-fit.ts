@@ -1,6 +1,6 @@
-import { MINUTES_PER_DAY, minutesOfClock } from "./clock-values";
-import { countOf, type Counts } from "./tally";
-import type { Placed } from "./times";
+import { MINUTES_PER_DAY, minutesOfClock } from "./clock-values.js";
+import { countOf, type Counts } from "./tally.js";
+import type { Placed } from "./times.js";
 
 /**
  * How a convention's values fit the other side: how many it holds room for, and how far the

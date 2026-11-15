@@ -1,15 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { checkLanguageColumn, checkLanguageLine } from "../../../src/domain/checks/language";
+import { checkLanguageColumn, checkLanguageLine } from "../../../src/domain/checks/language.js";
 import {
   candidateLanguages,
   japaneseShare,
   letterCount,
   stripForLanguage,
-} from "../../../src/domain/checks/language-text";
-import { aPair, ctx } from "../../support/builders";
-import { describeLanguageDetectorContract } from "../../support/language-detector.contract";
-import { FakeLanguageDetector } from "../../support/language-detector";
-import { testRules } from "../../support/rules";
+} from "../../../src/domain/checks/language-text.js";
+import { aPair, ctx } from "../../support/builders.js";
+import { describeLanguageDetectorContract } from "../../support/language-detector.contract.js";
+import { FakeLanguageDetector } from "../../support/language-detector.js";
+import { testRules } from "../../support/rules.js";
 
 const FR_LINES = ["Achetez maintenant et profitez de nos offres", "Livraison gratuite partout"];
 const JA = "\u30c8\u30ec\u30a4\u30eb\u30b7\u30e5\u30fc\u30ba\u3092\u4eca\u3059\u3050\u8cfc\u5165";

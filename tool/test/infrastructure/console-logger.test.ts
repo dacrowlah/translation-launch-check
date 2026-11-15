@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ConsoleLogger, quietConsole } from "../../src/infrastructure/console-logger";
+import { ConsoleLogger, quietConsole } from "../../src/infrastructure/console-logger.js";
 
 const EVENT = {
   event: "tool_call",

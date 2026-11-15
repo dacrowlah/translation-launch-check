@@ -1,5 +1,5 @@
-import type { Rules } from "../rules";
-import { listCheck } from "./compare";
+import type { Rules } from "../rules.js";
+import { listCheck } from "./compare.js";
 
 export const TRADEMARKS_DETAIL = "A trademark symbol is missing or added.";
 

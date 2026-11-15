@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { checkLocalization } from "../../src/application/check-localization";
-import type { LocaleReport, LocalizationReport, PackageLine } from "../../src/domain/types";
-import { aDeps, aLine, aPackage } from "../support/builders";
+import { checkLocalization } from "../../src/application/check-localization.js";
+import type { LocaleReport, LocalizationReport, PackageLine } from "../../src/domain/types.js";
+import { aDeps, aLine, aPackage } from "../support/builders.js";
 
 const LOCALES = ["de-DE", "fr-FR", "ja-JP", "en-GB"];
 type Texts = [en: string, de: string, fr: string, ja: string, gb: string];

@@ -5,11 +5,11 @@ import {
   type MultiCheck,
   type Row,
   type Spec,
-} from "./compare";
-import { withoutSpans } from "./spans";
-import { unique } from "../tokens/tally";
-import { dntTerms, termsPattern } from "../tokens/terms";
-import { wholeWords } from "./words";
+} from "./compare.js";
+import { withoutSpans } from "./spans.js";
+import { unique } from "../tokens/tally.js";
+import { dntTerms, termsPattern } from "../tokens/terms.js";
+import { wholeWords } from "./words.js";
 
 export const GLOSSARY_DNT_DETAIL = "A do-not-translate term is missing or was translated.";
 export const GLOSSARY_FORBIDDEN_DETAIL = "A forbidden term is used.";

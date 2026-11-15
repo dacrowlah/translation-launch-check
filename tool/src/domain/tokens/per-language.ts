@@ -1,4 +1,4 @@
-import type { LocaleRule } from "../rules";
+import type { LocaleRule } from "../rules.js";
 
 /** A per-language table's entry for the locale's language, or `none` when the rules have none. */
 export const ofLanguage = <T>(table: Readonly<Record<string, T>>, locale: LocaleRule, none: T): T =>

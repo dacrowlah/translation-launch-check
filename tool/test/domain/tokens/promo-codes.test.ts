@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { extractPromoCodes } from "../../../src/domain/tokens/promo-codes";
-import { testRules } from "../../support/rules";
+import { extractPromoCodes } from "../../../src/domain/tokens/promo-codes.js";
+import { testRules } from "../../support/rules.js";
 
 describe("extractPromoCodes", () => {
   it("finds_promo_codes_but_not_words", () => {

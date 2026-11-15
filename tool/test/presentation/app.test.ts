@@ -1,11 +1,11 @@
 import type { Server } from "node:http";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { createApp } from "../../src/main";
-import { anAppConfig, startApp, TOKEN } from "../support/app";
-import { aBody, discoveryOf, outcome, postTo, type DiscoveredFunction } from "../support/http";
-import { SwitchableDetector } from "../support/language-detector";
-import { RecordingLogger } from "../support/logger";
-import { aLogEvent } from "../support/telemetry";
+import { createApp } from "../../src/main.js";
+import { anAppConfig, startApp, TOKEN } from "../support/app.js";
+import { aBody, discoveryOf, outcome, postTo, type DiscoveredFunction } from "../support/http.js";
+import { SwitchableDetector } from "../support/language-detector.js";
+import { RecordingLogger } from "../support/logger.js";
+import { aLogEvent } from "../support/telemetry.js";
 
 const logger = new RecordingLogger();
 const detector = new SwitchableDetector();

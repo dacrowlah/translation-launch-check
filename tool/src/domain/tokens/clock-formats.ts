@@ -1,6 +1,6 @@
-import type { LocaleRule, Rules, TimeFormat } from "../rules";
-import { listOf } from "./per-language";
-import { anyChar, anyOfSources } from "./regex";
+import type { LocaleRule, Rules, TimeFormat } from "../rules.js";
+import { listOf } from "./per-language.js";
+import { anyChar, anyOfSources } from "./regex.js";
 
 /** A time format's pattern, whether it is a definite time or a candidate. */
 export const formatSourceOf = (format: TimeFormat): string =>

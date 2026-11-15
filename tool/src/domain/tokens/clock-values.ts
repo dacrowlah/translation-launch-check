@@ -1,6 +1,6 @@
-import type { TwelveOClock } from "../rules";
-import { twoDigits } from "./calendar";
-import type { Groups } from "./take";
+import type { TwelveOClock } from "../rules.js";
+import { twoDigits } from "./calendar.js";
+import type { Groups } from "./take.js";
 
 /** Minutes in a day, and noon in minutes after midnight. */
 export const MINUTES_PER_DAY = 1440;

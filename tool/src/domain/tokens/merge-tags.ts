@@ -1,7 +1,7 @@
-import type { Rules } from "../rules";
-import { perRules } from "./per-rules";
-import { anyOfSources } from "./regex";
-import { takeWith } from "./take";
+import type { Rules } from "../rules.js";
+import { perRules } from "./per-rules.js";
+import { anyOfSources } from "./regex.js";
+import { takeWith } from "./take.js";
 
 /** Every merge-tag syntax in the rules, case-sensitive; matches nothing when there are none. */
 export const mergeTagSource = (rules: Rules): string => anyOfSources(rules.merge_tag_patterns);

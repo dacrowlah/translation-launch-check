@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { checkFormality } from "../../../src/domain/checks/formality";
-import { checkGlossary } from "../../../src/domain/checks/glossary";
-import { checkLocaleSpelling } from "../../../src/domain/checks/locale-spelling";
-import { spellingFix } from "../../../src/domain/checks/spelling";
-import { checkTimeZone } from "../../../src/domain/checks/time-zone";
-import { checkTypography } from "../../../src/domain/checks/typography";
-import { checkUntranslated } from "../../../src/domain/checks/untranslated";
-import { aPair, ctx } from "../../support/builders";
-import { testLocale, testRules } from "../../support/rules";
+import { checkFormality } from "../../../src/domain/checks/formality.js";
+import { checkGlossary } from "../../../src/domain/checks/glossary.js";
+import { checkLocaleSpelling } from "../../../src/domain/checks/locale-spelling.js";
+import { spellingFix } from "../../../src/domain/checks/spelling.js";
+import { checkTimeZone } from "../../../src/domain/checks/time-zone.js";
+import { checkTypography } from "../../../src/domain/checks/typography.js";
+import { checkUntranslated } from "../../../src/domain/checks/untranslated.js";
+import { aPair, ctx } from "../../support/builders.js";
+import { testLocale, testRules } from "../../support/rules.js";
 
 const JA_SLUG =
   "\u30c8\u30ec\u30a4\u30eb\u30d7\u30ed \u30a6\u30eb\u30c8\u30e9 https://x.com/trailpro-ultra";

@@ -1,5 +1,5 @@
-import type { Rules, TimeFormat } from "../domain/rules";
-import { formatSourceOf } from "../domain/tokens/clock-formats";
+import type { Rules, TimeFormat } from "../domain/rules.js";
+import { formatSourceOf } from "../domain/tokens/clock-formats.js";
 
 const glossaryLocales = ({ glossary: g }: Rules): string[] => [
   ...Object.keys(g.forbidden),

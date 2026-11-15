@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { checkDates } from "../../../src/domain/checks/dates";
-import { checkMarkup } from "../../../src/domain/checks/markup";
-import { checkMergeTags } from "../../../src/domain/checks/merge-tags";
-import { checkTrademarks } from "../../../src/domain/checks/trademarks";
-import { checkUrls } from "../../../src/domain/checks/urls";
-import { aPair, ctx } from "../../support/builders";
+import { checkDates } from "../../../src/domain/checks/dates.js";
+import { checkMarkup } from "../../../src/domain/checks/markup.js";
+import { checkMergeTags } from "../../../src/domain/checks/merge-tags.js";
+import { checkTrademarks } from "../../../src/domain/checks/trademarks.js";
+import { checkUrls } from "../../../src/domain/checks/urls.js";
+import { aPair, ctx } from "../../support/builders.js";
 
 describe("dates", () => {
   it("flags_a_changed_date_and_weekday", () => {

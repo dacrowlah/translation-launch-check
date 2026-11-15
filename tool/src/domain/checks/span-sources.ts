@@ -1,6 +1,6 @@
-import { REFERENCE } from "../tokens/references";
-import { URL_PATH, URL_SOURCE } from "../tokens/link-patterns";
-import { anyCase } from "../tokens/regex";
+import { REFERENCE } from "../tokens/references.js";
+import { URL_PATH, URL_SOURCE } from "../tokens/link-patterns.js";
+import { anyCase } from "../tokens/regex.js";
 
 const block = (name: string): string =>
   String.raw`<${anyCase(name)}\b[^>]*>[\s\S]*?<\/${anyCase(name)}\s*>`;

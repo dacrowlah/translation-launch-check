@@ -1,4 +1,4 @@
-import type { Logger, LogEvent } from "../../src/domain/ports/logger";
+import type { Logger, LogEvent } from "../../src/domain/ports/logger.js";
 
 /** Keeps every logged event for assertions. */
 export class RecordingLogger implements Logger {

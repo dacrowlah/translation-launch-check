@@ -1,5 +1,5 @@
-import { resultOf, type LineCheck, type Row, type Spec } from "./compare";
-import { spellingFix } from "./spelling";
+import { resultOf, type LineCheck, type Row, type Spec } from "./compare.js";
+import { spellingFix } from "./spelling.js";
 
 export const LOCALE_SPELLING_DETAIL = "A word is not spelled the way this market spells it.";
 

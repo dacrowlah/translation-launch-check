@@ -1,8 +1,8 @@
-import type { LocaleRule, Rules } from "../rules";
-import { compile } from "./compiled";
-import type { CalendarPatterns } from "./date-patterns";
-import { orderOf, pieceOf, weekdayNamed, type Piece } from "./date-reader";
-import { takeParts, type Part } from "./take";
+import type { LocaleRule, Rules } from "../rules.js";
+import { compile } from "./compiled.js";
+import type { CalendarPatterns } from "./date-patterns.js";
+import { orderOf, pieceOf, weekdayNamed, type Piece } from "./date-reader.js";
+import { takeParts, type Part } from "./take.js";
 
 /** weekday: 0 = Monday, or null when the text names none next to the date. */
 export interface DateToken {

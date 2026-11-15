@@ -1,9 +1,9 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import type { Rules } from "../../../src/domain/rules";
-import { extractDates } from "../../../src/domain/tokens/dates";
-import { extractTimes } from "../../../src/domain/tokens/times";
-import { testLocale, testRules } from "../../support/rules";
+import type { Rules } from "../../../src/domain/rules.js";
+import { extractDates } from "../../../src/domain/tokens/dates.js";
+import { extractTimes } from "../../../src/domain/tokens/times.js";
+import { testLocale, testRules } from "../../support/rules.js";
 
 const TOKENS = new URL("../../../src/domain/tokens/", import.meta.url);
 /** Typographic spaces, not language: the no-break and narrow no-break spaces. */

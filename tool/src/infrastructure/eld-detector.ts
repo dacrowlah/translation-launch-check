@@ -1,5 +1,5 @@
 import { eld } from "eld/small";
-import type { LanguageDetector } from "../domain/ports/language-detector";
+import type { LanguageDetector } from "../domain/ports/language-detector.js";
 
 type Eld = ReturnType<typeof eld.newInstance>;
 

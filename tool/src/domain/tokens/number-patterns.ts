@@ -1,7 +1,7 @@
-import { multiplied, multiplierChain } from "./multipliers";
-import type { LocaleRule, Rules } from "../rules";
-import { listOf } from "./per-language";
-import { anyOfSources, escape, escapeInClass, LATIN, NO_BREAK_SPACES, SPACE } from "./regex";
+import { multiplied, multiplierChain } from "./multipliers.js";
+import type { LocaleRule, Rules } from "../rules.js";
+import { listOf } from "./per-language.js";
+import { anyOfSources, escape, escapeInClass, LATIN, NO_BREAK_SPACES, SPACE } from "./regex.js";
 
 /** dash: ",-" or ",\u2013" ends a price; space: a plain space groups digits; fraction: decimals required. */
 export interface NumberShape {

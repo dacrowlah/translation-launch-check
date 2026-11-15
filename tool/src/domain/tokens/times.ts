@@ -1,11 +1,11 @@
-import type { LocaleRule, Rules, TwelveOClock } from "../rules";
-import { endOf, noonEnd, startOf } from "./clock-halves";
-import { clockOf, secondReading } from "./clock-values";
-import { compile } from "./compiled";
-import { extractNumbers } from "./numbers";
-import { nameKey } from "./per-language";
-import type { ClockPatterns } from "./time-patterns";
-import { takeParts, type Groups, type Part } from "./take";
+import type { LocaleRule, Rules, TwelveOClock } from "../rules.js";
+import { endOf, noonEnd, startOf } from "./clock-halves.js";
+import { clockOf, secondReading } from "./clock-values.js";
+import { compile } from "./compiled.js";
+import { extractNumbers } from "./numbers.js";
+import { nameKey } from "./per-language.js";
+import type { ClockPatterns } from "./time-patterns.js";
+import { takeParts, type Groups, type Part } from "./take.js";
 
 /** A time that counts only if the other side of the line holds a time ("21 h", "midnight"). */
 export interface Candidate {

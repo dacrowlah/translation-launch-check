@@ -1,4 +1,4 @@
-import type { Stopwatch } from "../domain/ports/stopwatch";
+import type { Stopwatch } from "../domain/ports/stopwatch.js";
 
 export class SystemStopwatch implements Stopwatch {
   start(): number {

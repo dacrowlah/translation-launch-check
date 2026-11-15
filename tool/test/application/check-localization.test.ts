@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { checkLocalization, type CheckDeps } from "../../src/application/check-localization";
-import { ALL_CHECK_IDS, type LocaleReport } from "../../src/domain/types";
-import { aDeps, aPackage, aLine } from "../support/builders";
-import { testRules } from "../support/rules";
+import { checkLocalization, type CheckDeps } from "../../src/application/check-localization.js";
+import { ALL_CHECK_IDS, type LocaleReport } from "../../src/domain/types.js";
+import { aDeps, aPackage, aLine } from "../support/builders.js";
+import { testRules } from "../support/rules.js";
 
 const VALUE_CHECKS = ["dates", "weekday_date_match", "currency_amount", "currency_code"];
 /** The date and price findings of a report: none when "Fr. 27.11.: 29 $" is read right in de-DE. */

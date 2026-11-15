@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { checkDates } from "../../../src/domain/checks/dates";
-import { checkNumbers } from "../../../src/domain/checks/numbers";
-import { extractDates } from "../../../src/domain/tokens/dates";
-import { aDate, aPair, ctx, inLocale } from "../../support/builders";
-import { rows } from "../../support/rows";
+import { checkDates } from "../../../src/domain/checks/dates.js";
+import { checkNumbers } from "../../../src/domain/checks/numbers.js";
+import { extractDates } from "../../../src/domain/tokens/dates.js";
+import { aDate, aPair, ctx, inLocale } from "../../support/builders.js";
+import { rows } from "../../support/rows.js";
 
 const OFFER = "Offer valid Nov 27-30";
 const day = (d: number) => aDate({ month: 11, day: d });

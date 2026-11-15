@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { extractMoney } from "../../../src/domain/tokens/money";
-import { readable } from "../../../src/domain/tokens/tokenize";
-import { aPair, inLocale, tokensOf } from "../../support/builders";
+import { extractMoney } from "../../../src/domain/tokens/money.js";
+import { readable } from "../../../src/domain/tokens/tokenize.js";
+import { aPair, inLocale, tokensOf } from "../../support/builders.js";
 
 /** Prices in text read as the tokenizer reads it ("\uff5e" is "~"). */
 const read = (locale: string, text: string) => inLocale(extractMoney)(locale, readable(text));

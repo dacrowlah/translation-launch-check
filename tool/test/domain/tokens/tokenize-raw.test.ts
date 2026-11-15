@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { checkMergeTags } from "../../../src/domain/checks/merge-tags";
-import { checkNumbers } from "../../../src/domain/checks/numbers";
-import { checkPromoCodes } from "../../../src/domain/checks/promo-codes";
-import { checkUrls } from "../../../src/domain/checks/urls";
-import { aPair, ctx } from "../../support/builders";
-import { rows } from "../../support/rows";
+import { checkMergeTags } from "../../../src/domain/checks/merge-tags.js";
+import { checkNumbers } from "../../../src/domain/checks/numbers.js";
+import { checkPromoCodes } from "../../../src/domain/checks/promo-codes.js";
+import { checkUrls } from "../../../src/domain/checks/urls.js";
+import { aPair, ctx } from "../../support/builders.js";
+import { rows } from "../../support/rows.js";
 
 const ja = (master: string, target: string) => aPair(master, target, "ja-JP");
 

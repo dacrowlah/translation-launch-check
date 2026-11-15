@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { tokensOf } from "../../support/builders";
-import { resolvePair } from "../../../src/domain/tokens/resolve-pair";
-import { dateRows } from "../../support/rows";
+import { tokensOf } from "../../support/builders.js";
+import { resolvePair } from "../../../src/domain/tokens/resolve-pair.js";
+import { dateRows } from "../../support/rows.js";
 
 const NONE = [[], [], []];
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { extractUrls } from "../../../src/domain/tokens/urls";
-import { urlRows } from "../../support/rows";
+import { extractUrls } from "../../../src/domain/tokens/urls.js";
+import { urlRows } from "../../support/rows.js";
 
 const BF = "https://example.com/bf?utm_source=email&utm_campaign=bf26";
 

@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { checkNumbers } from "../../../src/domain/checks/numbers";
-import { extractNumbers } from "../../../src/domain/tokens/numbers";
-import { aPair, ctx, inLocale, tokensOf } from "../../support/builders";
-import { dateRows, numberRows, rows } from "../../support/rows";
+import { checkNumbers } from "../../../src/domain/checks/numbers.js";
+import { extractNumbers } from "../../../src/domain/tokens/numbers.js";
+import { aPair, ctx, inLocale, tokensOf } from "../../support/builders.js";
+import { dateRows, numberRows, rows } from "../../support/rows.js";
 
 const read = inLocale(extractNumbers);
 

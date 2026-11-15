@@ -1,8 +1,8 @@
-import type { Rules } from "../rules";
-import { promoPattern } from "../tokens/promo-codes";
-import { unique } from "../tokens/tally";
-import { dntPattern } from "../tokens/terms";
-import { withoutSpans } from "./spans";
+import type { Rules } from "../rules.js";
+import { promoPattern } from "../tokens/promo-codes.js";
+import { unique } from "../tokens/tally.js";
+import { dntPattern } from "../tokens/terms.js";
+import { withoutSpans } from "./spans.js";
 
 const JAPANESE = /[\u3040-\u30ff\u3400-\u9fff\uff66-\uff9f]/gu;
 const NOT_LANGUAGE = /[\p{N}\p{P}\p{S}]+/gu;

@@ -1,4 +1,4 @@
-import type { LanguageDetector } from "../../src/domain/ports/language-detector";
+import type { LanguageDetector } from "../../src/domain/ports/language-detector.js";
 
 /**
  * Answers from a text -> language map; any other text is "unsure" (null), and so is a

@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
-import type { LocaleRule, Rules } from "../../src/domain/rules";
-import { parseRules } from "../../src/infrastructure/rules-schema";
+import type { LocaleRule, Rules } from "../../src/domain/rules.js";
+import { parseRules } from "../../src/infrastructure/rules-schema.js";
 
 const RULES_PATH = new URL("../../config/rules.json", import.meta.url);
 

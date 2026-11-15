@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { extractTimes } from "../../../src/domain/tokens/times";
-import { aPair, inLocale, timesIn, tokensOf } from "../../support/builders";
-import { numberRows } from "../../support/rows";
-import { testLocale, testRules } from "../../support/rules";
+import { extractTimes } from "../../../src/domain/tokens/times.js";
+import { aPair, inLocale, timesIn, tokensOf } from "../../support/builders.js";
+import { numberRows } from "../../support/rows.js";
+import { testLocale, testRules } from "../../support/rules.js";
 
 describe("extractTimes", () => {
   it.each([

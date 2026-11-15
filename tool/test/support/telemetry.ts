@@ -1,6 +1,6 @@
-import type { ToolEvent } from "../../src/domain/ports/logger";
-import { RecordingLogger } from "./logger";
-import { FakeStopwatch } from "./stopwatch";
+import type { ToolEvent } from "../../src/domain/ports/logger.js";
+import { RecordingLogger } from "./logger.js";
+import { FakeStopwatch } from "./stopwatch.js";
 
 /** What safeHandler logs through: a RecordingLogger, and a stopwatch that reads 7 ms. */
 export const aTelemetry = () => ({

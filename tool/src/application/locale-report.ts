@@ -1,7 +1,13 @@
-import type { LinePair, LocaleContext } from "../domain/checks/compare";
-import { lengthInfo } from "../domain/copy-fit";
-import type { CheckId, CheckResult, CheckStatus, LineReport, LocaleReport } from "../domain/types";
-import type { LineResults } from "./locale-checks";
+import type { LinePair, LocaleContext } from "../domain/checks/compare.js";
+import { lengthInfo } from "../domain/copy-fit.js";
+import type {
+  CheckId,
+  CheckResult,
+  CheckStatus,
+  LineReport,
+  LocaleReport,
+} from "../domain/types.js";
+import type { LineResults } from "./locale-checks.js";
 
 export interface Scored {
   readonly pair: LinePair;

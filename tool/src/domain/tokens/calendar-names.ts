@@ -1,6 +1,6 @@
-import type { CalendarEntry, LocaleRule, Rules } from "../rules";
-import { listOf } from "./per-language";
-import { alternation } from "./regex";
+import type { CalendarEntry, LocaleRule, Rules } from "../rules.js";
+import { listOf } from "./per-language.js";
+import { alternation } from "./regex.js";
 
 export type Entries = readonly CalendarEntry[];
 

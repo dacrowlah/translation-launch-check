@@ -1,9 +1,9 @@
-import { checkDates } from "../../src/domain/checks/dates";
-import { checkCurrency } from "../../src/domain/checks/money";
-import { checkNumbers } from "../../src/domain/checks/numbers";
-import { checkUrls } from "../../src/domain/checks/urls";
-import type { CheckResult } from "../../src/domain/types";
-import { aPair, ctx } from "./builders";
+import { checkDates } from "../../src/domain/checks/dates.js";
+import { checkCurrency } from "../../src/domain/checks/money.js";
+import { checkNumbers } from "../../src/domain/checks/numbers.js";
+import { checkUrls } from "../../src/domain/checks/urls.js";
+import type { CheckResult } from "../../src/domain/types.js";
+import { aPair, ctx } from "./builders.js";
 
 /** A result's findings as [expected, found] rows; no result reads as no rows. */
 export const rows = (result?: CheckResult): (string | null)[][] =>

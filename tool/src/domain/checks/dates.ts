@@ -1,7 +1,7 @@
-import type { CheckResult } from "../types";
-import { isoDate, nextOccurrence, weekdayOf } from "../tokens/calendar";
-import type { DateToken } from "../tokens/dates";
-import type { Tokens } from "../tokens/tokenize";
+import type { CheckResult } from "../types.js";
+import { isoDate, nextOccurrence, weekdayOf } from "../tokens/calendar.js";
+import type { DateToken } from "../tokens/dates.js";
+import type { Tokens } from "../tokens/tokenize.js";
 import {
   diffRows,
   resultOf,
@@ -9,7 +9,7 @@ import {
   type MultiCheck,
   type Row,
   type Spec,
-} from "./compare";
+} from "./compare.js";
 
 export const DATES_DETAIL = "A date or weekday differs from the master.";
 export const WEEKDAY_DETAIL = "The weekday doesn't match the date.";

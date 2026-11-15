@@ -1,10 +1,10 @@
-import { checkLanguageColumn, checkLanguageLine } from "../domain/checks/language";
-import type { LinePair, LocaleContext } from "../domain/checks/compare";
-import type { Clock } from "../domain/ports/clock";
-import type { LanguageDetector } from "../domain/ports/language-detector";
-import type { Rules } from "../domain/rules";
-import { resolvePair } from "../domain/tokens/resolve-pair";
-import { tokenize } from "../domain/tokens/tokenize";
+import { checkLanguageColumn, checkLanguageLine } from "../domain/checks/language.js";
+import type { LinePair, LocaleContext } from "../domain/checks/compare.js";
+import type { Clock } from "../domain/ports/clock.js";
+import type { LanguageDetector } from "../domain/ports/language-detector.js";
+import type { Rules } from "../domain/rules.js";
+import { resolvePair } from "../domain/tokens/resolve-pair.js";
+import { tokenize } from "../domain/tokens/tokenize.js";
 import {
   ALL_CHECK_IDS,
   type CheckId,
@@ -12,9 +12,9 @@ import {
   type LocalizationPackage,
   type LocalizationReport,
   type PackageLine,
-} from "../domain/types";
-import { runLineChecks } from "./locale-checks";
-import { buildReport, type Scored } from "./locale-report";
+} from "../domain/types.js";
+import { runLineChecks } from "./locale-checks.js";
+import { buildReport, type Scored } from "./locale-report.js";
 
 export interface CheckDeps {
   readonly rules: Rules;

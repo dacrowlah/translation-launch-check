@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { checkFormality } from "../../../src/domain/checks/formality";
-import { checkGlossary } from "../../../src/domain/checks/glossary";
-import { checkTimeZone } from "../../../src/domain/checks/time-zone";
-import { checkTypography } from "../../../src/domain/checks/typography";
-import { checkUntranslated } from "../../../src/domain/checks/untranslated";
-import { aPair, ctx } from "../../support/builders";
+import { checkFormality } from "../../../src/domain/checks/formality.js";
+import { checkGlossary } from "../../../src/domain/checks/glossary.js";
+import { checkTimeZone } from "../../../src/domain/checks/time-zone.js";
+import { checkTypography } from "../../../src/domain/checks/typography.js";
+import { checkUntranslated } from "../../../src/domain/checks/untranslated.js";
+import { aPair, ctx } from "../../support/builders.js";
 
 const JA_BRAND = "\u30c8\u30ec\u30a4\u30eb\u30d7\u30ed \u30a6\u30eb\u30c8\u30e9";
 const JA_BF = "\u30d6\u30e9\u30c3\u30af\u30d5\u30e9\u30a4\u30c7\u30fc\u30bb\u30fc\u30eb";

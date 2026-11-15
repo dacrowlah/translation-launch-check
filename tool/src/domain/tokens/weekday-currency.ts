@@ -1,9 +1,9 @@
-import type { LocaleRule, Rules } from "../rules";
-import { rangeConnectors, weekdayNames } from "./calendar-names";
-import { anyClock, hourMinutes, minuteSeparator, timeConnectorList } from "./clock-formats";
-import { currenciesOf, currencyNames, namesSource } from "./currency";
-import { listOf } from "./per-language";
-import { alternation, SPACE } from "./regex";
+import type { LocaleRule, Rules } from "../rules.js";
+import { rangeConnectors, weekdayNames } from "./calendar-names.js";
+import { anyClock, hourMinutes, minuteSeparator, timeConnectorList } from "./clock-formats.js";
+import { currenciesOf, currencyNames, namesSource } from "./currency.js";
+import { listOf } from "./per-language.js";
+import { alternation, SPACE } from "./regex.js";
 
 /** Currencies written like a short weekday of the language ("Fr." in de-CH is also Friday). */
 const weekdayLike = (locale: LocaleRule, rules: Rules): string[] => {
