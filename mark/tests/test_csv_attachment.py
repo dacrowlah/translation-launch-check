@@ -1,7 +1,8 @@
 import pytest
 from opal_tms_sdk import ProxyChannelError
 
-from _platform import read_csv_attachment, strip_bom
+from _csv_package import strip_bom
+from _platform import read_csv_attachment
 from builders import an_attachment, csv_canvas, error, ok
 
 CSV = "id,en-US\r\nL1,Hey\r\n"  # 18 bytes, the builder's default size_bytes

@@ -27,7 +27,9 @@ binding docs rather than repeating them.
 - **Our tool only through `call_tool(tool, /, **params)`**: any status other than `ok` is a
   failure (`unavailable` when the call itself failed). Platform tools only through the
   helpers in `_platform.py`; email only through `send_email`, which enforces the allow-list.
-- **User-facing text only from `_text.py`.** Never exception text, tool messages or JSON.
+- **User-facing text only from the templates** (`_text.py`, `_text_problems.py`,
+  `_text_report.py`). Never exception text, tool messages or JSON. Untrusted text (copy,
+  model output) reaches chat, email and canvas only through `md_text()` (`_markdown.py`).
 - Return only routes, the run key, checksums and small plain-JSON values; large data goes
   to the run folder (`_run_folder.py`).
 
@@ -37,7 +39,7 @@ binding docs rather than repeating them.
   MARK.md section 1) will inline every `from _x import ...` into each step, each module
   once, so a step is one file (local imports fail in Mark), and will replace `_config` with
   literal `RULES` and `PRIVATE`.
-- Because of that, a helper imports only the allow-listed standard library modules,
+- Because of that, a helper or step imports only the allow-listed standard library modules,
   `opal_tms_sdk` and other helpers, and each module-level name is bound in one helper only.
   `test_import_graph.py` and `test_inlining.py` pin both. A new standard-library module is a
   reviewed addition to the allow-list.

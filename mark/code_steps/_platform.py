@@ -112,8 +112,3 @@ def read_csv_attachment(attachment, title):
         return {"status": "invalid_attachment", "text": None}
     body = call_platform("create_csv_canvas", title=title, csv_urls=[attachment["url"]])
     return _csv_result(body, attachment["size_bytes"])
-
-
-def strip_bom(text):
-    """The CSV parser's first step, for every source: one leading UTF-8 BOM removed."""
-    return text[1:] if isinstance(text, str) and text.startswith(BOM) else text

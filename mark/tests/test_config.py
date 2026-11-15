@@ -13,6 +13,7 @@ STEP_VALUES = {
     "allow_list": {"addresses": ["me@x.test"], "domains": ["x.test"]},
     "qa_inbox": "me@x.test",
     "template_url": "https://x.test/template.csv",
+    "webhook_trigger_name": "TLC webhook",
 }
 
 
@@ -50,7 +51,8 @@ def reload_config():
 
 
 def test_rules_hold_exactly_the_keys_steps_use():
-    assert set(RULES) == {"limits", "master_locale", "locales", "locale_aliases", "channels"}
+    keys = {"limits", "master_locale", "locales", "locale_aliases", "channels", "severities"}
+    assert set(RULES) == keys
 
 
 def test_rules_come_from_the_tools_rules_file():
@@ -58,7 +60,13 @@ def test_rules_come_from_the_tools_rules_file():
 
 
 def test_private_holds_exactly_the_keys_steps_use():
-    assert set(PRIVATE) == {"allow_list", "qa_inbox", "template_url"}
+    assert set(PRIVATE) == {"allow_list", "qa_inbox", "template_url", "webhook_trigger_name"}
+
+
+def test_a_missing_webhook_trigger_name_is_none(tmp_path, monkeypatch):
+    values = {k: v for k, v in STEP_VALUES.items() if k != "webhook_trigger_name"}
+    _point_config_at(tmp_path, monkeypatch, values)
+    assert _config._private()["webhook_trigger_name"] is None
 
 
 def test_tests_read_the_example_file():
@@ -122,7 +130,8 @@ def test_import_reads_the_named_file(tmp_path, reload_config):
 
 def test_example_file_keeps_script_values_out_of_step_keys():
     example = json.loads(EXAMPLE_CONFIG.read_text(encoding="utf-8"))
-    assert set(example) == {"_comment", "allow_list", "qa_inbox", "template_url", "scripts"}
+    steps = {"allow_list", "qa_inbox", "template_url", "webhook_trigger_name"}
+    assert set(example) == {"_comment", *steps, "scripts"}
     assert set(example["scripts"]) == {"webhook"}
 
 
@@ -147,6 +156,10 @@ BAD_SHAPES = [
     ({"qa_inbox": "not an address"}, "qa_inbox"),
     ({"template_url": 5}, "template_url"),
     ({"template_url": "http://x.test/template.csv"}, "template_url"),
+    ({"webhook_trigger_name": ""}, "webhook_trigger_name"),
+    ({"webhook_trigger_name": "a\nb"}, "webhook_trigger_name"),
+    ({"webhook_trigger_name": 7}, "webhook_trigger_name"),
+    ({"webhook_trigger_name": "x" * 101}, "webhook_trigger_name"),
 ]
 
 

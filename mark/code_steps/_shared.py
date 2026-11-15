@@ -7,10 +7,10 @@ Nothing here raises or prints: Mark's chat narrates stdout and stderr to the use
 from opal_tms_sdk import tools
 
 from _checksum import json_size
+from _routes import ROUTE_NEEDS_INFO
 from _text import TEXT
 
 TOOL_STATUSES = ("ok", "invalid_input", "internal_error", "invalid_request")
-ROUTE_NEEDS_INFO = "tlc_route_needs_info"
 MAX_RETURN_BYTES = 250_000  # under the 256 KB return limit (a bigger return becomes null)
 
 

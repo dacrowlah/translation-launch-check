@@ -17,9 +17,17 @@ from pathlib import Path
 from _checksum import canonical_bytes, facts_checksum
 
 RUN_ROOT = Path("/workspace/tlc")  # files here persist between the steps of one run
+CHECK_FILE = "check.json"  # "Read and check the file" -> Score, bound by check_checksum
+SCORES_FILE = "scores.json"  # Score -> the report, bound by verdict_checksum
 RUN_KEY = re.compile(r"[0-9a-f]{16}")
 LOCALE = r"[a-z]{2,3}(-[A-Z][a-z]{3})?(-([A-Z]{2}|[0-9]{3}))?"  # en-US, es-419, zh-Hant-TW
 RUN_FILE = re.compile(rf"[a-z0-9_-]+(/{LOCALE})?\.json")  # rules.json, reviews/es-419.json
+
+
+def run_root(ctx):
+    """RUN_ROOT. A test passes its own folder as ctx["run_root"]; Mark's ctx has no such key."""
+    root = ctx.get("run_root") if isinstance(ctx, dict) else None
+    return Path(root) if root else RUN_ROOT
 
 
 def new_run_key():

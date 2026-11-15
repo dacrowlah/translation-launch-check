@@ -10,6 +10,7 @@ CODE_STEPS = MARK_DIR / "code_steps"
 EXAMPLE_CONFIG = MARK_DIR / "local.config.example.json"
 EXAMPLE_ALLOWED = "owner@example.com"  # the example's allow-listed address, also its qa_inbox
 EXAMPLE_DOMAIN = "example.org"  # the example's allow-listed domain
+EXAMPLE_WEBHOOK = "Translation Launch Check webhook"  # the example's webhook_trigger_name
 
 RUN_KEY = "0123456789abcdef"
 RUN_DATA = {"t": "Gr\u00fc\u00dfe", "n": 1}

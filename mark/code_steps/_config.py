@@ -1,9 +1,10 @@
 """RULES and PRIVATE: read from files in dev and tests, literals after the build.
 
-PRIVATE holds only the keys a code step may see, in a checked shape. Script-only values (the
-webhook section) and credentials never reach a step. The private file is the one named by
-TLC_CONFIG, else mark/local.config.json, else the example file. A missing key or a wrong
-shape raises at import.
+PRIVATE holds only the keys a code step may see, in a checked shape: allow_list, qa_inbox,
+template_url, and webhook_trigger_name (the webhook trigger's run name; None if absent).
+Script-only values (the webhook section) and credentials never reach a step. The private
+file is the one named by TLC_CONFIG, else mark/local.config.json, else the example file. A
+missing required key or a wrong shape raises at import.
 """
 
 import json
@@ -14,8 +15,10 @@ from _address import on_allow_list, valid_allow_list
 from _url import valid_template_url
 
 _MARK = Path(__file__).resolve().parents[1]
-_RULE_KEYS = ("limits", "master_locale", "locales", "locale_aliases", "channels")
+_RULE_KEYS = ("limits", "master_locale", "locales", "locale_aliases", "channels", "severities")
 _PRIVATE_KEYS = ("allow_list", "qa_inbox", "template_url")
+_OPTIONAL_KEYS = ("webhook_trigger_name",)  # missing: None, and no run counts as a webhook
+MAX_TRIGGER_NAME = 100
 
 
 def _load(path):
@@ -38,7 +41,15 @@ def _problem(private):
     allow = private["allow_list"]
     if not valid_allow_list(allow):
         return "allow_list needs lists of valid addresses and bare domains"
-    return _inbox_problem(private["qa_inbox"], allow) or _url_problem(private["template_url"])
+    inbox = _inbox_problem(private["qa_inbox"], allow) or _url_problem(private["template_url"])
+    return inbox or _trigger_problem(private["webhook_trigger_name"])
+
+
+def _trigger_problem(name):
+    """The webhook trigger's run name: one printable line, or absent."""
+    ok = name is None or (isinstance(name, str) and 0 < len(name) <= MAX_TRIGGER_NAME)
+    ok = ok and (name is None or name.isprintable())
+    return None if ok else "webhook_trigger_name must be one line of text"
 
 
 def _inbox_problem(qa_inbox, allow):
@@ -59,7 +70,8 @@ def _checked(private):
 
 def _private(mark_dir=_MARK):
     full = _load(_private_path(mark_dir))
-    return _checked({key: full[key] for key in _PRIVATE_KEYS})
+    optional = {key: full.get(key) for key in _OPTIONAL_KEYS}
+    return _checked({**{key: full[key] for key in _PRIVATE_KEYS}, **optional})
 
 
 RULES = _rules()

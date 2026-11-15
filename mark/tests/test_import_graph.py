@@ -8,13 +8,17 @@ import sys
 
 import pytest
 
-from builders import a_module_file, helper_modules
+from builders import CODE_STEPS, a_module_file, helper_modules
 
 PLATFORM_PACKAGES = frozenset({"opal_tms_sdk"})  # preinstalled in Mark's Python runtime
 # An allow-list, not a deny-list: helpers do plain computation, and each new standard-library
 # module is a reviewed one-line addition. os is build-time only: _config reads files in dev,
-# and the build replaces _config with literals, so os never reaches a step.
-ALLOWED_STDLIB = frozenset({"hashlib", "json", "pathlib", "re", "secrets", "unicodedata"})
+# and the build replaces _config with literals, so os never reaches a step. csv and io parse
+# the attached file in memory (csv.reader over io.StringIO); neither opens a file or a socket.
+# datetime: the report step's clock (the run time in the canvas name).
+ALLOWED_STDLIB = frozenset(
+    {"csv", "datetime", "hashlib", "io", "json", "pathlib", "re", "secrets", "unicodedata"}
+)
 BUILD_TIME_ONLY = {"_config": frozenset({"os"})}
 # Builtins that import or run code the import graph can't see, flagged wherever they are
 # referenced (called, aliased or passed), plus attribute access to them (builtins.exec,
@@ -180,3 +184,20 @@ def test_helper_imports_form_no_cycle():
     edges = graph(helper_modules())
     assert {"_shared", "_address"} <= edges["_platform"]
     assert cycle(edges) == []
+
+
+def step_modules():
+    """The step files (every code_steps/*.py not starting with "_"): the build inlines their
+    helpers into them, so they keep to the same imports."""
+    return sorted(path for path in CODE_STEPS.glob("*.py") if not path.name.startswith("_"))
+
+
+def test_steps_import_only_the_standard_library_the_sdk_and_helpers():
+    helpers = {path.stem for path in helper_modules()}
+    found = {path.stem: foreign(path, helpers) for path in step_modules()}
+    assert len(found) == 5 and {stem: names for stem, names in found.items() if names} == {}
+
+
+def test_steps_import_nothing_dynamically():
+    found = {path.stem: dynamic_imports(path) for path in step_modules()}
+    assert {stem: names for stem, names in found.items() if names} == {}

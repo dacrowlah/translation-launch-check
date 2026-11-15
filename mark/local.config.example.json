@@ -3,6 +3,7 @@
   "allow_list": { "addresses": ["owner@example.com"], "domains": ["example.org"] },
   "qa_inbox": "owner@example.com",
   "template_url": "https://example.com/translation-launch-check/template.csv",
+  "webhook_trigger_name": "Translation Launch Check webhook",
   "scripts": {
     "webhook": {
       "url": "https://example.invalid/webhook",

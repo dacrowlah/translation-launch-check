@@ -15,17 +15,40 @@ for each behaviour, is the
 mark/                                      the Agent Platform source
   local.config.example.json                placeholders for the private values (section 7)
   requirements-dev.txt  pyproject.toml     pinned pytest and ruff; their settings
+  code_steps/read_and_check.py             step "Read and check the file"
+  code_steps/save_review.py                step "Save the review" (last step of each loop)
+  code_steps/score.py                      step "Score each language"
+  code_steps/report.py                     step "Write and send the report"
+  code_steps/needs_info.py                 step "Ask for a corrected file"
   code_steps/_shared.py                    call_tool, call_platform, run_safely
+  code_steps/_routes.py                    route tokens; has_route_word, defused (stdlib only)
   code_steps/_platform.py                  platform-tool helpers: send_email (allow-list),
-                                           create_canvas, read_csv_attachment, strip_bom
+                                           create_canvas, read_csv_attachment
   code_steps/_address.py                   email address and allow-list rules
   code_steps/_url.py                       the template URL rule
   code_steps/_checksum.py                  canonical JSON, sha256_hex, facts_checksum,
                                            locale_checksum, json_size
   code_steps/_run_folder.py                run-folder files: write, read, bind to a checksum
   code_steps/_config.py                    RULES and PRIVATE (files in dev, literals after build)
-  code_steps/_text.py                      every user-facing template
-  tests/                                   conftest.py, builders.py, fakes/opal_tms_sdk/,
+  code_steps/_campaign.py                  the campaign name, cleaned (canvas name, subject)
+  code_steps/_package.py  _locales.py      validate_package(): rules shared by CSV and webhook
+  code_steps/_csv_package.py               parse_csv() -> package; strip_bom
+  code_steps/_webhook_package.py           from_webhook() -> package (checksum)
+  code_steps/_tool_report.py               the tool's report: shape check, flat findings
+  code_steps/_check_facts.py               check.json: lines, rule findings, refs, checksums
+  code_steps/_loop_items.py                loop items: review and back-translation inputs
+  code_steps/_review.py                    Translation Review's answer: parsed and bound
+  code_steps/_model_output.py              JSON as object or text; model text, shortened
+  code_steps/_markdown.py                  md_text(): untrusted text shown as text
+  code_steps/_verdict.py                   verdict_for, overall (code decides every verdict)
+  code_steps/_scoring.py                   one language's score
+  code_steps/_fix_input.py                 lines to fix and the fixer's input text
+  code_steps/_fixes.py                     suggested fixes and their one re-check call
+  code_steps/_report_view.py  _message.py  the chat reply (also the QA-inbox email)
+  code_steps/_canvas.py                    the canvas markdown
+  code_steps/_text.py  _text_problems.py  _text_report.py   every user-facing template
+  tests/                                   conftest.py, builders.py, step_builders.py,
+                                           report_support.py, fakes/opal_tms_sdk/,
                                            test_*.py (section 5)
 ```
 
@@ -33,15 +56,6 @@ Planned, created as the build proceeds:
 ```
 mark/
   README.md                                setup (section 3) and the demo cases (section 5)
-  code_steps/_package.py                   validate_package(): rules shared by CSV and webhook
-  code_steps/_csv_package.py               parse_csv() -> package
-  code_steps/_webhook_package.py           from_webhook() -> package (checksum)
-  code_steps/_canvas.py                    canvas markdown
-  code_steps/read_and_check.py             step "Read and check the file"
-  code_steps/score.py                      step "Score each language"
-  code_steps/report.py                     step "Write and send the report"
-  code_steps/needs_info.py                 step "Ask for a corrected file"
-  code_steps/<named when written>.py       step "Save the review"
   agents/<agent_id>/                       agent.json, prompt.md, output.schema.json
   skills/market-rules-glossary.template.md rendered from tool/config/rules.json at build
   skills/translation-fix-playbook.md       skill text + When-to-use
@@ -50,6 +64,10 @@ mark/
   build.py  _build/{inline,agents,skills,workflow,layout}.py
   dist/                                    generated, importable, gitignored (never hand-edited)
 ```
+
+**Run folder files** (`/workspace/tlc/<run_key>/`): `check.json` (written by *Read and check
+the file*, bound by `check_checksum`), `reviews/<locale>.json` (*Save the review*, bound by
+the locale checksum) and `scores.json` (*Score each language*, bound by `verdict_checksum`).
 
 **Source of truth: the repo, not the instance.**
 - Every agent, skill and code step is edited here, then built and imported. Mark exports the
@@ -123,8 +141,20 @@ Rules:
   (tested).
 - **Return only what downstream needs, as a plain-JSON dict, plus a one-line user-safe
   `summary`.** No diagnostics. Technical detail stays in the tool's own server log.
-- **User-facing text comes only from the templates** in `_text.py`. Each template is keyed by
-  status and is pure string formatting; the report and canvas code never write prose.
+- **User-facing text comes only from the templates** in `_text.py`, `_text_problems.py` and
+  `_text_report.py`. Each template is pure string formatting; the report and canvas code
+  never write prose.
+- **Untrusted text is shown as text.** Copy, the campaign name, the tool's details and the
+  agents' drafts, reasons and notes reach the chat reply, the email and the canvas only
+  through `md_text()` (`_markdown.py`; `safe()` and `cell()` build on it). It escapes
+  Markdown and HTML syntax (links, images, emphasis, headings, tables, tags), removes control
+  and format characters (bidi overrides, zero-width characters), and defuses the route
+  prefix. Every echo of user or model text into a step output goes through `defused()`
+  (`_routes.py`), so no copy or model text can form a route token.
+- **The parse chain runs outside Mark.** `_csv_package`, `_webhook_package` and `_checksum`,
+  and every helper they import, use the standard library only: no `opal_tms_sdk`, no
+  `_config`. `scripts/send_package.py` imports them on a laptop. `test_parse_chain.py`
+  loads them in a fresh interpreter with neither the SDK nor any config.
 - **Checksums** (`_checksum.py`):
   - canonical JSON is exactly what `json.dumps(sort_keys=True, separators=(",", ":"),
     ensure_ascii=False, allow_nan=False)` writes, encoded as UTF-8. Data that is not plain
@@ -162,22 +192,28 @@ Rules:
 - `_config` is special: the build replaces it with literal `RULES = {...}` and
   `PRIVATE = {...}`. In dev and tests the module reads files:
   - `RULES`: the keys of `tool/config/rules.json` the steps use (`limits`, `master_locale`,
-    `locales`, `locale_aliases`, `channels`);
-  - `PRIVATE`: `allow_list`, `qa_inbox` and `template_url` from the file named by
-    `TLC_CONFIG`, else `mark/local.config.json`, else the example file. Script-only values
-    (the webhook section) never reach a step;
+    `locales`, `locale_aliases`, `channels`, and `severities`, whose keys are the check ids);
+  - `PRIVATE`: `allow_list`, `qa_inbox`, `template_url` and `webhook_trigger_name` (None
+    when absent) from the file named by `TLC_CONFIG`, else `mark/local.config.json`, else
+    the example file. Script-only values (the webhook section) never reach a step;
   - the values are checked at import (section 7). A missing key or a wrong shape raises, with
     a message that names no value.
-- User-facing templates live in `_text.py`, inlined like any other module.
+- User-facing templates live in `_text.py`, `_text_problems.py` and `_text_report.py`,
+  inlined like any other module.
 - **Tests pin what inlining relies on:**
-  - the import graph (`test_import_graph.py`): a helper imports only allow-listed standard
-    library modules (`hashlib`, `json`, `pathlib`, `re`, `secrets`, `unicodedata`; `os` only
-    in `_config`, which the build replaces), `opal_tms_sdk` and other helpers. So no network
-    or process modules. It imports nothing dynamically (`__import__`, `exec`, `eval`,
-    `compile`, `importlib`, ...), and the helpers form no import cycle. A new standard-library
-    module is a reviewed one-line addition to the allow-list;
+  - the import graph (`test_import_graph.py`): a helper or step imports only allow-listed
+    standard library modules (`csv`, `datetime`, `hashlib`, `io`, `json`, `pathlib`, `re`,
+    `secrets`, `unicodedata`; `os` only in `_config`, which the build replaces),
+    `opal_tms_sdk` and helpers. So no network or process modules. It imports nothing dynamically
+    (`__import__`, `exec`, `eval`, `compile`, `importlib`, ...), and the helpers form no
+    import cycle. A new standard-library module is a reviewed one-line addition to the
+    allow-list;
   - duplicate names (`test_inlining.py`): each module-level name is bound in one helper only,
-    because inlining puts every helper into one namespace.
+    because inlining puts every helper into one namespace; and (`test_step_names.py`) no step
+    binds a name a helper it inlines also binds;
+  - the prompts' contract (`test_prompt_contract.py`): the review input's double-check items
+    and the fix input, built from each merged prompt example's facts, appear in that prompt
+    verbatim.
 
 Tests import the real modules, so the shipped code and the tested code are the same source.
 
@@ -296,7 +332,9 @@ The how-to is the [writing-tests skill](../../.claude/skills/writing-tests/SKILL
   `{"response_type", "response"}` values, including error responses, or raises a scripted
   exception instance. An unscripted call raises `UnscriptedCall`, a `BaseException`, so a
   misspelt tool name fails the test. It is never a `monkeypatch` of our own modules.
-- **Fixtures are builders** in `mark/tests/builders.py` with defaults plus overrides,
+- **Fixtures are builders** in `mark/tests/builders.py` (platform shapes),
+  `step_builders.py` (the CSV, package, tool report, agents' answers and runs of the real
+  steps) and `report_support.py`, with defaults plus overrides,
   producing the exact shapes the tool contract and the platform produce today.
 - **Literal expectations.** Each new test is proven able to fail: mutate the production line,
   watch it go red, restore from a scratch copy, byte-compare.
@@ -344,6 +382,10 @@ once with `python3.12 -m venv .venv && .venv/bin/pip install -r mark/requirement
     everyone at that domain, so never list a public mail provider unless everyone there may
     receive reports;
   - `qa_inbox`: a valid address on the allow-list;
+  - `webhook_trigger_name` (optional): the `trigger_name` a webhook run carries, one line of
+    text. A payload counts only on a run with exactly this name; when it is absent, no run
+    counts as a webhook. It is filled by the orchestrator model like every input, so it is
+    a gate against mistakes, not authentication (the webhook's auth key is);
   - `template_url` (`_url.py`): at most 2,000 characters, and exactly `https://`, a host,
     and an optional path. The host must pass the shared hostname rule (`valid_domain`), so
     a port, userinfo, or a query or fragment straight after the host is refused. The path is
@@ -354,7 +396,8 @@ once with `python3.12 -m venv .venv && .venv/bin/pip install -r mark/requirement
 - The email recipient allow-list is enforced in code (`send_email`, section 2), never only in
   a prompt. File contents are data: an address inside a file is never a recipient.
 - Code steps hold no credentials. Tool auth is configured on the registry, not in steps.
-- Canvas output escapes Markdown table characters so a cell cannot break the report layout.
+- Chat, email and canvas output show untrusted text as text (`md_text`, section 2), so a
+  planted link, image or tag can't render and a cell can't break the report layout.
 - Agents have no side-effecting tools, and verdicts are computed in code.
 - A security review against this section and [TOOL.md](TOOL.md) section 3 runs before
   submission.
