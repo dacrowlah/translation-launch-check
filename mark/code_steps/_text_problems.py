@@ -49,6 +49,10 @@ PROBLEMS = {
         "wrong encoding.",
         SAVE_AS_UTF8,
     ),
+    "garbled_cell": (
+        "{line}'s {locale} text looks garbled: the file was probably saved in the wrong encoding.",
+        SAVE_AS_UTF8,
+    ),
     "bad_campaign": ("The campaign name must be text.", RESEND),
     "too_large_run": ("The file is too large to check in one run.", SPLIT_ROWS),
     "attach_one": ("Attach exactly one localization CSV.", "Attach the file in Mark chat."),

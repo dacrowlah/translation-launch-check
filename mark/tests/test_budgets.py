@@ -35,7 +35,7 @@ def test_each_step_has_a_ceiling_under_the_cap_and_these_input_budgets():
     )
     budgets = {step: input_budget(step) for step in STEPS}
     assert budgets == {
-        "read_and_check": 28_000,
+        "read_and_check": 27_000,
         "save_review": 58_000,
         "score": 44_000,
         "report": 26_000,

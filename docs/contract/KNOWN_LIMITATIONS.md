@@ -48,8 +48,12 @@ characters are written as `\uXXXX` escapes.
   - a file whose characters were already replaced by `?` when it was saved is refused per
     cell that is mostly question marks (at least 3, and at least half its visible
     characters): "...the file was probably saved in the wrong encoding.";
-  - a Shift_JIS file arrives with garbled Japanese; today its ja-JP column gets language
-    blockers, and a rule that refuses it with the wrong-encoding message is being added.
+  - a Shift_JIS file arrives with garbled Japanese and is refused per garbled cell: at
+    least 5 characters Windows-1252 decoding makes from multibyte text, at least 30% of its
+    visible characters, and one of them a character real copy doesn't use (such as U+0192
+    or a C1 control): "...text looks garbled: the file was probably saved in the wrong
+    encoding." Dense French or German copy (accents, guillemets, euro signs, dashes) has no
+    such character and passes. Pinned by tests at the thresholds.
 
   The webhook sender reads the file's raw bytes and refuses one that isn't UTF-8: "The file
   isn't UTF-8 text." A UTF-8 byte-order mark is fine either way. The tool reads JSON request
@@ -380,8 +384,8 @@ become limitations or unsure findings, not new parsing rules.
   but get no opinion, and the chat reply says "N more findings weren't sent for a second
   opinion (too many for one run)." Why: the review's answer must fit _Save the review_'s
   input. Pinned by a test.
-- **A webhook package is at most about 27.8 KB.** The package must fit _Read and check the
-  file_'s input next to its code: 27,800 bytes as escaped JSON, where every non-ASCII
+- **A webhook package is at most about 26.8 KB.** The package must fit _Read and check the
+  file_'s input next to its code: 26,800 bytes as escaped JSON, where every non-ASCII
   character counts 6 bytes. `scripts/send_package.py` refuses a larger package before
   sending. A CMP that posts directly and goes over it gets no answer: the platform fails the
   step before any code runs, and the webhook caller is not told. Why: the step's code shares

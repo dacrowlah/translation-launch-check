@@ -14,7 +14,7 @@ library only: the webhook sender imports it too."""
 STEP_LIMIT = 68_000
 MAX_CODE_BYTES = 60_000
 CODE_CEILINGS = {
-    "read_and_check": 40_000,
+    "read_and_check": 41_000,
     "save_review": 10_000,
     "score": 24_000,
     "report": 42_000,

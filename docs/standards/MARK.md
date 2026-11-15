@@ -32,6 +32,7 @@ mark/                                      the Agent Platform source
   code_steps/_config.py                    RULES and PRIVATE (files in dev, literals after build)
   code_steps/_campaign.py                  the campaign name, cleaned (canvas name, subject)
   code_steps/_package.py  _locales.py      validate_package(): rules shared by CSV and webhook
+                                           (per cell: empty, NUL, "????", garbled, too long)
   code_steps/_csv_package.py               parse_csv() -> package; strip_bom
   code_steps/_webhook_package.py           from_webhook() -> package (checksum)
   code_steps/_tool_report.py               the tool's report: shape check, flat findings
@@ -129,7 +130,7 @@ The platform contract (verified; the evidence and more facts are in the
     code counts toward that cap** (2026-11, tiny input: 68,200 and 70,700 bytes of code ran;
     73,200 and more failed with exit_code=-1 and no message). Rule: the JSON-escaped built
     code plus the escaped input (`json_size`) stays at most 68,000, about 5 KB under the cap.
-    `_budgets.py` holds each step's code ceiling (escaped: read and check 40,000, save the
+    `_budgets.py` holds each step's code ceiling (escaped: read and check 41,000, save the
     review 10,000, score 24,000, report 42,000, ask for a corrected file 21,000; none above
     `MAX_CODE_BYTES`, 60,000) and `input_budget(step)` = 68,000 - ceiling. The caps derive from the budgets: the back-translation cap is Save the
     review's budget less the largest review the agent schema admits; the fixer cap keeps
@@ -137,7 +138,7 @@ The platform contract (verified; the evidence and more facts are in the
     budget; problems leave the read step at most 25 (plus a count), each field at most 300
     characters; second-opinion refs stop at the review schema's 20 per locale, and fixer
     lines at the fix schema's 60. The webhook sender refuses a package over Read and check
-    the file's budget less its keys (27,800 bytes of escaped JSON);
+    the file's budget less its keys (26,800 bytes of escaped JSON);
   - a return is at most 256 KB, and a bigger one silently becomes `null` (docs);
   - the timeout is set per step: default 30 s, at most 300 s (docs).
 - **Loops:** the step after a loop that takes the loop output receives each iteration's full

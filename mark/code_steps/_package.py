@@ -9,6 +9,17 @@ from _text_problems import PROBLEM_LABELS, file_problem, label_row, problem, sho
 
 MAX_ID_CHARS = 40  # the tool's bound on id, channel and field
 MIN_QUESTION_MARKS = 3  # with half the visible characters: an encoding that dropped letters
+# Mark decodes a non-UTF-8 chat attachment as Windows-1252 (verified): multibyte text such as
+# Shift_JIS Japanese arrives as U+0080-U+00FF and these characters. A cell is garbled with at
+# least MIN_GARBLED of them, GARBLED_PERCENT of its visible characters, and one marker: a
+# character real copy doesn't use (dense French or German reaches the share without one).
+CP1252_EXTRAS = frozenset(
+    "\u0152\u0153\u0160\u0161\u0178\u017d\u017e\u0192\u02c6\u02dc\u2013\u2014\u2018\u2019"
+    "\u201a\u201c\u201d\u201e\u2020\u2021\u2022\u2026\u2030\u2039\u203a\u20ac\u2122"
+)
+CP1252_MARKERS = frozenset("\u0192\u201a\u2030\u02c6\u02dc\u2020\u2021")  # and U+0080-U+009F
+MIN_GARBLED = 5
+GARBLED_PERCENT = 30
 
 
 def channel_pairs(rules):
@@ -57,10 +68,28 @@ def _question_marks(text):
     return marks >= MIN_QUESTION_MARKS and 2 * marks >= visible
 
 
+def _cp1252_char(char):
+    return "\x80" <= char <= "\xff" or char in CP1252_EXTRAS
+
+
+def _marker(char):
+    return "\x80" <= char <= "\x9f" or char in CP1252_MARKERS
+
+
+def _garbled(text):
+    """Multibyte text decoded as Windows-1252 (mojibake), by the rule above."""
+    visible = [char for char in text if not char.isspace()]
+    odd = sum(map(_cp1252_char, visible))
+    share = 100 * odd >= GARBLED_PERCENT * len(visible)
+    return odd >= MIN_GARBLED and share and any(map(_marker, visible))
+
+
 def _text_issue(text):
     if "\x00" in text:
         return "nul_cell"
-    return "question_marks" if _question_marks(text) else None
+    if _question_marks(text):
+        return "question_marks"
+    return "garbled_cell" if _garbled(text) else None
 
 
 def _cell_issue(text, limit):

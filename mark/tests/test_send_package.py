@@ -213,4 +213,4 @@ def test_a_package_over_the_webhook_budget_is_refused_and_nothing_sent(tmp_path,
 def test_a_package_within_the_budget_is_sent(tmp_path, capsys):
     opener = RecordingOpener()
     assert send(tmp_path, opener, [a_large_csv(tmp_path, 20)]) == 0 and len(opener.requests) == 1
-    assert MAX_PAYLOAD_BYTES == 27_800
+    assert MAX_PAYLOAD_BYTES == 26_800

@@ -45,12 +45,13 @@ How a file arrives matters:
    Excel's default CSV on a Japanese Windows machine (Shift_JIS). Here the German and
    French accented letters are the ones written as "?".
    Expected in chat: Mark's Windows-1252 conversion turns the Japanese into garbled
-   characters; refused with the wrong-encoding message (after the mojibake rule ships).
+   characters; refused per cell, "...text looks garbled: the file was probably saved in the
+   wrong encoding." / "Save it as CSV UTF-8 and attach it again."
 
 Demo story: "A file can look perfect in Excel and still be broken on disk. Files 4 and 6
 lost text the moment they were saved, and no guess at an encoding can bring it back. The
 workflow asks for CSV UTF-8, which Excel offers in File > Save As."
 
-Status: files 3, 4 and 5 were run in chat and behave as written above. File 6 is confirmed
-once the mojibake rule ships. Through the webhook sender, files 4 to 6 are refused as not
+Status: files 3, 4 and 5 were run in chat and behave as written above. File 6's garbled
+Japanese, as observed live, is refused by a tested rule; confirm it in chat once deployed. Through the webhook sender, files 4 to 6 are refused as not
 UTF-8 (the parser's result is tested).

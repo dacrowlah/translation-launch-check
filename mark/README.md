@@ -160,8 +160,9 @@ word the report its own way: show the canvas.
      it as CSV UTF-8 and attach it again.";
    - file 5 (Windows-1252, German and French only) is accepted and checked, the umlauts and
      accents correct: Mark's conversion is the right one for it;
-   - file 6 (Shift_JIS) arrives with garbled Japanese and is refused with the
-     wrong-encoding message (after the mojibake rule ships).
+   - file 6 (Shift_JIS) arrives with garbled Japanese and is refused: "...text looks
+     garbled: the file was probably saved in the wrong encoding." / "Save it as CSV UTF-8
+     and attach it again."
 
    Through the webhook sender, which reads the file's raw bytes, files 4-6 are refused:
    "The file isn't UTF-8 text."
@@ -182,7 +183,7 @@ word the report its own way: show the canvas.
   file; very long copy is refused earlier ([KNOWN_LIMITATIONS](../docs/contract/KNOWN_LIMITATIONS.md)
   section 1).
 - **Encoding:** UTF-8 only ([section 1](../docs/contract/KNOWN_LIMITATIONS.md)).
-- **Webhook:** a package is at most about 27.8 KB, the caller gets no report back, and
+- **Webhook:** a package is at most about 26.8 KB, the caller gets no report back, and
   failures are silent ([section 5](../docs/contract/KNOWN_LIMITATIONS.md)).
 - **Email:** only webhook runs send the report, to the QA inbox; email can't carry the file
   yet ([section 5](../docs/contract/KNOWN_LIMITATIONS.md)).
