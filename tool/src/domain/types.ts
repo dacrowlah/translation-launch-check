@@ -1,5 +1,7 @@
 export type Severity = "blocker" | "warning" | "info";
 export type CheckStatus = "verified" | "not_applicable";
+/** "unsure": the tool could not tell (a question for a person); it never blocks on its own. */
+export type Confidence = "certain" | "unsure";
 
 export const ALL_CHECK_IDS = [
   "numbers",
@@ -32,6 +34,7 @@ export type CheckId = (typeof ALL_CHECK_IDS)[number];
 export interface Finding {
   readonly check: CheckId;
   readonly severity: Severity;
+  readonly confidence: Confidence;
   readonly detail: string;
   readonly expected: string | null;
   readonly found: string | null;

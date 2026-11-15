@@ -55,11 +55,21 @@ const minuteIssues = (r: Rules): string[] => [
   ...driftIssues(r),
 ];
 
-/** Rules that point at locales or languages the file does not define. */
-export const crossIssues = (r: Rules): string[] => [
-  ...references(r).flatMap(([label, keys]) =>
+/** The promo pattern must read its excluded suffixes, or the list is silently unused. */
+const promoIssues = (r: Rules): string[] =>
+  r.promo_code_pattern.includes("{excluded_suffixes}")
+    ? []
+    : ["promo_code_pattern: no {excluded_suffixes} place"];
+
+const localeIssues = (r: Rules): string[] =>
+  references(r).flatMap(([label, keys]) =>
     keys.filter((k) => !(k in r.locales)).map((k) => `${label}: unknown locale ${k}`),
-  ),
+  );
+
+/** Rules that point at locales or languages the file does not define, or that go unread. */
+export const crossIssues = (r: Rules): string[] => [
+  ...localeIssues(r),
   ...languageIssues(r),
   ...minuteIssues(r),
+  ...promoIssues(r),
 ];

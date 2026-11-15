@@ -7,6 +7,17 @@ import { checkUrls } from "../../../src/domain/checks/urls.js";
 import { aPair, ctx } from "../../support/builders.js";
 import { numberRows } from "../../support/rows.js";
 
+const UNREAD_USD = {
+  check: "currency_code",
+  severity: "warning",
+  confidence: "unsure",
+  detail:
+    "Couldn't find the master's price in this line. Is it written in a form the tool " +
+    "can't read (in words, or glued to a word), or is it missing?",
+  expected: "USD",
+  found: null,
+};
+
 describe("numbers, merge tags, promo codes", () => {
   it("flags_a_changed_percentage", () => {
     const r = checkNumbers(aPair("30% off all jackets", "20 % auf alle Jacken"), ctx("de-DE"));
@@ -14,6 +25,7 @@ describe("numbers, merge tags, promo codes", () => {
       {
         check: "numbers",
         severity: "blocker",
+        confidence: "certain",
         detail: "A number differs from the master.",
         expected: "30%",
         found: "20%",
@@ -95,6 +107,35 @@ describe("currency", () => {
   it("accepts_the_same_price_written_locally", () => {
     const r = checkCurrency(aPair("Only \u20ac1,299.50", "Nur 1.299,50 \u20ac"), ctx());
     expect([r.currency_amount?.findings, r.currency_code?.findings]).toEqual([[], []]);
+  });
+  it("a_currency_changed_to_another_is_a_certain_warning", () => {
+    const r = checkCurrency(aPair("Only $50", "Nur 50 \u20ac"), ctx());
+    expect(r.currency_code?.findings).toEqual([
+      {
+        check: "currency_code",
+        severity: "warning",
+        confidence: "certain",
+        detail: "The currency differs from the master; confirm the local price.",
+        expected: "USD",
+        found: "EUR",
+      },
+    ]);
+  });
+  it("a_master_price_with_nothing_in_its_place_is_an_unsure_question", () => {
+    const r = checkCurrency(aPair("Only $20", "Nur zwanzig Dollar"), ctx());
+    expect(r.currency_code).toEqual({ applicable: true, findings: [UNREAD_USD] });
+  });
+  it("the_unsure_question_on_a_japanese_line_names_kanji_numerals", () => {
+    const yen = "\u4e8c\u4e07\u5186\u5206\u306e\u30ae\u30d5\u30c8\u30ab\u30fc\u30c9";
+    const r = checkCurrency(aPair("\u00a520,000 gift card", yen, "ja-JP"), ctx("ja-JP"));
+    expect(r.currency_code?.findings[0]?.detail).toBe(
+      "Couldn't find the master's price in this line. Is it written in a form the tool " +
+        "can't read (kanji numerals), or is it missing?",
+    );
+  });
+  it("a_currency_only_the_translation_has_stays_certain", () => {
+    const r = checkCurrency(aPair("Free shipping", "Gratisversand ab 50 \u20ac"), ctx());
+    expect(r.currency_code?.findings[0]).toMatchObject({ confidence: "certain", found: "EUR" });
   });
 });
 

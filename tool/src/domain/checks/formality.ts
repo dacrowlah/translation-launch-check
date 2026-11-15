@@ -2,7 +2,7 @@ import type { Lexicon, Rules } from "../rules.js";
 import type { CheckResult } from "../types.js";
 import { resultOf, type LineCheck, type Row, type Spec } from "./compare.js";
 import { unique } from "../tokens/tally.js";
-import { withoutSpans } from "./spans.js";
+import { visibleText } from "./spans.js";
 
 export const FORMALITY_DETAIL = "The line uses the informal register in a formal locale.";
 
@@ -24,5 +24,5 @@ const verdict = (words: readonly string[], lexicon: Lexicon, rules: Rules): Chec
 export const checkFormality: LineCheck = (pair, ctx) => {
   const lexicon = ctx.rules.formality_markers[ctx.rule.language];
   if (ctx.rule.formality !== "formal" || !lexicon) return resultOf(ctx.rules, FORMALITY, false, []);
-  return verdict(WORDS(withoutSpans(pair.targetText, ctx.rules)), lexicon, ctx.rules);
+  return verdict(WORDS(visibleText(pair.targetText, ctx.rules)), lexicon, ctx.rules);
 };

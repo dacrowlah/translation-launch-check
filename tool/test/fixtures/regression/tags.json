@@ -40,5 +40,31 @@
       "{{ first_name\u3000}}\u69d8\u3001",
       [["merge_tags", "{{ first_name }}", "{{ first_name\u3000}}"]]
     ]
+  ],
+  "a_promo_code_kept_by_the_translation_has_no_finding": [
+    ["de-DE", "Use code 20OFF today", "Code 20OFF nur heute", []]
+  ],
+  "a_time_ordinal_unit_or_price_after_digits_is_no_promo_code_has_no_finding": [
+    ["de-DE", "Ends 9PM", "Endet um 21 Uhr", []],
+    ["fr-FR", "YOUR 1ST ORDER", "VOTRE 1RE COMMANDE", []],
+    ["fr-FR", "-50% ON THE 2ND ITEM", "-50 % D\u00c8S LE 2EME ARTICLE", []],
+    ["fr-FR", "YOUR 1ST ORDER SHIPS FREE", "VOTRE 1ERE COMMANDE OFFERTE", []],
+    ["de-DE", "Galaxy S24 512GB", "Galaxy S24 512 GB", []],
+    ["fr-FR", "iPhone 15 128GB", "iPhone 15 128 Go", []],
+    ["fr-FR", "Portable SSD 1TB", "SSD portable 1 To", []],
+    ["de-DE", "48HR FLASH SALE: 40% off", "48-STUNDEN-FLASH-SALE: 40 % Rabatt", []],
+    ["de-DE", "12PCS gift set", "Geschenkset mit 12 St\u00fcck", []],
+    ["de-DE", "Bottle 750ML", "Flasche 750 ml", []],
+    ["de-DE", "Run the 10KM trail", "Lauf den 10-km-Trail", []],
+    ["de-DE", "Only 50EUR", "Nur 50 EUR", []],
+    ["de-CH", "Only CHF 20", "Nur 20CHF", []]
+  ],
+  "known_limitation_a_size_written_with_digits_is_a_number": [
+    ["de-DE", "Sizes up to 3XL", "Gr\u00f6\u00dfen bis XXXL", [["numbers", "3", null]]]
+  ],
+  "a_changed_or_dropped_promo_code_is_a_finding": [
+    ["de-DE", "Use code 20OFF", "Code 20RABATT", [["promo_codes", "20OFF", "20RABATT"]]],
+    ["fr-FR", "Use code 20OFF now", "Code 25OFF maintenant", [["promo_codes", "20OFF", "25OFF"]]],
+    ["fr-FR", "Use code 15OFF", "Utilisez le code", [["promo_codes", "15OFF", null]]]
   ]
 }

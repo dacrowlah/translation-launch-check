@@ -25,10 +25,8 @@ const powerOfTen = z
   .int()
   .refine((n) => n > 1 && /^10*$/u.test(String(n)));
 /** The default reading of 12 o'clock, then at most one more. */
-const readings = z
-  .array(z.union([z.literal(0), z.literal(12)]))
-  .min(1)
-  .max(2);
+const twelve = z.union([z.literal(0), z.literal(12)]);
+const readings = z.array(twelve).min(1).max(2);
 const severity = z.enum(["blocker", "warning", "info"]);
 
 const locale = z.strictObject({
@@ -93,7 +91,8 @@ const shape = z.strictObject({
   number_multiplier_blockers: z.record(name, z.array(name)),
   twelve_oclock: z.record(name, z.strictObject({ am: readings, pm: readings })),
   merge_tag_patterns: patterns,
-  promo_code_pattern: pattern,
+  promo_code_pattern: template,
+  promo_code_excluded_suffixes: z.array(name),
   artifact_patterns: patterns,
   artifact_phrases: strings,
   currencies: table,
@@ -110,7 +109,9 @@ const shape = z.strictObject({
   formality_markers: z.record(z.string(), z.strictObject({ formal: strings, informal: strings })),
   glossary,
   accepted_loanwords: z.record(z.string(), strings),
-  language_check: z.strictObject({ min_letters: count }),
+  language_check: z.strictObject({ min_letters: count, japanese_share: z.number().gt(0).max(1) }),
+  unsure_severity: severity,
+  time_zone_exclusions: z.record(name, strings),
   length_ratio_min_chars: count,
 });
 

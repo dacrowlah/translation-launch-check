@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { diffRows, multisetDiff, resultOf } from "../../../src/domain/checks/compare.js";
+import {
+  diffRows,
+  multisetDiff,
+  resultOf,
+  unsureResult,
+} from "../../../src/domain/checks/compare.js";
 import { testRules } from "../../support/rules.js";
 
 const lower = (item: string): string => item.toLowerCase();
@@ -46,7 +51,18 @@ describe("resultOf", () => {
   });
   it("turns_each_row_of_an_applicable_check_into_a_finding", () => {
     expect(resultOf(testRules(), spec, true, [["1", undefined]]).findings).toEqual([
-      { ...spec, severity: "blocker", expected: "1", found: null },
+      { ...spec, severity: "blocker", confidence: "certain", expected: "1", found: null },
     ]);
+  });
+});
+
+describe("unsureResult", () => {
+  const spec = { check: "currency_code", detail: "Is the price there?" } as const;
+  it("makes_one_applicable_unsure_finding_from_a_row", () => {
+    const rules = { ...testRules(), unsure_severity: "info" as const };
+    expect(unsureResult(rules, spec, ["JPY", undefined])).toEqual({
+      applicable: true,
+      findings: [{ ...spec, severity: "info", confidence: "unsure", expected: "JPY", found: null }],
+    });
   });
 });

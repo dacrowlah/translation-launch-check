@@ -76,8 +76,14 @@ describe("layerViolations", () => {
   });
 });
 
+/** Paths are relative to tool/: a run from another directory scans nothing, so count them. */
+const realTree = (): Record<string, string> => ({ ...sourcesUnder("src"), ...sourcesUnder("api") });
+
 describe("the real source tree", () => {
+  it("scans_at_least_60_files", () => {
+    expect(Object.keys(realTree()).length).toBeGreaterThanOrEqual(60);
+  });
   it("respects_the_layer_table", () => {
-    expect(layerViolations({ ...sourcesUnder("src"), ...sourcesUnder("api") })).toEqual([]);
+    expect(layerViolations(realTree())).toEqual([]);
   });
 });

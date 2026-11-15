@@ -17,8 +17,12 @@ export const CORPUS_CHECKS: readonly CheckId[] = [
   "promo_codes",
 ];
 
-/** [check, expected, found]: one finding, or ["spelling_fix", null, the fixed line]. */
-export type CorpusFinding = [string, string | null, string | null];
+type Values = [check: string, expected: string | null, found: string | null];
+/**
+ * [check, expected, found]: one certain finding; an unsure one adds "unsure" as a fourth value.
+ * ["spelling_fix", null, the fixed line] is the line's spelling fix.
+ */
+export type CorpusFinding = Values | [...Values, "unsure"];
 /** locale, master text, target text, and the findings the pair must give, in report order. */
 export type CorpusRow = [string, string, string, CorpusFinding[]];
 type Behaviours = Record<string, CorpusRow[]>;
@@ -35,7 +39,10 @@ const lineOf = (report: LocalizationReport): LineReport => {
 
 const findingsOf = (line: LineReport): CorpusFinding[] => {
   const kept = line.findings.filter((f) => CORPUS_CHECKS.includes(f.check));
-  const rows = kept.map((f): CorpusFinding => [f.check, f.expected, f.found]);
+  const rows = kept.map((f): CorpusFinding => {
+    const values: Values = [f.check, f.expected, f.found];
+    return f.confidence === "unsure" ? [...values, "unsure"] : values;
+  });
   return line.spelling_fix ? [...rows, ["spelling_fix", null, line.spelling_fix]] : rows;
 };
 

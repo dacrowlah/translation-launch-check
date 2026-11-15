@@ -5,7 +5,7 @@ import { defineConfig } from "vitest/config";
 // --expose-gc lets each sample start after a full collection, so no sample pays for another.
 export default defineConfig({
   test: {
-    include: ["test/perf/**/*.test.ts"],
+    include: ["test/perf/**/*.{test,spec}.ts"],
     passWithNoTests: false,
     pool: "forks",
     isolate: true,

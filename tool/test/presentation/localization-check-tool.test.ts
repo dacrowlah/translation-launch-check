@@ -10,4 +10,9 @@ describe("localizationCheckTool", () => {
     const tool = localizationCheckTool({ ...aDeps(), rules }, aTelemetry());
     expect(tool.description).toContain("(master en-GB plus translations)");
   });
+
+  it("tells_the_caller_that_findings_carry_a_confidence", () => {
+    const tool = localizationCheckTool(aDeps(), aTelemetry());
+    expect(tool.description).toContain('a confidence ("certain", or "unsure": a question');
+  });
 });

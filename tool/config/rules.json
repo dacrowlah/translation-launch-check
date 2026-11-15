@@ -240,8 +240,6 @@
         "canceled": "cancelled",
         "canceling": "cancelling",
         "labeled": "labelled",
-        "judgment": "judgement",
-        "acknowledgment": "acknowledgement",
         "pediatric": "paediatric",
         "tumor": "tumour"
       },
@@ -298,7 +296,7 @@
       "\\b\\d{1,2}\\s?h\\s?\\d{2}\\b",
       "\\b\\d{1,2}:\\d{2}\\b",
       "minuit",
-      "midi",
+      "(?<!-)midi",
       "aujourd'hui seulement",
       "ce soir"
     ],
@@ -407,8 +405,45 @@
     "deutscher Zeit",
     "\u65e5\u672c\u6642\u9593"
   ],
+  "time_zone_exclusions": { "fr": ["ET"] },
   "merge_tag_patterns": ["\\{\\{[^{}]+\\}\\}", "\\*\\|[A-Z0-9_]+\\|\\*", "%%[A-Za-z0-9_]+%%"],
-  "promo_code_pattern": "\\b[A-Z]{2,}[0-9]{1,4}\\b(?![:.]\\d)",
+  "promo_code_pattern": "\\b(?:[A-Z]{2,}[0-9]{1,4}|[0-9]{1,4}(?!(?:{excluded_suffixes})\\b)[A-Z]{2,})\\b(?![:.]\\d)",
+  "promo_code_excluded_suffixes": [
+    "GB",
+    "TB",
+    "MB",
+    "KB",
+    "MP",
+    "HR",
+    "HRS",
+    "MIN",
+    "DAY",
+    "DAYS",
+    "PCS",
+    "PK",
+    "KM",
+    "ML",
+    "KG",
+    "CM",
+    "MM",
+    "XS",
+    "XL",
+    "XXL",
+    "XXXL",
+    "AM",
+    "PM",
+    "ST",
+    "ND",
+    "RD",
+    "TH",
+    "EME",
+    "EMES",
+    "ERE",
+    "ERES",
+    "ER",
+    "ERS",
+    "RE"
+  ],
   "artifact_patterns": ["\\[\\[[^\\]]*\\]\\]", "\\{skill:", "(?<!\\{)\\{\\d+\\}(?!\\})"],
   "artifact_phrases": [
     "(at least one needed)",
@@ -617,7 +652,9 @@
     "ja": []
   },
   "language_check": {
-    "min_letters": 20
+    "min_letters": 20,
+    "japanese_share": 0.5
   },
+  "unsure_severity": "warning",
   "length_ratio_min_chars": 20
 }

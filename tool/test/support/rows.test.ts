@@ -4,6 +4,7 @@ import { dateRows, numberRows, rows, urlRows, valueRows } from "./rows.js";
 const finding = (expected: string | null, found: string | null) => ({
   check: "numbers" as const,
   severity: "blocker" as const,
+  confidence: "certain" as const,
   detail: "d",
   expected,
   found,

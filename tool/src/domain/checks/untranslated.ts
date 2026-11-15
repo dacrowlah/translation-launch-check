@@ -1,4 +1,3 @@
-import { listOf } from "../tokens/per-language.js";
 import type { Tokens } from "../tokens/tokenize.js";
 import {
   resultOf,
@@ -8,7 +7,8 @@ import {
   type Row,
   type Spec,
 } from "./compare.js";
-import { wholeWords } from "./words.js";
+import { loanwordsOf } from "./language-text.js";
+import { visibleText } from "./spans.js";
 
 export const UNTRANSLATED_DETAIL = "The line is the same as the master.";
 
@@ -20,16 +20,16 @@ const lettersOf = (text: string): string =>
     .trim()
     .toLowerCase();
 
-/** The words left once terms, tags, URLs, codes, numbers, punctuation and loanwords are gone. */
-const wordsOf = (tokens: Tokens, loanwords: RegExp): string =>
-  lettersOf(tokens.rest.replace(loanwords, " "));
-
-const loanwordsFor = (ctx: LocaleContext): RegExp =>
-  wholeWords(listOf(ctx.rules.accepted_loanwords, ctx.rule), "giu");
+/**
+ * The visible words left once markup, terms, tags, URLs, codes, values, punctuation and
+ * loanwords are gone (the tokens' rest has the values taken out).
+ */
+const wordsOf = (tokens: Tokens, loanwords: RegExp, ctx: LocaleContext): string =>
+  lettersOf(visibleText(tokens.rest, ctx.rules).replace(loanwords, " "));
 
 const sides = (pair: LinePair, ctx: LocaleContext): [master: string, target: string] => {
-  const loan = loanwordsFor(ctx);
-  return [wordsOf(pair.master, loan), wordsOf(pair.target, loan)];
+  const loan = loanwordsOf(ctx.rules, ctx.rule);
+  return [wordsOf(pair.master, loan, ctx), wordsOf(pair.target, loan, ctx)];
 };
 
 const otherLanguage = (ctx: LocaleContext): boolean =>

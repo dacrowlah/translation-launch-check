@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # Runs every gate, each one's output to .preflight/<gate>.log; stops at the first failure.
-# Mark gates are added alongside (see docs/standards/MARK.md section 6).
 set -u
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -46,14 +45,25 @@ run_mark() {
   fi
 }
 
+SKIPPED=0
+
+# A gate whose input does not exist yet is reported as skipped, never as passed.
 mark_build() {
-  [ -f "$ROOT/mark/build.py" ] || { echo "mark/build.py not written yet (Task 20)"; return 0; }
-  "$VENV/python" "$ROOT/mark/build.py" --example
+  if [ -f "$ROOT/mark/build.py" ]; then
+    run_mark mark-build "$VENV/python" "$ROOT/mark/build.py" --example
+  else
+    echo "SKIP mark-build (mark/build.py does not exist)"
+    SKIPPED=$((SKIPPED + 1))
+  fi
 }
 
 run_mark mark-lint "$VENV/ruff" check mark || exit 1
 run_mark mark-format "$VENV/ruff" format --check mark || exit 1
 run_mark mark-test bash "$ROOT/scripts/mark-test-gate.sh" || exit 1
-run_mark mark-build mark_build || exit 1
+mark_build || exit 1
 echo "mark tests: $(tail -1 "$LOGS/mark-test.log")"
-echo "preflight: all gates green"
+if [ "$SKIPPED" -gt 0 ]; then
+  echo "preflight: all gates green ($SKIPPED skipped)"
+else
+  echo "preflight: all gates green"
+fi

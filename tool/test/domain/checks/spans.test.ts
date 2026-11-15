@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { rewriteVisible, withoutSpans } from "../../../src/domain/checks/spans.js";
+import { rewriteVisible, visibleTerms } from "../../../src/domain/checks/spans.js";
 import { spellingFix } from "../../../src/domain/checks/spelling.js";
 import { LATIN_WORD } from "../../../src/domain/checks/words.js";
 import { respelled } from "../../support/builders.js";
@@ -12,12 +12,18 @@ const swiss = (text: string) =>
 describe("urls and merge tags as spans", () => {
   it("protects_only_capital_mailchimp_tags_so_lowercase_text_is_copy", () => {
     expect(spellingFix("*|fname|* color", "en-GB", testRules()).fixed).toBe("*|fname|* colour");
-    expect(withoutSpans("*|FNAME|* and *|fname|*", testRules())).toBe("  and *|fname|*");
+    expect(visibleTerms("*|FNAME|* and *|fname|*", testRules())).toBe("and *|fname|*");
   });
 
-  it("keeps_anchor_text_after_a_quoted_href", () => {
-    expect(withoutSpans('<a href="https://x.com/a">Garantiert</a>', testRules())).toBe(
-      '<a href=" ">Garantiert</a>',
+  it("keeps_anchor_text_and_drops_the_tag_with_its_href", () => {
+    expect(visibleTerms('<a href="https://x.com/a">Garantiert</a>', testRules())).toBe(
+      "Garantiert",
+    );
+  });
+
+  it("keeps_promo_codes_and_do_not_translate_terms_as_copy", () => {
+    expect(visibleTerms("<b>TrailPro</b> code BF26 &amp; more", testRules())).toBe(
+      "TrailPro code BF26 & more",
     );
   });
 });

@@ -13,6 +13,7 @@ const NONE = { applicable: false, findings: [] };
 const HEADLINE_31 = {
   check: "length_hard",
   severity: "blocker",
+  confidence: "certain",
   detail: "The text is longer than the channel allows (characters; double-width ones count 2).",
   expected: "30",
   found: "31",
@@ -20,6 +21,7 @@ const HEADLINE_31 = {
 const PROMPT_LEFT = {
   check: "template_leftovers",
   severity: "blocker",
+  confidence: "certain",
   detail: "Placeholder or prompt text was left in the copy.",
   expected: null,
   found: "(mindestens eines erforderlich)",
@@ -27,6 +29,7 @@ const PROMPT_LEFT = {
 const RATIO_136 = {
   check: "length_ratio",
   severity: "info",
+  confidence: "certain",
   detail: "The translation is much longer than the master.",
   expected: "135",
   found: "136",
@@ -34,6 +37,7 @@ const RATIO_136 = {
 const SUBJECT_41 = {
   check: "length_soft",
   severity: "warning",
+  confidence: "certain",
   detail: "The text is longer than the recommended length (characters).",
   expected: "40",
   found: "41",
@@ -60,6 +64,7 @@ describe("length checks", () => {
       {
         check: "length_hard",
         severity: "blocker",
+        confidence: "certain",
         detail: "The text is longer than the channel allows (SMS segments).",
         expected: "1",
         found: "2",

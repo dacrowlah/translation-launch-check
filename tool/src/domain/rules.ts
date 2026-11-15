@@ -130,7 +130,10 @@ export interface Rules {
   /** Per language, words that name a clock time ("midnight" -> "00:00"); always candidates. */
   readonly time_words: Readonly<Record<string, Table>>;
   readonly merge_tag_patterns: Strings;
+  /** A template: {excluded_suffixes} is filled from promo_code_excluded_suffixes and currencies. */
   readonly promo_code_pattern: string;
+  /** Capitals after digits that make no code ("512GB", "3XL", "2EME"); currency codes too. */
+  readonly promo_code_excluded_suffixes: Strings;
   readonly artifact_patterns: Strings;
   readonly artifact_phrases: Strings;
   readonly currencies: Table;
@@ -140,7 +143,16 @@ export interface Rules {
   readonly formality_markers: Readonly<Record<string, Lexicon>>;
   readonly glossary: Glossary;
   readonly accepted_loanwords: Readonly<Record<string, Strings>>;
-  readonly language_check: { readonly min_letters: number };
+  readonly language_check: {
+    /** Below this many letters, a detector's answer is too unreliable to block on. */
+    readonly min_letters: number;
+    /** The share of Japanese among a ja column's letters below which it is a finding. */
+    readonly japanese_share: number;
+  };
+  /** The severity of every unsure finding, whatever its check's own severity. */
+  readonly unsure_severity: Severity;
+  /** Per language, upper-case time-zone codes that are ordinary words there (fr "ET": and). */
+  readonly time_zone_exclusions: Readonly<Record<string, Strings>>;
   /** The master length, in characters, from which length_ratio applies (short CTAs grow). */
   readonly length_ratio_min_chars: number;
 }

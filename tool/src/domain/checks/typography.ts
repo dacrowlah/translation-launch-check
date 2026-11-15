@@ -1,7 +1,7 @@
 import type { LocaleRule } from "../rules.js";
 import { escapeInClass } from "../tokens/regex.js";
 import { resultOf, type LineCheck, type Row, type Spec } from "./compare.js";
-import { withoutSpans } from "./spans.js";
+import { visibleGlued } from "./spans.js";
 
 export const TYPOGRAPHY_DETAIL = "French spacing is missing before ; : ! ? or inside guillemets.";
 
@@ -30,6 +30,6 @@ const rowsOf = (text: string, rule: NonNullable<LocaleRule["typography"]>): Row[
 
 export const checkTypography: LineCheck = (pair, ctx) => {
   const rule = ctx.rule.typography;
-  const text = withoutSpans(pair.targetText, ctx.rules).replace(/\d{1,2}:\d{2}/gu, " ");
+  const text = visibleGlued(pair.targetText, ctx.rules).replace(/\d{1,2}:\d{2}/gu, " ");
   return resultOf(ctx.rules, TYPOGRAPHY, rule !== undefined, rule ? rowsOf(text, rule) : []);
 };

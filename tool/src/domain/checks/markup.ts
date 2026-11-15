@@ -3,7 +3,8 @@ import { diffRows, resultOf, type LineCheck, type Spec } from "./compare.js";
 export const MARKUP_DETAIL = "An HTML tag is missing, extra or left unclosed.";
 
 const SPEC: Spec = { check: "markup", detail: MARKUP_DETAIL };
-const TAG = /<(\/?)([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>/gu;
+/** A tag name ends at a space, "/" or ">", so "<help@example.com>" is no tag. */
+const TAG = /<(\/?)([a-zA-Z][a-zA-Z0-9]*)(?=[\s/>])[^>]*>/gu;
 
 const tagsIn = (text: string): string[] =>
   [...text.matchAll(TAG)].map(([, slash, name]) => `<${slash}${name?.toLowerCase()}>`);

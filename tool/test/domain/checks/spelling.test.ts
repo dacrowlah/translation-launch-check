@@ -1,10 +1,28 @@
 import { describe, expect, it } from "vitest";
 import { checkLocaleSpelling } from "../../../src/domain/checks/locale-spelling.js";
+import { checkMarkup } from "../../../src/domain/checks/markup.js";
+import { checkPromoCodes } from "../../../src/domain/checks/promo-codes.js";
 import { spellingFix } from "../../../src/domain/checks/spelling.js";
+import { checkUrls } from "../../../src/domain/checks/urls.js";
 import { aPair, ctx } from "../../support/builders.js";
 import { testRules } from "../../support/rules.js";
 
 const gb = (text: string) => spellingFix(text, "en-GB", testRules());
+
+/** en-GB lines with markup, a link, a merge tag or a code, and the fix code builds for each. */
+const FIXES: [string, string][] = [
+  [
+    '<td align="center" style="color:#333">Our favorite colors</td>',
+    '<td align="center" style="color:#333">Our favourite colours</td>',
+  ],
+  ['<a href="https://x.com/colors">Colors</a>', '<a href="https://x.com/colors">Colours</a>'],
+  [
+    "Shop https://x.com/colors?c=gray in every color",
+    "Shop https://x.com/colors?c=gray in every colour",
+  ],
+  ["Hi {{favorite_color}}, new colors", "Hi {{favorite_color}}, new colours"],
+  ["Code COLOR20: all colors", "Code COLOR20: all colours"],
+];
 
 describe("market spelling", () => {
   it("us_spellings_in_en_gb_get_the_uk_line", () => {
@@ -45,6 +63,9 @@ describe("market spelling", () => {
     );
     expect(gb("Realize").changes).toEqual([["Realize", "Realise"]]);
   });
+  it("valid_uk_spellings_judgment_and_acknowledgment_are_not_changed", () => {
+    expect(gb("Use your judgment; acknowledgment sent").changes).toEqual([]);
+  });
   it("short_ize_words_are_not_changed", () => {
     expect(gb("Ize unize").changes).toEqual([]);
   });
@@ -63,5 +84,40 @@ describe("market spelling", () => {
   it("de_ch_finding_names_the_whole_word", () => {
     const r = checkLocaleSpelling(aPair("Street", "Stra\u00dfe", "de-CH"), ctx("de-CH"));
     expect(r.findings[0]).toMatchObject({ found: "Stra\u00dfe", expected: "Strasse" });
+  });
+});
+
+describe("market spelling reads the visible copy only", () => {
+  it.each([
+    ["en-GB", "Use code COLOR20 today."],
+    ["en-GB", "Email favorites@example.com"],
+    ["en-GB", "Shop at www.example.com/colors now"],
+    ["de-CH", "Schreiben Sie an stra\u00dfe@example.ch"],
+  ])("a_word_inside_a_code_email_or_link_is_no_finding_%#", (locale, text) => {
+    expect(checkLocaleSpelling(aPair("x", text, locale), ctx(locale))).toEqual({
+      applicable: true,
+      findings: [],
+    });
+  });
+  it.each(FIXES)("the_fix_keeps_markup_links_tags_and_terms_byte_for_byte_%#", (text, fixed) => {
+    const r = checkLocaleSpelling(aPair("x", text, "en-GB"), ctx("en-GB"));
+    expect(r.fix).toBe(fixed);
+  });
+  it.each(FIXES)("a_fixed_line_rechecks_with_no_structure_finding_%#", (text, fixed) => {
+    const pair = aPair(text, fixed, "en-GB");
+    const results = [checkMarkup(pair, ctx("en-GB")), checkPromoCodes(pair, ctx("en-GB"))];
+    const urls = Object.values(checkUrls(pair, ctx("en-GB")));
+    expect([...results, ...urls].flatMap((r) => r?.findings ?? [])).toEqual([]);
+  });
+  it("the_fix_keeps_a_do_not_translate_term_as_written", () => {
+    const rules = testRules();
+    const glossary = { ...rules.glossary, do_not_translate: ["Color Lab"] };
+    const c = { ...ctx("en-GB"), rules: { ...rules, glossary } };
+    const r = checkLocaleSpelling(aPair("x", "Color Lab colors in gray", "en-GB"), c);
+    expect(r.fix).toBe("Color Lab colours in grey");
+  });
+  it("a_plain_line_gets_the_fix", () => {
+    const r = checkLocaleSpelling(aPair("x", "Our favorite colors", "en-GB"), ctx("en-GB"));
+    expect(r.fix).toBe("Our favourite colours");
   });
 });

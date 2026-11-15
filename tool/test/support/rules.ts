@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import { z } from "zod";
 import type { LocaleRule, Rules } from "../../src/domain/rules.js";
 import { parseRules } from "../../src/infrastructure/rules-schema.js";
 
@@ -18,4 +19,16 @@ export const testLocale = (code: string): LocaleRule => {
   const rule = testRules().locales[code];
   if (!rule) throw new Error(`no test locale ${code}`);
   return rule;
+};
+
+const named = (issue: z.core.$ZodIssue): string => `${issue.path.join(".")}: ${issue.message}`;
+
+/** What parseRules says of a rules JSON: each zod issue as "path: message", the cross-check's message, or "accepted". */
+export const rejection = (json: unknown): string => {
+  try {
+    parseRules(json);
+  } catch (error) {
+    return error instanceof z.ZodError ? error.issues.map(named).join("; ") : String(error);
+  }
+  return "accepted";
 };

@@ -6,7 +6,7 @@ import {
   type Row,
   type Spec,
 } from "./compare.js";
-import { withoutSpans } from "./spans.js";
+import { visibleTerms, visibleText } from "./spans.js";
 import { unique } from "../tokens/tally.js";
 import { dntTerms, termsPattern } from "../tokens/terms.js";
 import { wholeWords } from "./words.js";
@@ -26,19 +26,19 @@ const present = (text: string, [term, ...more]: readonly string[]): string[] => 
 
 const kept = (pair: LinePair, term: string, ctx: LocaleContext): boolean => {
   const approved = ctx.rules.glossary.approved_translations[pair.locale]?.[term];
-  const target = withoutSpans(pair.targetText, ctx.rules);
+  const target = visibleTerms(pair.targetText, ctx.rules);
   return termsPattern([term]).test(target) || target.includes(approved ?? "\0");
 };
 
 const dntResult = (pair: LinePair, ctx: LocaleContext) => {
-  const master = withoutSpans(pair.masterText, ctx.rules);
+  const master = visibleTerms(pair.masterText, ctx.rules);
   const terms = present(master, dntTerms(ctx.rules));
   const rows = terms.filter((term) => !kept(pair, term, ctx)).map((term): Row => [term, undefined]);
   return resultOf(ctx.rules, DNT, terms.length > 0, rows);
 };
 
 const forbiddenIn = (pair: LinePair, list: readonly string[], ctx: LocaleContext): string[] => {
-  const text = withoutSpans(pair.targetText, ctx.rules);
+  const text = visibleText(pair.targetText, ctx.rules);
   return unique([...text.matchAll(wholeWords(list, "giu"))].map((m) => m[0]));
 };
 

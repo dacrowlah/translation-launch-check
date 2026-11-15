@@ -2,7 +2,7 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    include: ["test/**/*.test.ts"],
+    include: ["test/**/*.{test,spec}.ts"],
     // The scaling tests time CPU work; they run alone in their own gate (vitest.perf.config.ts).
     exclude: ["test/perf/**", "**/node_modules/**"],
     passWithNoTests: false,

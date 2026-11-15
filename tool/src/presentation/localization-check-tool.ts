@@ -9,9 +9,10 @@ const WHAT_AND_WHEN =
   "numbers, currency, dates, merge tags, URLs, promo codes, template leftovers, length, " +
   "formality, glossary, language, typography, trademarks, markup, time zones and market " +
   "spelling. Call it once with the whole package and once more to re-check suggested fixes. " +
-  'Returns status "ok" with, per locale, findings with severities, per-line lengths, ' +
-  "spelling fixes and a status for each of the 24 checks; any other status means the call " +
-  "failed. It never decides a verdict.";
+  'Returns status "ok" with, per locale, findings with severities and a confidence ' +
+  '("certain", or "unsure": a question for a person), per-line lengths, spelling fixes and a ' +
+  "status for each of the 24 checks; any other status means the call failed. It never " +
+  "decides a verdict.";
 
 const describe = (master: string): string =>
   `Runs every rule check on a localization package (master ${master} plus translations): ${WHAT_AND_WHEN}`;

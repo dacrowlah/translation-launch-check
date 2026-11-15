@@ -11,7 +11,11 @@ const rowsOf = (changes: readonly (readonly [from: string, to: string])[]): Row[
   return changes.length === 0 ? [] : [[to.join(", "), from.join(", ")]];
 };
 
-/** The finding, and the corrected line as the result's fix (computed once per line). */
+/**
+ * The finding, and the corrected line as the result's fix (computed once per line). The fix
+ * rewrites the visible copy only: markup, links, emails, merge tags, codes and terms stay as
+ * written.
+ */
 export const checkLocaleSpelling: LineCheck = (pair, ctx) => {
   const applicable = Object.hasOwn(ctx.rules.spelling, pair.locale);
   const { fixed, changes } = spellingFix(pair.targetText, pair.locale, ctx.rules);

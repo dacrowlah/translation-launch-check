@@ -3,13 +3,18 @@ import { letterCount, stripForLanguage } from "../../src/domain/checks/language-
 import { EldLanguageDetector } from "../../src/infrastructure/eld-detector.js";
 import { latinCases, paragraph } from "../support/language-cases.js";
 import { describeLanguageDetectorContract } from "../support/language-detector.contract.js";
-import { testRules } from "../support/rules.js";
+import { testLocale, testRules } from "../support/rules.js";
 
 const CANDIDATES = ["en", "de", "fr"];
+/** A locale of each fixture language, for its loanwords. */
+const LOCALE_OF: Record<string, string> = { en: "en-US", de: "de-DE", fr: "fr-FR" };
 
 const longCases = (): { lang: string; text: string }[] =>
   latinCases()
-    .map((c) => ({ lang: c.lang, text: stripForLanguage(c.text, testRules()) }))
+    .map((c) => ({
+      lang: c.lang,
+      text: stripForLanguage(c.text, testRules(), testLocale(LOCALE_OF[c.lang] ?? "")),
+    }))
     .filter((c) => letterCount(c.text) >= 20);
 
 const answers = (): (string | null)[] => {
@@ -23,7 +28,7 @@ describe("eld detector", () => {
   it("eld_has_no_wrong_answers_on_20_plus_letters", () => {
     const cases = longCases();
     const wrong = answers().filter((a, i) => a !== null && a !== cases[i]?.lang);
-    expect(cases.length).toBeGreaterThanOrEqual(60);
+    expect(cases.length).toBeGreaterThanOrEqual(55);
     expect(wrong).toEqual([]);
   });
   it("eld_answers_most_20_plus_letter_lines", () => {

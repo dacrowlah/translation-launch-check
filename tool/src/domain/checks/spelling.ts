@@ -1,6 +1,6 @@
 import type { Rules } from "../rules.js";
 import { escapeInClass } from "../tokens/regex.js";
-import { rewriteOutside } from "./spans.js";
+import { rewriteVisible } from "./spans.js";
 import { keepCase, LATIN_WORD, wholeWordSource } from "./words.js";
 
 type Fix = (word: string) => string;
@@ -52,11 +52,11 @@ const recorder =
 
 const apply = (text: string, plan: Plan, rules: Rules): { fixed: string; changes: Change[] } => {
   const changes: Change[] = [];
-  const fixed = rewriteOutside(text, rules, plan.pattern, recorder(plan.fix, changes));
+  const fixed = rewriteVisible(text, rules, plan.pattern, recorder(plan.fix, changes));
   return { fixed, changes };
 };
 
-/** The market's spelling applied outside URLs and merge tags, with each [from, to] change. */
+/** The market's spelling applied to the visible copy only, with each [from, to] change. */
 export const spellingFix = (
   text: string,
   locale: string,

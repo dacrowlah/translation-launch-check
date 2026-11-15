@@ -101,6 +101,17 @@ describe("the tool app", () => {
     expect([res.status, body.status, checks, body.rules.version]).toEqual([200, "ok", 24, "1.0"]);
   });
 
+  it("each_finding_in_the_response_carries_its_confidence", async () => {
+    const body = (await (await check(aBody({ text: "Only $20, 2 days" }))).json()) as {
+      locales: { lines: { findings: { check: string; confidence: string }[] }[] }[];
+    };
+    const findings = body.locales[0]?.lines[0]?.findings ?? [];
+    expect(findings.map((f) => [f.check, f.confidence])).toEqual([
+      ["numbers", "certain"],
+      ["currency_code", "unsure"],
+    ]);
+  });
+
   it("copy_fit_check_returns_status_ok_with_its_items", async () => {
     const res = await fit([{ channel: "google_ads", field: "headline", text: "x".repeat(31) }]);
     const body = (await res.json()) as { status: string; items: { fits: boolean }[] };

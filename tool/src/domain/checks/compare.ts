@@ -1,4 +1,4 @@
-import { makeFinding } from "../finding.js";
+import { makeFinding, makeUnsureFinding, type FindingText } from "../finding.js";
 import type { LanguageDetector } from "../ports/language-detector.js";
 import type { LocaleRule, Rules } from "../rules.js";
 import { countOf, countsOf, occurrences } from "../tokens/tally.js";
@@ -63,12 +63,20 @@ export const diffRows = (a: readonly string[], b: readonly string[], keyOf?: Key
   return Array.from({ length: size }, (_, i) => [missing[i], extra[i]]);
 };
 
-const findingOf = (rules: Rules, spec: Spec, [expected, found]: Row): Finding =>
-  makeFinding(rules, spec.check, {
-    detail: spec.detail,
-    ...(expected === undefined ? {} : { expected }),
-    ...(found === undefined ? {} : { found }),
-  });
+const textOf = (spec: Spec, [expected, found]: Row): FindingText => ({
+  detail: spec.detail,
+  ...(expected === undefined ? {} : { expected }),
+  ...(found === undefined ? {} : { found }),
+});
+
+const findingOf = (rules: Rules, spec: Spec, row: Row): Finding =>
+  makeFinding(rules, spec.check, textOf(spec, row));
+
+/** One unsure finding (its detail a question): the tool could not tell, a person should look. */
+export const unsureResult = (rules: Rules, spec: Spec, row: Row): CheckResult => ({
+  applicable: true,
+  findings: [makeUnsureFinding(rules, spec.check, textOf(spec, row))],
+});
 
 /** A check that does not apply carries no findings, whatever rows it computed. */
 export const resultOf = (

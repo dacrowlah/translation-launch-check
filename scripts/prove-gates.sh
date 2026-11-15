@@ -30,9 +30,11 @@ expect_red() {
   local label="$1" script="$2" pattern="$3" dir="$4"
   (cd "$dir/tool" && pnpm run "$script") >"$dir/out.log" 2>&1
   local status=$?
-  if [ "$status" -ne 0 ] && grep -Eq "$pattern" "$dir/out.log"; then
+  # test:gate writes its failures only to the fresh JSON report (never copied into the base).
+  local logs=("$dir/out.log" "$dir/tool/.vitest.json")
+  if [ "$status" -ne 0 ] && grep -Eqs "$pattern" "${logs[@]}"; then
     echo "OK   $label: gate '$script' is red for '$pattern'"
-    echo "       > $(grep -Em1 "$pattern" "$dir/out.log" | cut -c1-150)"
+    echo "       > $({ grep -Ehm1 "$pattern" "${logs[0]}" || grep -Eohm1 "$pattern" "${logs[1]}"; } 2>/dev/null | head -1 | cut -c1-150)"
   else
     echo "FAIL $label: gate '$script' exit $status, pattern '$pattern'; output follows"
     head -30 "$dir/out.log"
@@ -102,6 +104,17 @@ plant unformatted format:check 'Code style issues found' src/domain/ugly.ts \
   'export const   ugly   =   {a:1,b:2}'
 plant duplicate-block dup 'Clone found' src/domain/dup-a.ts "$(dup_block first)" \
   src/domain/dup-b.ts "$(dup_block second)"
+# A *.spec.ts file is collected like a *.test.ts one, by the unit gate and by the perf gate.
+plant spec-named-test test:gate 'spec file ran.*spec file skipped' test/planted.spec.ts \
+  'import { expect, it } from "vitest";
+it("planted_spec", () => {
+  expect("spec file ran").toBe("spec file skipped");
+});'
+plant spec-named-perf-test test:perf 'FAIL +test/perf/planted\.spec\.ts' test/perf/planted.spec.ts \
+  'import { expect, it } from "vitest";
+it("planted_perf_spec", () => {
+  expect("spec file ran").toBe("spec file skipped");
+});'
 plant skipped-test test:gate '1 skipped or todo' test/skipped.test.ts \
   'import { it } from "vitest";
 it.skip("skipped", () => {});'

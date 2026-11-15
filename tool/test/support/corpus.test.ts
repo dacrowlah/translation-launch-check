@@ -8,6 +8,13 @@ describe("valueFindings", () => {
     ]);
   });
 
+  it("marks_an_unsure_finding_with_a_fourth_value", () => {
+    const yen = "\u4e8c\u4e07\u5186\u5206\u306e\u30ae\u30d5\u30c8\u30ab\u30fc\u30c9";
+    expect(valueFindings("ja-JP", "\u00a520,000 gift card", yen)).toEqual([
+      ["currency_code", "JPY", null, "unsure"],
+    ]);
+  });
+
   it("leaves_out_the_checks_outside_the_corpus", () => {
     expect(valueFindings("fr-FR", "Shop now!", "Achetez maintenant!")).toEqual([]);
   });

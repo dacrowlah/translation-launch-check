@@ -8,7 +8,7 @@ const block = (name: string): string =>
 const QUOTED = String.raw`"[^"]*"|'[^']*'`;
 /** A comment; style and script blocks with their bodies; a tag (a ">" in quotes is no end). */
 const ELEMENT = String.raw`<\/?[A-Za-z!](?:${QUOTED}|[^<>"'])*>`;
-const TAG = String.raw`<!--[\s\S]*?-->|${block("style")}|${block("script")}|${ELEMENT}`;
+export const TAG = String.raw`<!--[\s\S]*?-->|${block("style")}|${block("script")}|${ELEMENT}`;
 
 /** A top-level domain is all lower or all upper case ("shop.de", "SHOP.COM"). */
 const TLD = String.raw`(?:[a-z]{2,}|[A-Z]{2,})(?![\p{Script=Latin}\p{N}])`;

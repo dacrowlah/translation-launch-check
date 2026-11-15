@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { z } from "zod";
 import { parseRules } from "../../src/infrastructure/rules-schema.js";
-import { rawRules, testRules } from "../support/rules.js";
+import { rawRules, rejection, testRules } from "../support/rules.js";
 
 const severities = (): Record<string, unknown> =>
   rawRules()["severities"] as Record<string, unknown>;
@@ -16,17 +15,6 @@ const withGlossary = (part: object) => ({
   glossary: { ...section("glossary"), ...part },
 });
 
-const named = (issue: z.core.$ZodIssue): string => `${issue.path.join(".")}: ${issue.message}`;
-
-/** What a rejection names: each zod issue as "path: message", or the cross-check's message. */
-const rejection = (json: unknown): string => {
-  try {
-    parseRules(json);
-  } catch (error) {
-    return error instanceof z.ZodError ? error.issues.map(named).join("; ") : String(error);
-  }
-  return "accepted";
-};
 const locales = (): Record<string, object> => rawRules()["locales"] as Record<string, object>;
 const withLocale = (id: string, patch: object) => ({
   ...rawRules(),
