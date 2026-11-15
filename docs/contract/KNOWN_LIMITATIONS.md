@@ -328,12 +328,11 @@ become limitations or unsure findings, not new parsing rules.
   plain text: markup in copy is kept literally (a `[link](url)` or `**bold**` reads as
   typed), control and bidi characters are dropped and route tokens defused (also when an
   invisible character hides inside the prefix), and links are written as "Label: url".
-  Verified in the instance: the body arrives as written, with Markdown not rendered (an
-  earlier escaped email showed its backslashes and brackets literally) and line breaks kept;
-  the mail client links bare URLs. Whether a raw HTML tag in copy would render was not
-  tested. In chat and the canvas, a link in copy can be cut short: escaping a `_` or `&`
-  inside a URL ends a renderer's autolink there (the visible text is intact). Pinned by a
-  test (the exact plain body, and hostile copy arriving as inert text).
+  Verified in the instance: the platform sends the body as `text/plain; charset=UTF-8`, so
+  neither Markdown nor an HTML tag in copy renders, and line breaks are kept; the mail
+  client links bare URLs. In chat and the canvas, a link in copy can be cut short: escaping
+  a `_` or `&` inside a URL ends a renderer's autolink there (the visible text is intact).
+  Pinned by a test (the exact plain body, and hostile copy arriving as inert text).
 - **Format characters are removed from displayed copy.** Chat, canvas and email drop control
   and format characters, to stop bidi overrides and invisible text. That also drops the
   zero-width joiner, so an emoji sequence (woman, ZWJ, laptop) shows as two emoji, and the
