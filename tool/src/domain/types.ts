@@ -81,4 +81,6 @@ export interface LocalizationReport {
 export interface CheckResult {
   readonly applicable: boolean;
   readonly findings: readonly Finding[];
+  /** The corrected line, from a check that builds one (locale_spelling), when it changes. */
+  readonly fix?: string;
 }

@@ -1,6 +1,7 @@
 import type { Lexicon, Rules } from "../rules";
 import type { CheckResult } from "../types";
 import { resultOf, type LineCheck, type Row, type Spec } from "./compare";
+import { unique } from "../tokens/tally";
 import { withoutSpans } from "./spans";
 
 export const FORMALITY_DETAIL = "The line uses the informal register in a formal locale.";
@@ -8,8 +9,6 @@ export const FORMALITY_DETAIL = "The line uses the informal register in a formal
 const FORMALITY: Spec = { check: "formality", detail: FORMALITY_DETAIL };
 
 const WORDS = (text: string): string[] => text.match(/\p{L}+/gu) ?? [];
-
-const unique = (items: readonly string[]): string[] => [...new Set(items)];
 
 const marked = (words: readonly string[], markers: readonly string[]): string[] =>
   unique(words.filter((word) => markers.includes(word)));
@@ -23,8 +22,7 @@ const verdict = (words: readonly string[], lexicon: Lexicon, rules: Rules): Chec
 };
 
 export const checkFormality: LineCheck = (pair, ctx) => {
-  const rule = ctx.rules.locales[pair.locale];
-  const lexicon = ctx.rules.formality_markers[rule?.language ?? ""];
-  if (rule?.formality !== "formal" || !lexicon) return resultOf(ctx.rules, FORMALITY, false, []);
+  const lexicon = ctx.rules.formality_markers[ctx.rule.language];
+  if (ctx.rule.formality !== "formal" || !lexicon) return resultOf(ctx.rules, FORMALITY, false, []);
   return verdict(WORDS(withoutSpans(pair.targetText, ctx.rules)), lexicon, ctx.rules);
 };

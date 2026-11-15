@@ -1,5 +1,8 @@
 export type Counts = ReadonlyMap<string, number>;
 
+/** Each value once, in order of first appearance. */
+export const unique = <T>(values: readonly T[]): T[] => [...new Set(values)];
+
 /** How often each value occurs (one pass). */
 export const countsOf = (values: readonly string[]): Counts => {
   const counts = new Map<string, number>();
@@ -10,7 +13,7 @@ export const countsOf = (values: readonly string[]): Counts => {
 export const countOf = (counts: Counts, value: string): number => counts.get(value) ?? 0;
 
 /** Each key's occurrence among the keys before it: 0 for the first, 1 for the second... */
-const occurrences = (keys: readonly string[]): number[] => {
+export const occurrences = (keys: readonly string[]): number[] => {
   const seen = new Map<string, number>();
   return keys.map((key) => {
     const n = seen.get(key) ?? 0;

@@ -38,7 +38,7 @@ const PACKAGE_CPU_MS = 8_000;
  * Hostile cells of n units each, and the n growth is measured from: at n = BOUND a cell is
  * about 1000 characters, the contract's cell bound. Growth runs from there to 4 times, so the
  * fixed work of a package does not hide a quadratic stage (one over the whole text that makes
- * a bound-sized package 1.2 times slower fails; one in the numbers stage that makes a
+ * a bound-sized package about 1.1 times slower fails; one in the numbers stage that makes a
  * number-heavy package 3 times slower fails through the number-like cells).
  */
 const CELLS: [string, (n: number) => string, number][] = [

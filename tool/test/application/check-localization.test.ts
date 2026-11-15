@@ -15,6 +15,22 @@ const DETECTED = {
   "Sparen Sie jetzt": "de",
 };
 
+/** The master report of the default package: its line of 26 characters reads as English. */
+const CLEAN_MASTER = {
+  locale: "en-US",
+  status: "checked",
+  column_findings: [],
+  lines: [
+    {
+      id: "L1",
+      length: { value: 26, limit: null, unit: "chars" },
+      findings: [],
+      spelling_fix: null,
+    },
+  ],
+  checks: { language_column: "verified", language_line: "verified" },
+};
+
 describe("checkLocalization", () => {
   it("reports_every_check_id_per_locale", () => {
     const [locale] = checkLocalization(aPackage(), aDeps()).locales;
@@ -38,6 +54,33 @@ describe("checkLocalization", () => {
     const [locale] = checkLocalization(aPackage({ locales: ["it-IT"] }), aDeps()).locales;
     const unsupported = { locale: "it-IT", status: "unsupported_locale" };
     expect(locale).toEqual({ ...unsupported, column_findings: [], lines: [], checks: {} });
+  });
+  it("reports_the_master_under_the_rules_master_locale", () => {
+    expect(checkLocalization(aPackage(), aDeps()).master.locale).toBe(testRules().master_locale);
+  });
+  it("compares_each_target_with_the_master_locale_text", () => {
+    const texts = {
+      "en-US": "Save 20% now",
+      "de-DE": "Jetzt 25 % sparen",
+      "fr-FR": "25 % maintenant",
+    };
+    const pkg = aPackage({ locales: ["de-DE", "fr-FR"], lines: [aLine({ texts })] });
+    const [de] = checkLocalization(pkg, aDeps()).locales;
+    const numbers = (de?.lines.flatMap((l) => l.findings) ?? []).filter(
+      (f) => f.check === "numbers",
+    );
+    expect(numbers.map((f) => [f.expected, f.found])).toEqual([["20%", "25%"]]);
+  });
+  it("checks_the_master_text_for_its_language", () => {
+    const { master } = checkLocalization(aPackage(), aDeps(DETECTED));
+    expect(master).toEqual(CLEAN_MASTER);
+  });
+  it("a_master_in_another_language_is_a_master_column_finding", () => {
+    const deps = aDeps({ ...DETECTED, "Save big this season today": "de" });
+    const { master } = checkLocalization(aPackage(), deps);
+    expect(master.column_findings.map((f) => [f.check, f.severity, f.detail])).toEqual([
+      ["language_column", "blocker", "The en-US column reads as German."],
+    ]);
   });
   it("master_holds_only_the_two_language_checks", () => {
     const { master } = checkLocalization(aPackage(), aDeps(DETECTED));

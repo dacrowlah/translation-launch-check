@@ -1,27 +1,47 @@
-import type { ChannelRule, Rules } from "../rules";
-import type { LengthInfo } from "../types";
-import { channelRule, lengthInfo } from "../copy-fit";
-import { resultOf, type LinePair, type MultiCheck, type Row, type Spec } from "./compare";
+import { channelRule, fitsLimit, lengthCheckOf, lengthInfo, type LengthCheck } from "../copy-fit";
+import type { Rules } from "../rules";
+import type { CheckResult, LengthInfo, PackageLine, Unit } from "../types";
+import { resultOf, type MultiCheck, type Row } from "./compare";
 
-export const LENGTH_HARD_DETAIL = "The text is longer than the channel allows.";
-export const LENGTH_SOFT_DETAIL = "The text is longer than the recommended length.";
-
-const HARD: Spec = { check: "length_hard", detail: LENGTH_HARD_DETAIL };
-const SOFT: Spec = { check: "length_soft", detail: LENGTH_SOFT_DETAIL };
-
-const overRows = (info: LengthInfo | null): Row[] =>
-  info?.limit != null && info.value > info.limit ? [[String(info.limit), String(info.value)]] : [];
-
-const countedRule = (pair: LinePair, rules: Rules): ChannelRule | null => {
-  const rule = channelRule(rules, pair.line.channel, pair.line.field);
-  return rule?.limit == null ? null : rule;
+const OVER: Readonly<Record<LengthCheck, string>> = {
+  length_hard: "The text is longer than the channel allows",
+  length_soft: "The text is longer than the recommended length",
+};
+const UNIT_NAMES: Readonly<Record<Unit, string>> = {
+  chars: "characters",
+  ads_chars: "characters; double-width ones count 2",
+  sms_segments: "SMS segments",
 };
 
-export const checkLength: MultiCheck = (pair, ctx) => {
-  const soft = countedRule(pair, ctx.rules)?.soft;
-  const rows = overRows(lengthInfo(pair.line, pair.targetText, ctx.rules));
+/** One fixed detail per check and unit: "The text is longer than the channel allows (SMS segments)." */
+export const lengthDetail = (check: LengthCheck, unit: Unit): string =>
+  `${OVER[check]} (${UNIT_NAMES[unit]}).`;
+
+const overRows = (info: LengthInfo | null): Row[] =>
+  info === null || fitsLimit(info) ? [] : [[String(info.limit), String(info.value)]];
+
+/** `applies`: the one length check the channel's limit belongs to, or null without a limit. */
+const resultFor = (
+  check: LengthCheck,
+  info: LengthInfo | null,
+  applies: LengthCheck | null,
+  rules: Rules,
+): CheckResult => {
+  const spec = { check, detail: lengthDetail(check, info?.unit ?? "chars") };
+  return resultOf(rules, spec, applies === check, overRows(info));
+};
+
+/** The length check a line's channel limit belongs to; null for no limit or an unknown pair. */
+const appliesTo = ({ channel, field }: PackageLine, rules: Rules): LengthCheck | null => {
+  const rule = channelRule(rules, channel, field);
+  return rule?.limit == null ? null : lengthCheckOf(rule);
+};
+
+export const checkLength: MultiCheck = ({ line, targetText }, ctx) => {
+  const info = lengthInfo(line.channel, line.field, targetText, ctx.rules);
+  const applies = appliesTo(line, ctx.rules);
   return {
-    length_hard: resultOf(ctx.rules, HARD, soft === false, rows),
-    length_soft: resultOf(ctx.rules, SOFT, soft === true, rows),
+    length_hard: resultFor("length_hard", info, applies, ctx.rules),
+    length_soft: resultFor("length_soft", info, applies, ctx.rules),
   };
 };

@@ -1,0 +1,44 @@
+{
+  "a_merge_tag_kept_by_name_has_no_finding": [
+    [
+      "de-DE",
+      "Hi {{ first_name | default: \"you\" }}",
+      "Hallo {{first_name | default: \"du\"}}",
+      []
+    ],
+    ["de-DE", "Hi {{ first_name }}!", "Hallo {{first_name}}!", []]
+  ],
+  "a_changed_or_broken_merge_tag_is_a_finding": [
+    [
+      "de-DE",
+      "Hi {{first_name}}",
+      "Hallo {{vorname}}",
+      [["merge_tags", "{{first_name}}", "{{vorname}}"]]
+    ],
+    [
+      "de-DE",
+      "Hi {{first_name}}, ends Nov 29",
+      "Hallo {{FIRST_NAME}}, endet 29. November",
+      [["merge_tags", "{{first_name}}", "{{FIRST_NAME}}"]]
+    ],
+    ["de-DE", "Hi *|FNAME|*", "Hallo *|fname|*", [["merge_tags", "*|FNAME|*", null]]],
+    [
+      "de-DE",
+      "Hi %%first_name%%, 20% off",
+      "Hallo %%vorname%%, 20 % Rabatt",
+      [["merge_tags", "%%first_name%%", "%%vorname%%"]]
+    ],
+    [
+      "ja-JP",
+      "Hi {{first_name}}",
+      "\uff5b\uff5bfirst_name\uff5d\uff5d\u69d8",
+      [["merge_tags", "{{first_name}}", null]]
+    ],
+    [
+      "ja-JP",
+      "Hi {{ first_name }},",
+      "{{ first_name\u3000}}\u69d8\u3001",
+      [["merge_tags", "{{ first_name }}", "{{ first_name\u3000}}"]]
+    ]
+  ]
+}

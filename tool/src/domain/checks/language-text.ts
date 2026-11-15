@@ -1,6 +1,7 @@
 import type { Rules } from "../rules";
 import { promoPattern } from "../tokens/promo-codes";
-import { dntPattern } from "./terms";
+import { unique } from "../tokens/tally";
+import { dntPattern } from "../tokens/terms";
 import { withoutSpans } from "./spans";
 
 const JAPANESE = /[\u3040-\u30ff\u3400-\u9fff\uff66-\uff9f]/gu;
@@ -25,10 +26,9 @@ export const japaneseShare = (text: string): number =>
   letterCount(text) === 0 ? 0 : count(text, JAPANESE) / letterCount(text);
 
 /** The latin-script languages of every locale in the rules. */
-export const candidateLanguages = (rules: Rules): string[] => [
-  ...new Set(
+export const candidateLanguages = (rules: Rules): string[] =>
+  unique(
     Object.values(rules.locales)
       .filter((locale) => locale.script === "latin")
       .map((locale) => locale.language),
-  ),
-];
+  );

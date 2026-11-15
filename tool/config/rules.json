@@ -409,19 +409,27 @@
   ],
   "merge_tag_patterns": ["\\{\\{[^{}]+\\}\\}", "\\*\\|[A-Z0-9_]+\\|\\*", "%%[A-Za-z0-9_]+%%"],
   "promo_code_pattern": "\\b[A-Z]{2,}[0-9]{1,4}\\b(?![:.]\\d)",
-  "artifact_patterns": ["\\[\\[[^\\]]*\\]\\]", "\\{skill:"],
+  "artifact_patterns": ["\\[\\[[^\\]]*\\]\\]", "\\{skill:", "(?<!\\{)\\{\\d+\\}(?!\\})"],
   "artifact_phrases": [
     "(at least one needed)",
     "(mindestens eines erforderlich)",
     "(au moins un requis)",
     "Here is the translation",
-    "Translated text:"
+    "Translated text:",
+    "[NAME]",
+    "[FIRST NAME]",
+    "[FIRSTNAME]",
+    "[FIRST_NAME]",
+    "[LAST NAME]",
+    "[LAST_NAME]",
+    "[EMAIL]",
+    "[COMPANY]"
   ],
   "date_range_connectors": {
-    "en": ["-", "\u2013", "to", "through", "thru"],
-    "de": ["-", "\u2013", "bis", "bis zum"],
-    "fr": ["au", "-", "\u2013"],
-    "ja": ["\uff5e", "\u301c", "-", "\u304b\u3089"]
+    "en": ["-", "\u2013", "to", "through", "thru", "and", "&", "or"],
+    "de": ["-", "\u2013", "bis", "bis zum", "und", "&", "oder"],
+    "fr": ["au", "-", "\u2013", "et", "&", "ou"],
+    "ja": ["\uff5e", "\u301c", "-", "\u304b\u3089", "\u30fb", "\u3068"]
   },
   "currencies": {
     "$": "USD",
@@ -502,7 +510,7 @@
       ]
     },
     "weekday_after": {
-      "ja": ["[(\\uff08]{name}(?:\\u66dc\\u65e5)?[)\\uff09]", "{name}\\u66dc\\u65e5"]
+      "ja": ["[(\\uff08]{name}(?:\\u66dc\\u65e5?)?[)\\uff09]", "{name}\\u66dc\\u65e5?"]
     },
     "weekdays": {
       "en": [
@@ -610,5 +618,6 @@
   },
   "language_check": {
     "min_letters": 20
-  }
+  },
+  "length_ratio_min_chars": 20
 }

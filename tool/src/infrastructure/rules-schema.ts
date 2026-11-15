@@ -111,6 +111,7 @@ const shape = z.strictObject({
   glossary,
   accepted_loanwords: z.record(z.string(), strings),
   language_check: z.strictObject({ min_letters: count }),
+  length_ratio_min_chars: count,
 });
 
 /**

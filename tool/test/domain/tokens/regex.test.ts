@@ -21,7 +21,7 @@ describe("shared regex sources", () => {
   });
 
   it("artifacts_escape_phrases_with_the_shared_escaper", () => {
-    expect(findArtifacts("x (at least one needed)", null, testRules())).toEqual([
+    expect(findArtifacts("x (at least one needed)", testRules())).toEqual([
       "(at least one needed)",
     ]);
   });

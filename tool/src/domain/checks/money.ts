@@ -1,4 +1,5 @@
 import type { Money } from "../tokens/money";
+import { unique } from "../tokens/tally";
 import { diffRows, multisetDiff, resultOf, type MultiCheck, type Row, type Spec } from "./compare";
 
 export const CURRENCY_AMOUNT_DETAIL = "A price differs from the master.";
@@ -14,7 +15,7 @@ const show = ({ amount, currency }: Money): string => {
   return `${whole}.${fraction.padEnd(2, "0")} ${currency}`;
 };
 
-const codesOf = (moneys: readonly Money[]): string[] => [...new Set(moneys.map((m) => m.currency))];
+const codesOf = (moneys: readonly Money[]): string[] => unique(moneys.map((m) => m.currency));
 const amountsIn = (moneys: readonly Money[], code: string): string[] =>
   moneys.filter((m) => m.currency === code).map(show);
 const joined = (codes: readonly string[]): string | undefined =>

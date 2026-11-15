@@ -74,5 +74,23 @@
       "\u30b3\u30fc\u30c9\uff22\uff26\uff12\uff16",
       [["promo_codes", "BF26", null]]
     ]
+  ],
+  "known_limitation_a_number_word_or_idiom_is_a_missing_number": [
+    [
+      "fr-FR",
+      "Your 1st order ships free",
+      "Votre premi\u00e8re commande est livr\u00e9e gratuitement",
+      [["numbers", "1", null]]
+    ],
+    [
+      "de-DE",
+      "24/7 support",
+      "Support rund um die Uhr",
+      [
+        ["numbers", "24", null],
+        ["numbers", "7", null]
+      ]
+    ],
+    ["de-DE", "Over 1,000 reviews", "\u00dcber tausend Bewertungen", [["numbers", "1000", null]]]
   ]
 }

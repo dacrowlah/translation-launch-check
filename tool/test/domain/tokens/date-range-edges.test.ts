@@ -48,10 +48,7 @@ describe("every range form has a changed-day partner", () => {
       "Nov 27-30",
       "11\u670827\u65e5\uff08\u91d1\uff09\uff5e29\u65e5\uff08\u65e5\uff09",
       "ja-JP",
-      [
-        ["11/27", "11/27 Fri"],
-        ["11/30", "11/29 Sun"],
-      ],
+      [["11/30", "11/29"]],
     ],
     ["Valid Nov 27-30", "11/27\uff5e29\u6709\u52b9", "ja-JP", [["11/30", "11/29"]]],
     [

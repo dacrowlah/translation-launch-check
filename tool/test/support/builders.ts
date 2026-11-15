@@ -1,11 +1,11 @@
 import type { CheckDeps } from "../../src/application/check-localization";
 import type { LinePair, LocaleContext } from "../../src/domain/checks/compare";
-import { resolvedSides } from "../../src/domain/checks/sides";
 import { rewriteVisible, visibleText } from "../../src/domain/checks/spans";
 import { wholeWordSource } from "../../src/domain/checks/words";
 import type { LanguageDetector } from "../../src/domain/ports/language-detector";
 import type { LocaleRule, Rules } from "../../src/domain/rules";
 import type { DateToken } from "../../src/domain/tokens/dates";
+import { resolvePair } from "../../src/domain/tokens/resolve-pair";
 import { usualTimes } from "../../src/domain/tokens/resolve-twelves";
 import { extractTimes } from "../../src/domain/tokens/times";
 import { readable, tokenize, type Tokens } from "../../src/domain/tokens/tokenize";
@@ -79,9 +79,10 @@ export const ctx = (
   return { locale, rule, masterRule, rules, today: FAKE_NOW, detector };
 };
 
-/** Both sides tokenized and resolved against each other, as the use case does. */
+/** Both sides tokenized (each in its own locale) and resolved against each other, as the use case does. */
 const sidesOf = (masterText: string, targetText: string, locale: string) => {
-  const [master, target] = resolvedSides(masterText, targetText, ctx(locale));
+  const masterTokens = tokensOf(testRules().master_locale, masterText);
+  const [master, target] = resolvePair(masterTokens, tokensOf(locale, targetText));
   return { master, target, masterText, targetText };
 };
 

@@ -141,4 +141,6 @@ export interface Rules {
   readonly glossary: Glossary;
   readonly accepted_loanwords: Readonly<Record<string, Strings>>;
   readonly language_check: { readonly min_letters: number };
+  /** The master length, in characters, from which length_ratio applies (short CTAs grow). */
+  readonly length_ratio_min_chars: number;
 }

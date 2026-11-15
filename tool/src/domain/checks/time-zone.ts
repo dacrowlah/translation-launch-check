@@ -23,9 +23,8 @@ const timeIn = (text: string, sources: readonly string[]): string | undefined =>
     : text.match(new RegExp(sources.map(bounded).join("|"), "iu"))?.[0];
 
 export const checkTimeZone: LineCheck = (pair, ctx) => {
-  const language = ctx.rules.locales[pair.locale]?.language ?? "";
   const text = withoutSpans(pair.targetText, ctx.rules);
-  const time = timeIn(text, ctx.rules.time_expressions[language] ?? []);
+  const time = timeIn(text, ctx.rules.time_expressions[ctx.rule.language] ?? []);
   const rows: Row[] = time === undefined || hasZone(text, ctx.rules) ? [] : [[undefined, time]];
   return resultOf(ctx.rules, TIME_ZONE, time !== undefined, rows);
 };

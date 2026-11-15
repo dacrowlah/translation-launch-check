@@ -115,12 +115,13 @@ const quadratic = (n: number) => {
 it("quadratic", () => {
   expect(growth(quadratic, 2000)).toBeLessThan(LINEAR_GROWTH);
 });'
-# A quadratic stage in tokenize: a contract-bound package of mixed cells only 1.2 times slower.
+# A quadratic stage in tokenize: a contract-bound package of mixed cells only about 1.1 times
+# slower (each text is tokenized once, so the stage runs once per text).
 edit_plant quadratic-stage test:perf 'to be less than 8' src/domain/tokens/tokenize.ts \
   'start(text));' 'start(slowly(text)));' '
 let sink = 0;
 const slowly = (text: string): string => {
-  for (let i = 0; i < text.length; i++) for (let j = 0; j < text.length; j += 16) sink += (i ^ j) & 1;
+  for (let i = 0; i < text.length; i++) for (let j = 0; j < text.length; j += 8) sink += (i ^ j) & 1;
   return sink < 0 ? "" : text;
 };'
 # A quadratic loop over the numbers found per text (the numbers stage only).

@@ -5,7 +5,7 @@ import { decodeReference } from "../tokens/references";
 import { anyOfSources, NO_BREAK_SPACES } from "../tokens/regex";
 import { cutOf, gapsBetween, interleaved, takeWith } from "../tokens/take";
 import { BREAK, LINKS, MARKUP } from "./span-sources";
-import { dntSource } from "./terms";
+import { dntSource } from "../tokens/terms";
 
 /** glued: a token that text may touch ("{{name}}s"); tags and references are word breaks. */
 interface Segment {

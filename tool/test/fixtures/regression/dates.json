@@ -28,12 +28,26 @@
       "ja-JP",
       "Nov 27-30",
       "11\u670827\u65e5\uff08\u91d1\uff09\uff5e29\u65e5\uff08\u65e5\uff09",
-      [
-        ["dates", "11/27", "11/27 Fri"],
-        ["dates", "11/30", "11/29 Sun"]
-      ]
+      [["dates", "11/30", "11/29"]]
     ],
-    ["fr-FR", "Valid May 1-3", "Valable du 1er au 4 mai", [["dates", "5/3", "5/4"]]]
+    ["fr-FR", "Valid May 1-3", "Valable du 1er au 4 mai", [["dates", "5/3", "5/4"]]],
+    ["de-DE", "Ends Nov 29", "Endet Montag, 30. November", [["dates", "11/29", "11/30"]]],
+    [
+      "de-DE",
+      "Ends Sunday, Nov 29",
+      "Endet Montag, 30. November",
+      [["dates", "11/29 Sun", "11/30 Mon"]]
+    ],
+    ["ja-JP", "Ends Sunday", "\u571f\u66dc\u307e\u3067", [["dates", "Sun", "Sat"]]],
+    [
+      "ja-JP",
+      "Pop-up shop: Saturday, Dec 5 and Dec 6",
+      "\u30dd\u30c3\u30d7\u30a2\u30c3\u30d7\u30b7\u30e7\u30c3\u30d7\uff1a12\u67085\u65e5\uff08\u571f\uff09\u30fb7\u65e5\uff08\u65e5\uff09",
+      [
+        ["dates", "12/6", "12/7 Sun"],
+        ["weekday_date_match", "12/7 Mon", "12/7 Sun"]
+      ]
+    ]
   ],
   "a_date_kept_by_the_translation_has_no_finding": [
     [
@@ -65,7 +79,118 @@
     ["de-DE", "Sat-Sun, Nov 28-29", "Sa.-So., 28.-29. November", []],
     ["de-DE", "Valid 11/27,11/29", "G\u00fcltig 27.11., 29.11.", []],
     ["de-DE", "Sale.11/29 only", "Sale. Nur 29.11.", []],
-    ["ja-JP", "Valid Fri, Nov 27 - Mon, Nov 30", "11/27(\u91d1)\uff5e30(\u6708)", []]
+    ["ja-JP", "Valid Fri, Nov 27 - Mon, Nov 30", "11/27(\u91d1)\uff5e30(\u6708)", []],
+    ["de-DE", "Black&nbsp;Friday deals end Sunday", "Black Friday Angebote enden Sonntag", []],
+    [
+      "ja-JP",
+      "Sale runs Friday, Nov 27 through Nov 30",
+      "\u30bb\u30fc\u30eb\u306f11\u670827\u65e5\uff08\u91d1\uff09\uff5e30\u65e5\uff08\u6708\uff09",
+      []
+    ],
+    [
+      "de-DE",
+      "Starts Nov 27, ends Sunday, Nov 29",
+      "Beginnt am Freitag, 27. November, endet am Sonntag, 29. November",
+      []
+    ],
+    [
+      "fr-FR",
+      "Starts Friday, Nov 27. Ends Nov 29.",
+      "Commence le vendredi 27 novembre. Se termine le dimanche 29 novembre.",
+      []
+    ],
+    ["ja-JP", "Ends Sunday", "\u65e5\u66dc\u307e\u3067", []],
+    [
+      "ja-JP",
+      "Pop-up shop: Saturday, Dec 5 and Dec 6",
+      "\u30dd\u30c3\u30d7\u30a2\u30c3\u30d7\u30b7\u30e7\u30c3\u30d7\uff1a12\u67085\u65e5\uff08\u571f\uff09\u30fb6\u65e5\uff08\u65e5\uff09",
+      []
+    ]
+  ],
+  "a_two_day_list_kept_by_the_translation_has_no_finding": [
+    [
+      "ja-JP",
+      "Pop-up Dec 5 and 6",
+      "\u30dd\u30c3\u30d7\u30a2\u30c3\u30d7 12\u67085\u65e5\u30fb6\u65e5",
+      []
+    ],
+    [
+      "ja-JP",
+      "Pop-up Dec 5 & 6",
+      "\u30dd\u30c3\u30d7\u30a2\u30c3\u30d7 12\u67085\u65e5\u30686\u65e5",
+      []
+    ],
+    ["de-DE", "Pop-up Dec 5 and 6", "Pop-up am 5. und 6. Dezember", []],
+    ["fr-FR", "Pop-up Dec 5 and 6", "Pop-up les 5 et 6 d\u00e9cembre", []],
+    ["de-DE", "Nov 29 & 30", "29. & 30. November", []],
+    ["de-DE", "Valid Nov 5 and Dec 1", "G\u00fcltig am 5. November und 1. Dezember", []],
+    ["de-DE", "Ends Nov 29 and 30% off", "Endet am 29. November und 30 % Rabatt", []],
+    [
+      "ja-JP",
+      "December 5 & 6",
+      "\u30dd\u30c3\u30d7\u30a2\u30c3\u30d7 12\u67085\u65e5\u30fb6\u65e5",
+      []
+    ],
+    ["de-DE", "December 5 & 6", "5. & 6. Dezember", []],
+    ["fr-FR", "December 5 & 6", "5 & 6 d\u00e9cembre", []],
+    ["ja-JP", "Delivery Dec 5 or 6", "\u914d\u9001 12\u67085\u65e5\u30fb6\u65e5", []],
+    ["de-DE", "Delivery Dec 5 or 6", "Lieferung am 5. oder 6. Dezember", []],
+    ["fr-FR", "Delivery Dec 5 or 6", "Livraison le 5 ou 6 d\u00e9cembre", []],
+    ["de-DE", "Nov 29 or 30% off", "29. November oder 30 % Rabatt", []]
+  ],
+  "a_changed_day_in_a_two_day_list_is_a_finding": [
+    [
+      "ja-JP",
+      "Pop-up Dec 5 and 6",
+      "\u30dd\u30c3\u30d7\u30a2\u30c3\u30d7 12\u67085\u65e5\u30fb7\u65e5",
+      [["dates", "12/6", "12/7"]]
+    ],
+    ["de-DE", "Pop-up Dec 5 and 6", "Pop-up am 5. und 7. Dezember", [["dates", "12/6", "12/7"]]],
+    ["fr-FR", "Pop-up Dec 5 and 6", "Pop-up les 5 et 7 d\u00e9cembre", [["dates", "12/6", "12/7"]]],
+    [
+      "de-DE",
+      "Valid Nov 5 and Dec 1",
+      "G\u00fcltig am 5. November und 2. Dezember",
+      [["dates", "12/1", "12/2"]]
+    ],
+    [
+      "ja-JP",
+      "Delivery Dec 5 or 7",
+      "\u914d\u9001 12\u67085\u65e5\u30fb6\u65e5",
+      [["dates", "12/7", "12/6"]]
+    ]
+  ],
+  "known_limitation_a_larger_number_after_and_reads_as_a_second_day": [
+    [
+      "de-DE",
+      "Order by Dec 1 and 3 free gifts are yours",
+      "Bestellen Sie bis 1. Dezember und 3 Gratisgeschenke geh\u00f6ren Ihnen",
+      [
+        ["numbers", null, "3"],
+        ["dates", "12/3", null]
+      ]
+    ]
+  ],
+  "known_limitation_a_list_of_three_or_more_days_reads_only_its_ends_as_dates": [
+    [
+      "de-DE",
+      "Dec 5, 12 and 19",
+      "5., 12. und 19. Dezember",
+      [
+        ["numbers", "12", "5"],
+        ["numbers", "19", null],
+        ["dates", "12/5", "12/12"],
+        ["dates", null, "12/19"]
+      ]
+    ]
+  ],
+  "a_wrong_weekday_is_a_weekday_finding": [
+    [
+      "ja-JP",
+      "Fri, Nov 27 - Nov 30",
+      "11\u670827\u65e5\uff08\u91d1\uff09\uff5e30\u65e5\uff08\u706b\uff09",
+      [["weekday_date_match", "11/30 Mon", "11/30 Tue"]]
+    ]
   ],
   "known_limitation_a_cross_month_japanese_range_with_weekdays_is_unread": [
     [

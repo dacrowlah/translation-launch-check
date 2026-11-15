@@ -1,13 +1,11 @@
-import { findArtifacts } from "./artifacts";
+import { copyFitArtifacts } from "./artifacts";
 import type { ChannelRule, Rules } from "./rules";
 import { smsEncoding, smsSegments, type SmsEncoding } from "./sms";
-import type { LengthInfo, PackageLine, Severity, Unit } from "./types";
+import type { LengthInfo, Severity, Unit } from "./types";
 
-export { findArtifacts } from "./artifacts";
-export { smsEncoding } from "./sms";
-
+/** Double-width characters (Google Ads counts them 2): CJK, Hangul, full-width forms. */
 const WIDE =
-  /[\u1100-\u115f\u2e80-\ua4cf\uac00-\ud7a3\uf900-\ufaff\ufe30-\ufe4f\uff00-\uff60\uffe0-\uffe6]/u;
+  /[\u1100-\u115f\u2e80-\ua4cf\uac00-\ud7a3\uf900-\ufaff\ufe30-\ufe4f\uff00-\uff60\uffe0-\uffe6\u{20000}-\u{3fffd}]/u;
 
 const adsChars = (text: string): number =>
   [...text].reduce((sum, ch) => sum + (WIDE.test(ch) ? 2 : 1), 0);
@@ -20,10 +18,25 @@ export const measure = (text: string, unit: Unit): number => {
 export const channelRule = (rules: Rules, channel: string, field: string): ChannelRule | null =>
   rules.channels.find((c) => c.channel === channel && c.field === field) ?? null;
 
-export const lengthInfo = (line: PackageLine, text: string, rules: Rules): LengthInfo | null => {
-  const rule = channelRule(rules, line.channel, line.field);
+export const lengthInfo = (
+  channel: string,
+  field: string,
+  text: string,
+  rules: Rules,
+): LengthInfo | null => {
+  const rule = channelRule(rules, channel, field);
   return rule && { value: measure(text, rule.unit), limit: rule.limit, unit: rule.unit };
 };
+
+/** Whether a measured text is within its channel's limit (no limit: always). */
+export const fitsLimit = (info: LengthInfo): boolean =>
+  info.limit === null || info.value <= info.limit;
+
+export type LengthCheck = "length_hard" | "length_soft";
+
+/** The check a text over the channel's limit fails: a soft channel only warns. */
+export const lengthCheckOf = (rule: ChannelRule): LengthCheck =>
+  rule.soft ? "length_soft" : "length_hard";
 
 export interface CopyFitItem {
   readonly channel: string;
@@ -44,39 +57,48 @@ export interface CopyFitResult {
   readonly severity: Severity | null;
 }
 
-const severityOf = (artifacts: number, fits: boolean | null): Severity | null => {
-  if (artifacts > 0) return "blocker";
-  return fits === true ? null : "warning";
+/** An item measured on its channel; an unknown pair is counted in chars, with no limit. */
+interface Measured {
+  readonly rule: ChannelRule | null;
+  readonly info: LengthInfo;
+  readonly fits: boolean | null;
+}
+
+const measured = ({ channel, field, text }: CopyFitItem, rules: Rules): Measured => {
+  const info = lengthInfo(channel, field, text, rules);
+  const fits = info && fitsLimit(info);
+  const unknown: LengthInfo = { value: measure(text, "chars"), limit: null, unit: "chars" };
+  return { rule: channelRule(rules, channel, field), info: info ?? unknown, fits };
 };
 
-const FALLBACK = (text: string): LengthInfo => ({
-  value: measure(text, "chars"),
-  limit: null,
-  unit: "chars",
-});
+/** The severities localization_check gives the same text (unknown pair: a warning). */
+const severityOf = (rules: Rules, artifacts: number, { rule, fits }: Measured): Severity | null => {
+  if (artifacts > 0) return rules.severities.template_leftovers;
+  if (rule === null) return "warning";
+  return fits === true ? null : rules.severities[lengthCheckOf(rule)];
+};
 
 const overBy = (info: LengthInfo, fits: boolean | null): number | null =>
   fits === null ? null : Math.max(0, info.value - (info.limit ?? info.value));
 
-const fitsOf = (info: LengthInfo | null): boolean | null =>
-  info && (info.limit === null || info.value <= info.limit);
+const counted = (info: LengthInfo) => ({ length: info.value, limit: info.limit, unit: info.unit });
 
-const lengthFields = (info: LengthInfo, fits: boolean | null) => ({
-  ...{ length: info.value, limit: info.limit, unit: info.unit },
-  ...{ fits, over_by: overBy(info, fits) },
+const lengthFields = ({ info, fits }: Measured) => ({
+  ...counted(info),
+  fits,
+  over_by: overBy(info, fits),
 });
 
-const describe = (item: CopyFitItem, info: LengthInfo, fits: boolean | null) => ({
+const itemFields = (item: CopyFitItem, m: Measured) => ({
   channel: item.channel,
   field: item.field,
-  ...lengthFields(info, fits),
-  encoding: info.unit === "sms_segments" ? smsEncoding(item.text) : null,
+  ...lengthFields(m),
+  encoding: m.info.unit === "sms_segments" ? smsEncoding(item.text) : null,
 });
 
 export const fitItem = (item: CopyFitItem, rules: Rules): CopyFitResult => {
-  const known = lengthInfo({ id: "", ...item, texts: {} }, item.text, rules);
-  const fits = fitsOf(known);
-  const artifacts = findArtifacts(item.text, item.master ?? null, rules);
-  const base = describe(item, known ?? FALLBACK(item.text), fits);
-  return { ...base, template_artifacts: artifacts, severity: severityOf(artifacts.length, fits) };
+  const m = measured(item, rules);
+  const template_artifacts = copyFitArtifacts(item.text, item.master ?? null, rules);
+  const severity = severityOf(rules, template_artifacts.length, m);
+  return { ...itemFields(item, m), template_artifacts, severity };
 };

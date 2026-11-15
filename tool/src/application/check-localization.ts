@@ -1,9 +1,10 @@
 import { checkLanguageColumn, checkLanguageLine } from "../domain/checks/language";
 import type { LinePair, LocaleContext } from "../domain/checks/compare";
-import { resolvedSides } from "../domain/checks/sides";
 import type { Clock } from "../domain/ports/clock";
 import type { LanguageDetector } from "../domain/ports/language-detector";
 import type { Rules } from "../domain/rules";
+import { resolvePair } from "../domain/tokens/resolve-pair";
+import { tokenize } from "../domain/tokens/tokenize";
 import {
   ALL_CHECK_IDS,
   type CheckId,
@@ -25,16 +26,30 @@ const MASTER_IDS: readonly CheckId[] = ["language_column", "language_line"];
 
 type Context = (locale: string) => LocaleContext | undefined;
 
+/** A line with its master text, tokenized once in the master locale and shared by every target. */
+type MasterLine = Pick<LinePair, "line" | "masterText" | "master">;
+
 const textOf = (line: PackageLine, locale: string): string => line.texts[locale] ?? "";
 
-const pairOf = (line: PackageLine, ctx: LocaleContext): LinePair => {
-  const [masterText, targetText] = [
-    textOf(line, ctx.rules.master_locale),
-    textOf(line, ctx.locale),
-  ];
-  const [master, target] = resolvedSides(masterText, targetText, ctx);
-  return { line, locale: ctx.locale, master, target, masterText, targetText };
+const masterLineOf = (line: PackageLine, master: LocaleContext): MasterLine => {
+  const masterText = textOf(line, master.locale);
+  return { line, masterText, master: tokenize(masterText, master.rule, master.rules) };
 };
+
+/** The target tokenized in its own locale, then both sides resolved against each other. */
+const pairOf = (source: MasterLine, ctx: LocaleContext): LinePair => {
+  const targetText = textOf(source.line, ctx.locale);
+  const [master, target] = resolvePair(source.master, tokenize(targetText, ctx.rule, ctx.rules));
+  return { ...source, locale: ctx.locale, master, target, targetText };
+};
+
+/** The master's own line: only the language checks read it, so its tokens need no resolving. */
+const ownPair = (source: MasterLine, ctx: LocaleContext): LinePair => ({
+  ...source,
+  locale: ctx.locale,
+  target: source.master,
+  targetText: source.masterText,
+});
 
 const columnOf = (scored: readonly Scored[], ctx: LocaleContext) =>
   checkLanguageColumn(
@@ -42,24 +57,30 @@ const columnOf = (scored: readonly Scored[], ctx: LocaleContext) =>
     ctx,
   );
 
-const reportFor = (pkg: LocalizationPackage, ctx: LocaleContext): LocaleReport => {
-  const pairs = pkg.lines.map((line) => pairOf(line, ctx));
+const reportFor = (sources: readonly MasterLine[], ctx: LocaleContext): LocaleReport => {
+  const pairs = sources.map((source) => pairOf(source, ctx));
   const scored = pairs.map((pair) => ({ pair, results: runLineChecks(pair, ctx) }));
   return buildReport(ctx, scored, columnOf(scored, ctx), ALL_CHECK_IDS);
 };
 
-const masterReport = (pkg: LocalizationPackage, ctx: LocaleContext): LocaleReport => {
-  const pairs = pkg.lines.map((line) => pairOf(line, ctx));
-  const scored = pairs.map((pair) => ({
-    pair,
-    results: { language_line: checkLanguageLine(pair, ctx) },
-  }));
+const languageOnly = (pair: LinePair, ctx: LocaleContext): Scored => ({
+  pair,
+  results: { language_line: checkLanguageLine(pair, ctx) },
+});
+
+const masterReport = (sources: readonly MasterLine[], ctx: LocaleContext): LocaleReport => {
+  const scored = sources.map((source) => languageOnly(ownPair(source, ctx), ctx));
   return buildReport(ctx, scored, columnOf(scored, ctx), MASTER_IDS);
 };
 
-const unsupported = (locale: string): LocaleReport => ({
-  ...{ locale, status: "unsupported_locale", column_findings: [], lines: [], checks: {} },
-});
+const NOT_CHECKED = {
+  status: "unsupported_locale",
+  column_findings: [],
+  lines: [],
+  checks: {},
+} as const;
+
+const unsupported = (locale: string): LocaleReport => ({ locale, ...NOT_CHECKED });
 
 /** A context only for a locale the rules support (and while they hold the master's rule). */
 const contextFor =
@@ -71,23 +92,25 @@ const contextFor =
     return { locale, rule, masterRule, rules, detector, today };
   };
 
-const localeReport = (pkg: LocalizationPackage, locale: string, ctx?: LocaleContext) =>
-  ctx ? reportFor(pkg, ctx) : unsupported(locale);
-
-const masterOf = (pkg: LocalizationPackage, master: string, ctx?: LocaleContext): LocaleReport =>
-  ctx ? masterReport(pkg, ctx) : unsupported(master);
-
 const versionOf = ({ version, effective_date }: Rules) => ({ version, effective_date });
 
-const localesOf = (pkg: LocalizationPackage, context: Context) =>
-  pkg.locales.map((locale) => localeReport(pkg, locale, context(locale)));
+/** The master tokenized once per line; none when the rules lack the master (nothing is checked). */
+const sourcesOf = (pkg: LocalizationPackage, master?: LocaleContext): MasterLine[] =>
+  master ? pkg.lines.map((line) => masterLineOf(line, master)) : [];
+
+const localesOf = (pkg: LocalizationPackage, sources: readonly MasterLine[], context: Context) =>
+  pkg.locales.map((locale) => {
+    const ctx = context(locale);
+    return ctx ? reportFor(sources, ctx) : unsupported(locale);
+  });
 
 export const checkLocalization = (
   pkg: LocalizationPackage,
   deps: CheckDeps,
 ): LocalizationReport => {
-  const context = contextFor(deps, deps.clock.today());
-  const code = deps.rules.master_locale;
-  const master = masterOf(pkg, code, context(code));
-  return { rules: versionOf(deps.rules), master, locales: localesOf(pkg, context) };
+  const [context, code] = [contextFor(deps, deps.clock.today()), deps.rules.master_locale];
+  const masterCtx = context(code);
+  const sources = sourcesOf(pkg, masterCtx);
+  const master = masterCtx ? masterReport(sources, masterCtx) : unsupported(code);
+  return { rules: versionOf(deps.rules), master, locales: localesOf(pkg, sources, context) };
 };

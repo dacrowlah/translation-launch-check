@@ -13,14 +13,13 @@ const finding = (ctx: LocaleContext, check: CheckId, detail: string): CheckResul
 });
 
 const nameOf = (code: string): string => NAMES[code] ?? code;
-const isJapanese = (ctx: LocaleContext): boolean =>
-  ctx.rules.locales[ctx.locale]?.script === "japanese";
+const isJapanese = (ctx: LocaleContext): boolean => ctx.rule.script === "japanese";
 
 /** "ja" for Japanese text, else the detector's answer: a candidate, or null when unsure. */
 const reading = (text: string, ctx: LocaleContext): string | null =>
   japaneseShare(text) >= 0.5 ? "ja" : ctx.detector.detect(text, candidateLanguages(ctx.rules));
 
-const expected = (ctx: LocaleContext): string => ctx.rules.locales[ctx.locale]?.language ?? "";
+const expected = (ctx: LocaleContext): string => ctx.rule.language;
 
 const lineVerdict = (text: string, ctx: LocaleContext): CheckResult => {
   const read = reading(text, ctx);

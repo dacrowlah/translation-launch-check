@@ -6,6 +6,7 @@ import { extractNumbers, type Spaced } from "./numbers";
 import { extractPromoCodes, promoPattern } from "./promo-codes";
 import { decodeReferences } from "./references";
 import { NO_BREAK_SPACES } from "./regex";
+import { dntPattern } from "./terms";
 import { extractTimes, type Candidate, type Twelve } from "./times";
 import { extractUrls, type Url } from "./urls";
 
@@ -31,8 +32,9 @@ export interface Tokens {
   readonly spaced: Spaced[];
   /**
    * What is left. URLs, merge tags and promo codes are taken from the text as sent; then
-   * character references are decoded and the rest is NFKC-normalized for dates, clock times,
-   * money, numbers and weekdays. Never use it for typography or trademark checks.
+   * character references are decoded, the rest is NFKC-normalized and do-not-translate terms
+   * are removed, for dates, clock times, money, numbers and weekdays. Never use it for
+   * typography or trademark checks.
    */
   readonly rest: string;
 }
@@ -72,13 +74,23 @@ const promoResidue: Stage = (acc, _rule, rules) => ({
   rest: acc.rest.replace(promoPattern(rules), " "),
 });
 
-/** In order: structural tokens on the raw text, then readable text, then the copy's values. */
+/** Do-not-translate terms ("Black Friday", "Cyber Monday") hold weekday names that are no dates. */
+const withoutTerms: Stage = (acc, _rule, rules) => ({
+  ...acc,
+  rest: acc.rest.replace(dntPattern(rules), " "),
+});
+
+/**
+ * In order: structural tokens on the raw text, then readable text without do-not-translate
+ * terms (a term inside a link stays part of the link), then the copy's values.
+ */
 const STAGES: readonly Stage[] = [
   spread(extractUrls),
   spread(withRules(extractMergeTags)),
   spread(withRules(extractPromoCodes)),
   toReadable,
   promoResidue,
+  withoutTerms,
   spread(extractDates),
   spread(extractTimes),
   spread(extractMoney),

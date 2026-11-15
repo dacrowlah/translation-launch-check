@@ -7,7 +7,8 @@ import {
   type Spec,
 } from "./compare";
 import { withoutSpans } from "./spans";
-import { dntTerms, termsPattern } from "./terms";
+import { unique } from "../tokens/tally";
+import { dntTerms, termsPattern } from "../tokens/terms";
 import { wholeWords } from "./words";
 
 export const GLOSSARY_DNT_DETAIL = "A do-not-translate term is missing or was translated.";
@@ -38,7 +39,7 @@ const dntResult = (pair: LinePair, ctx: LocaleContext) => {
 
 const forbiddenIn = (pair: LinePair, list: readonly string[], ctx: LocaleContext): string[] => {
   const text = withoutSpans(pair.targetText, ctx.rules);
-  return [...new Set([...text.matchAll(wholeWords(list, "giu"))].map((m) => m[0]))];
+  return unique([...text.matchAll(wholeWords(list, "giu"))].map((m) => m[0]));
 };
 
 const forbiddenResult = (pair: LinePair, ctx: LocaleContext) => {

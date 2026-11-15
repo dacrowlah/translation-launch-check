@@ -45,6 +45,14 @@ describe("checkLocalization lines", () => {
       "merge_tags",
     ]);
   });
+  it("spelling_fix_is_the_line_the_spelling_finding_describes", () => {
+    const lines = [aLine({ texts: { "en-US": "Gray colors", "en-GB": "Gray colors" } })];
+    const [line] = checkLocalization(aPackage({ locales: ["en-GB"], lines }), aDeps()).locales[0]!
+      .lines;
+    const spelling = line!.findings.filter((f) => f.check === "locale_spelling");
+    expect(spelling.map((f) => [f.expected, f.found])).toEqual([["Grey, colours", "Gray, colors"]]);
+    expect(line!.spelling_fix).toBe("Grey colours");
+  });
   it("spelling_fix_is_null_when_nothing_changes", () => {
     const texts = { "en-US": "Great sale", "en-GB": "Great sale" };
     const lines = [aLine({ texts })];
