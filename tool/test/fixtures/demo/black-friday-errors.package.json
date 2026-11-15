@@ -1,0 +1,77 @@
+{
+  "campaign": "black-friday-errors",
+  "master_locale": "en-US",
+  "locales": [
+    "de-DE",
+    "fr-FR",
+    "ja-JP"
+  ],
+  "lines": [
+    {
+      "id": "L1",
+      "channel": "email",
+      "field": "subject",
+      "texts": {
+        "en-US": "Black Friday: 30% off all jackets",
+        "de-DE": "Black Friday: 20 % auf alle Jacken",
+        "fr-FR": "Black Friday : toutes les vestes à -30 %",
+        "ja-JP": "ブラックフライデー：全ジャケット30％オフ"
+      }
+    },
+    {
+      "id": "L2",
+      "channel": "email",
+      "field": "body",
+      "texts": {
+        "en-US": "Hi {{first_name}}, members get early access from Thursday. Free returns until Sunday, Nov 29. We saved the best deals for you: https://example.com/bf?utm_source=email&utm_campaign=bf26",
+        "de-DE": "Hallo {{vorname}}, als Mitglied erhalten Sie schon ab Donnerstag Vorabzugang. Kostenloser Versand bis Montag, 30. November. Die besten Angebote haben wir dir reserviert: https://example.com/bf?utm_source=email&utm_campaign=bf26",
+        "fr-FR": "Bonjour {{first_name}}, accès anticipé pour tous dès jeudi. Retours gratuits jusqu'au dimanche 29 novembre. Prix le plus bas garanti. Nous vous avons réservé les meilleures offres : https://example.com/bf?utm_source=email",
+        "ja-JP": "{{first_name}}様、会員の皆様は木曜日から先行アクセスいただけます。11月29日（日）まで返品無料。最もお得な商品をご用意しました：https://example.com/bf?utm_source=email&utm_campaign=bf26"
+      }
+    },
+    {
+      "id": "L3",
+      "channel": "google_ads",
+      "field": "headline",
+      "texts": {
+        "en-US": "30% off all jackets",
+        "de-DE": "30 % auf alle Jacken",
+        "fr-FR": "-30 % sur toutes les vestes",
+        "ja-JP": "すべてのジャケットが30％オフ"
+      }
+    },
+    {
+      "id": "L4",
+      "channel": "email",
+      "field": "preheader",
+      "texts": {
+        "en-US": "Our biggest sale of the year is almost here.",
+        "de-DE": "Unser größter Sale des Jahres steht vor der Tür.",
+        "fr-FR": "Notre plus grande promo de l'année arrive bientôt.",
+        "ja-JP": "今年最大のセールがまもなく始まります。"
+      }
+    },
+    {
+      "id": "L5",
+      "channel": "email",
+      "field": "body",
+      "texts": {
+        "en-US": "Meet the new TrailPro jacket: waterproof, light and made for winter trails.",
+        "de-DE": "Die neue TrailPro-Jacke: wasserdicht, leicht und gemacht für Wintertrails.",
+        "fr-FR": "Découvrez la nouvelle veste TrailPro : imperméable, légère et faite pour les sentiers d'hiver.",
+        "ja-JP": "新しいトレイルプロジャケット：防水・軽量で、冬のトレイルにぴったり。"
+      }
+    },
+    {
+      "id": "L6",
+      "channel": "email",
+      "field": "cta",
+      "texts": {
+        "en-US": "Shop the sale",
+        "de-DE": "Zum Sale",
+        "fr-FR": "Voir les offres",
+        "ja-JP": "セールを見る"
+      }
+    }
+  ]
+}

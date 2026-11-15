@@ -1,0 +1,143 @@
+{
+  "campaign": "seeded-errors",
+  "master_locale": "en-US",
+  "locales": [
+    "de-DE",
+    "fr-FR",
+    "ja-JP",
+    "en-GB",
+    "de-CH"
+  ],
+  "lines": [
+    {
+      "id": "S1",
+      "channel": "email",
+      "field": "subject",
+      "texts": {
+        "en-US": "Black Friday: 30% off all jackets",
+        "de-DE": "Black Friday: 30 % auf alle Jacken",
+        "fr-FR": "Vendredi noir : -30 % sur les vestes",
+        "ja-JP": "ブラックフライデー：全ジャケット30%オフ",
+        "en-GB": "Black Friday: 40% off all jackets",
+        "de-CH": "Black Friday: 30 % auf alle Jacken"
+      }
+    },
+    {
+      "id": "S2",
+      "channel": "email",
+      "field": "preheader",
+      "texts": {
+        "en-US": "Members can shop the sale first from Nov 26.",
+        "de-DE": "Mitglieder shoppen schon ab 26. November.",
+        "fr-FR": "Les membres en profitent dès le vendredi 26 novembre.",
+        "ja-JP": "会員の方は11月26日からセールで先行してお買い物いただけます。",
+        "en-GB": "Members can shop the sale first from 26 November.",
+        "de-CH": "Mitglieder können ab 26. November zuerst einkaufen."
+      }
+    },
+    {
+      "id": "S3",
+      "channel": "email",
+      "field": "body",
+      "texts": {
+        "en-US": "Hi {{first_name}}, your Black Friday deals are here: https://example.com/bf?utm_source=email&utm_campaign=bf26",
+        "de-DE": "Hallo {{first_name}}, Ihre Black Friday Angebote sind da: https://example.com/bf?utm_source=email&utm_campaign=bf26",
+        "fr-FR": "Bonjour {{first_name}}, vos offres Black Friday sont arrivées : https://example.com/bf?utm_source=email&utm_campaign=bf26",
+        "ja-JP": "{{名前}}様、ブラックフライデーのお得な情報をお届けします：https://example.com/bf?utm_source=email&utm_campaign=bf26",
+        "en-GB": "Hi {{first_name}}, your Black Friday deals are here: https://example.com/bf?utm_source=email&utm_campaign=bf26",
+        "de-CH": "Hallo {{first_name}}, Ihre Black Friday Angebote sind da: https://example.com/bf?utm_campaign=bf26"
+      }
+    },
+    {
+      "id": "S4",
+      "channel": "email",
+      "field": "body",
+      "texts": {
+        "en-US": "Use code BF30 at checkout. Free returns until Nov 30.",
+        "de-DE": "Code BF30 an der Kasse eingeben. Gratis Rücksendung bis 1. Dezember.",
+        "fr-FR": "Code BF30 au paiement. Retours gratuits jusqu'au 30 novembre.",
+        "ja-JP": "ご購入時にコードBF20をご入力ください。11月30日まで返品無料。",
+        "en-GB": "Use code BF30 at checkout. Free returns until 30 November.",
+        "de-CH": "Code BF30 an der Kasse eingeben. Gratis Rücksendung bis 30. November."
+      }
+    },
+    {
+      "id": "S5",
+      "channel": "email",
+      "field": "body",
+      "texts": {
+        "en-US": "The new <b>TrailPro®</b> jacket is waterproof and light.",
+        "de-DE": "Die neue <b>TrailPro®</b> Jacke ist garantiert wasserdicht und leicht.",
+        "fr-FR": "La nouvelle veste <b>TrailPro®</b> est imperméable et légère.",
+        "ja-JP": "新しい<b>TrailPro</b>ジャケットは防水で軽量です。",
+        "en-GB": "The new <b>TrailPro®</b> jacket is waterproof and light.",
+        "de-CH": "Die neue <b>TrailPro® Jacke ist wasserdicht und leicht."
+      }
+    },
+    {
+      "id": "S6",
+      "channel": "email",
+      "field": "body",
+      "texts": {
+        "en-US": "Gift cards from $25, delivered instantly by email.",
+        "de-DE": "Geschenkkarten ab 25 $, sofort per E-Mail zugestellt.",
+        "fr-FR": "Cartes cadeaux dès 20 $, envoyées immédiatement par e-mail.",
+        "ja-JP": "ギフトカードは25ドルから。メールですぐにお届けします。",
+        "en-GB": "Gift cards from $25, delivered instantly by email.",
+        "de-CH": "Cartes cadeaux à partir de 25 $, envoyées immédiatement par e-mail."
+      }
+    },
+    {
+      "id": "S7",
+      "channel": "email",
+      "field": "body",
+      "texts": {
+        "en-US": "The sale ends Nov 30 at 11:59 PM EST.",
+        "de-DE": "Der Sale endet am 30. November um 23:59 Uhr EST.",
+        "fr-FR": "Fin des promotions le 30 novembre à 23 h 59 EST.",
+        "ja-JP": "セールは11月30日午後11時59分に終了します。",
+        "en-GB": "The sale ends 30 November at 11:59 PM EST.",
+        "de-CH": "Der Sale endet am 30. November um 23:59 Uhr EST."
+      }
+    },
+    {
+      "id": "S8",
+      "channel": "google_ads",
+      "field": "headline",
+      "texts": {
+        "en-US": "Jackets 30% off",
+        "de-DE": "Jacken jetzt mit 30 % Rabatt im großen Sale",
+        "fr-FR": "Vestes à -30 %",
+        "ja-JP": "ジャケット30%オフ",
+        "en-GB": "Jackets 30% off",
+        "de-CH": "Jacken 30 % günstiger"
+      }
+    },
+    {
+      "id": "S9",
+      "channel": "email",
+      "field": "cta",
+      "texts": {
+        "en-US": "Find your size",
+        "de-DE": "Größe finden",
+        "fr-FR": "Find your size",
+        "ja-JP": "サイズを探す",
+        "en-GB": "Translated text: Find your size",
+        "de-CH": "Grösse finden"
+      }
+    },
+    {
+      "id": "S10",
+      "channel": "email",
+      "field": "body",
+      "texts": {
+        "en-US": "Members get early access. Online only, while stocks last.",
+        "de-DE": "Mitglieder erhalten Vorabzugang. Nur online, solange der Vorrat reicht.",
+        "fr-FR": "Accès anticipé pour tous. En ligne uniquement, dans la limite des stocks.",
+        "ja-JP": "会員の方は先行アクセスいただけます。オンライン限定、在庫がなくなり次第終了。全品送料無料。",
+        "en-GB": "Members get early access. Online and in store, while stocks last.",
+        "de-CH": "Als Mitglied hast du früher Zugang. Nur online, solange der Vorrat reicht."
+      }
+    }
+  ]
+}

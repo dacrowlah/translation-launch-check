@@ -1,0 +1,70 @@
+{
+  "campaign": "black-friday-uk-ch",
+  "master_locale": "en-US",
+  "locales": [
+    "en-GB",
+    "de-CH"
+  ],
+  "lines": [
+    {
+      "id": "L1",
+      "channel": "email",
+      "field": "subject",
+      "texts": {
+        "en-US": "Black Friday: 30% off all jackets",
+        "en-GB": "Black Friday: 30% off all jackets",
+        "de-CH": "Black Friday: 30 % auf alle Jacken"
+      }
+    },
+    {
+      "id": "L2",
+      "channel": "email",
+      "field": "body",
+      "texts": {
+        "en-US": "Hi {{first_name}}, find your favorite colors in our Black Friday sale. Free returns until Sunday, Nov 29. Best wishes, the TrailPro team",
+        "en-GB": "Hi {{first_name}}, find your favorite colors in our Black Friday sale. Free returns until Sunday 29 November. Best wishes, the TrailPro team",
+        "de-CH": "Hallo {{first_name}}, finden Sie Ihre Lieblingsfarben in unserem Black Friday Sale. Kostenlose Rücksendung bis Sonntag, 29. November. Freundliche Grüße, Ihr TrailPro-Team"
+      }
+    },
+    {
+      "id": "L3",
+      "channel": "google_ads",
+      "field": "headline",
+      "texts": {
+        "en-US": "30% off all jackets",
+        "en-GB": "30% off all jackets",
+        "de-CH": "30 % auf alle Jacken"
+      }
+    },
+    {
+      "id": "L4",
+      "channel": "email",
+      "field": "preheader",
+      "texts": {
+        "en-US": "Visit our new store on Bahnhofstrasse in Zurich.",
+        "en-GB": "Visit our new shop on Bahnhofstrasse in Zurich.",
+        "de-CH": "Besuchen Sie unseren neuen Laden an der Bahnhofstraße in Zürich."
+      }
+    },
+    {
+      "id": "L5",
+      "channel": "email",
+      "field": "body",
+      "texts": {
+        "en-US": "Organize your winter gear: TrailPro jackets from $49.90.",
+        "en-GB": "Organize your winter gear: TrailPro jackets from $49.90.",
+        "de-CH": "Bereit für den Winter: TrailPro-Jacken ab CHF 49.90."
+      }
+    },
+    {
+      "id": "L6",
+      "channel": "email",
+      "field": "cta",
+      "texts": {
+        "en-US": "Shop the sale",
+        "en-GB": "Shop the sale",
+        "de-CH": "Zum Sale"
+      }
+    }
+  ]
+}

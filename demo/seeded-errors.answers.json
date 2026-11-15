@@ -1,0 +1,22 @@
+[
+  { "locale": "de-DE", "line_id": "S4", "check": "dates" },
+  { "locale": "de-DE", "line_id": "S5", "check": "glossary_forbidden" },
+  { "locale": "de-DE", "line_id": "S8", "check": "length_hard" },
+  { "locale": "fr-FR", "line_id": "S1", "check": "glossary_dnt" },
+  { "locale": "fr-FR", "line_id": "S2", "check": "weekday_date_match" },
+  { "locale": "fr-FR", "line_id": "S6", "check": "currency_amount" },
+  { "locale": "fr-FR", "line_id": "S9", "check": "untranslated" },
+  { "locale": "fr-FR", "line_id": "S10", "check": "claim" },
+  { "locale": "ja-JP", "line_id": "S3", "check": "merge_tags" },
+  { "locale": "ja-JP", "line_id": "S4", "check": "promo_codes" },
+  { "locale": "ja-JP", "line_id": "S5", "check": "trademark_symbols" },
+  { "locale": "ja-JP", "line_id": "S7", "check": "time_zone" },
+  { "locale": "ja-JP", "line_id": "S10", "check": "claim" },
+  { "locale": "en-GB", "line_id": "S1", "check": "numbers" },
+  { "locale": "en-GB", "line_id": "S9", "check": "template_leftovers" },
+  { "locale": "en-GB", "line_id": "S10", "check": "claim" },
+  { "locale": "de-CH", "line_id": "S3", "check": "url_params" },
+  { "locale": "de-CH", "line_id": "S5", "check": "markup" },
+  { "locale": "de-CH", "line_id": "S6", "check": "language_line" },
+  { "locale": "de-CH", "line_id": "S10", "check": "formality" }
+]

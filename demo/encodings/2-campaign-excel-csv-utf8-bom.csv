@@ -1,0 +1,4 @@
+﻿id,channel,field,en-US,de-DE,fr-FR,ja-JP
+L1,email,subject,Black Friday: 30% off all jackets,Black Friday: 30 % auf alle Jacken,Black Friday : -30 % sur les vestes,ブラックフライデー：全ジャケット30%オフ
+L2,email,body,"Hi {{first_name}}, members get early access from Thursday. Free returns. https://example.com/bf?utm_source=email&utm_campaign=bf26","Hallo {{first_name}}, Mitglieder erhalten ab Donnerstag frühen Zugang. Kostenlose Rücksendung. https://example.com/bf?utm_source=email&utm_campaign=bf26","Bonjour {{first_name}}, les membres bénéficient d'un accès anticipé dès jeudi. Retours gratuits. https://example.com/bf?utm_source=email&utm_campaign=bf26",{{first_name}}様、会員の皆様は木曜日から先行アクセスいただけます。返品無料。 https://example.com/bf?utm_source=email&utm_campaign=bf26
+L3,google_ads,headline,30% off jackets,30 % Rabatt auf Jacken,-30 % sur les vestes,ジャケット30%オフ

@@ -98,17 +98,16 @@ docs/contract/TOOL_CONTRACT.md  BEHAVIOUR.md  KNOWN_LIMITATIONS.md
 docs/standards/README.md  TOOL.md  MARK.md
 .claude/skills/writing-tests/SKILL.md
 .claude/skills/mark-platform/  mark-code-step-patterns/  mark-json-authoring/  opal-custom-tools/
-scripts/     preflight.sh  prove-gates.sh  mark-test-gate.sh
+scripts/     preflight.sh  prove-gates.sh  mark-test-gate.sh  send_package.py  write_demo_fixtures.py  catch_rate.py
 .githooks/   pre-commit
 tool/        api/  config/  scripts/  src/{domain,application,infrastructure,presentation}  test/
 mark/        code_steps/ (helper modules)  tests/
+demo/        template.csv  black-friday-{clean,errors,broken,uk-ch}.csv  seeded-errors.csv (+ .answers.json)  encodings/
 ```
 
 Planned, created as the build proceeds:
 ```
 README.md
-demo/        template.csv, black-friday-{clean,errors,broken,uk-ch}.csv, seeded-errors.csv
-scripts/     send_package.py  catch_rate.py
 mark/        code_steps/ (steps)  agents/  skills/  workflow/  _build/  build.py  dist/ (generated)
 ```
 See [standards README section 4](docs/standards/README.md#4-repository-layout), and

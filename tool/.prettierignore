@@ -2,3 +2,4 @@
 .vitest-perf.json
 .vercel
 pnpm-lock.yaml
+test/fixtures/demo/
