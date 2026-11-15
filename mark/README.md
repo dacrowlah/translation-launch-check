@@ -6,8 +6,8 @@ and walk through the demo files. What the workflow does and how it is built:
 [TOOL_CONTRACT.md](../docs/contract/TOOL_CONTRACT.md). What it does not do:
 [KNOWN_LIMITATIONS.md](../docs/contract/KNOWN_LIMITATIONS.md).
 
-Commands run from the repository root. Steps marked "verified in Task 23" are filled in after
-the end-to-end runs.
+Commands run from the repository root. The import steps, runs and demo results below were
+verified in end-to-end runs in Mark; how the report email renders is still being checked.
 
 ## 1. Prerequisites
 
@@ -107,22 +107,25 @@ example config into a temp folder, to check the build without private values.
   ```
   The script parses the file with the workflow's own parser (a file with problems lists them
   and sends nothing), adds the package checksum, and refuses a package over the webhook's
-  size budget. The report goes to `qa_inbox` by email; the webhook caller gets only the HTTP
-  status, no report. (Verified in Task 23.)
+  size budget. The run gives the same verdicts as chat, saves the canvas and emails the
+  report to `qa_inbox`; the webhook caller gets only the HTTP status, no report.
 
-Every run's outcome is in the run log (each step's inputs, outputs and condition branch);
-chat text is a summary, the run log is the record.
+Every run's outcome is in the run log (each step's inputs, outputs and condition branch).
+Mark's chat reply is the orchestrator's summary of the report and may add its own remarks;
+the canvas and the report text (the last step's `message`) are the system of record.
 
 ## 5. Demo walkthrough
 
-About five minutes, in chat unless noted. The files are in `demo/`; the results below are
-the tool's exact findings for each file. The agents' part (back-translation, review, fixes)
-varies a little between runs.
+In chat unless noted; each 3-language file takes about 1.5-3 minutes. The files are in
+`demo/`; the results below are from live runs and the tool's exact findings. The agents'
+part (back-translation, review, fixes) varies a little between runs, and the chat reply may
+word the report its own way: show the canvas.
 
-1. **Clean file** (`black-friday-clean.csv`; en-US with de-DE, fr-FR, ja-JP): no rule finding
-   in any language. Overall Ready unless the reviewer raises something.
-2. **Errors file** (`black-friday-errors.csv`; four cells changed): de-DE and fr-FR are
-   **Fix first**, ja-JP is Ready with warnings. The rule checks find:
+1. **Clean file** (`black-friday-clean.csv`; en-US with de-DE, fr-FR, ja-JP): **Ready**, no
+   findings in any language; the canvas is saved.
+2. **Errors file** (`black-friday-errors.csv`; four cells changed): **Fix first**. de-DE and
+   fr-FR each have 4 blockers and 1 warning; ja-JP has no blocker and 1 warning. The rule
+   checks find:
    - de-DE L1: the discount changed, 30% -> 20% (numbers);
    - de-DE L2: the date changed, 11/29 Sun -> 11/30 Mon; the merge tag renamed,
      `{{first_name}}` -> `{{vorname}}`; informal "dir" in a formal locale;
@@ -133,25 +136,32 @@ varies a little between runs.
    Two changes no rule can see go to the reviewer: de-DE L2 promises free shipping where the
    master says free returns, and fr-FR L2 offers early access to everyone where the master
    says members. Open the canvas: findings, back-translations, and suggested fixes, each
-   re-checked ("passes the rule checks").
+   re-checked (the top fixes "pass the rule checks").
 
 3. **Broken file** (`black-friday-broken.csv`): one message lists all three problems, and no
    agent runs: "Column jp isn't a supported locale. Did you mean ja-JP?", "L4 has no fr-FR
    text." and "The id L5 is used more than once.", with a link to the template.
-4. **UK and Swiss file** (`black-friday-uk-ch.csv`; en-GB and de-CH): no blocker, both Ready
-   with warnings. Market spelling fixed by code: en-GB "favourite colours" and "Organise";
-   de-CH writes the sharp s as ss, in the greeting and in "Bahnhofstrasse"; and de-CH quotes the price in CHF where the master says USD
-   ("confirm the local price").
-5. **Encodings** (`demo/encodings/`, see its README): files 1-3 (UTF-8, UTF-8 with a
-   byte-order mark, semicolon-separated) are accepted with no finding. Files 4-6 (Excel's
-   default Windows-1252 and Shift_JIS) are refused: "The file isn't UTF-8 text." / "Save it
-   as CSV UTF-8 and attach it again."
-6. **Webhook**: `python scripts/send_package.py demo/black-friday-errors.csv`, then show the
-   run in the run log and the report email in the QA inbox. (Verified in Task 23.)
-7. **Optional, the catch rate:** run `demo/seeded-errors.csv` (20 planted errors: 17 rule
-   checks and 3 claims, answer key in `seeded-errors.answers.json`). In the run log, copy
-   the whole output of "Score each language" into a file, then run
-   `python scripts/catch_rate.py <file>` for caught, missed and extra.
+4. **UK and Swiss file** (`black-friday-uk-ch.csv`; en-GB and de-CH): no blocker, **Ready
+   with warnings**. Market spelling fixed by code: en-GB "favourite colours" and "Organise";
+   de-CH writes the sharp s as ss, in the greeting and in "Bahnhofstrasse". The de-CH price
+   in CHF, where the master says USD, is kept and flagged for a person ("confirm the local
+   price").
+5. **Encodings** (`demo/encodings/`, see its README):
+   - file 3 (German Excel: semicolons and a byte-order mark) is accepted: **Ready**;
+   - file 4 (Excel's default Windows-1252, the Japanese already saved as "????") is refused:
+     "...mostly question marks: the file was probably saved in the wrong encoding." / "Save
+     it as CSV UTF-8 and attach it again."
+   - In the tests, files 1-3 parse to the same package, and files 4-6 get "The file isn't
+     UTF-8 text." when their raw bytes reach the parser.
+6. **Webhook:** `python scripts/send_package.py demo/black-friday-errors.csv` gives the same
+   verdicts as chat, a saved canvas and the report email in the QA inbox; show the run in
+   the run log. (How the email body renders is still being checked.)
+7. **Optional, the catch rate:** run `demo/seeded-errors.csv` (5 target languages, 20
+   planted errors: 17 rule checks and 3 claims, answer key in `seeded-errors.answers.json`).
+   In the run log, copy the whole output of "Score each language" into a file, then run
+   `python scripts/catch_rate.py <file>` for caught, missed and extra. Live: **20 of 20**
+   caught (17 by code, 3 claims by Translation Review), plus a few extra reviewer
+   warnings.
 
 ## 6. Costs and limits
 
@@ -165,6 +175,8 @@ varies a little between runs.
   yet ([section 5](../docs/contract/KNOWN_LIMITATIONS.md)).
 - **Agents:** at most 20 second opinions per language and 60 suggested fixes per run
   ([section 5](../docs/contract/KNOWN_LIMITATIONS.md)).
-- **Time and credits:** each language is one loop iteration with two agents, and iterations
-  run mostly one after another; every run costs credits, shown in Agent Activity Logs. Run
-  time and credits per demo file: verified in Task 23.
+- **Time:** each language is one loop iteration with two agents, and iterations run mostly
+  one after another: about 1.5-3 minutes for a 3-language file.
+- **Credits** (from the run logs, rounded): a refused file (broken, wrong encoding) about 6;
+  a 3-language file about 40-65 (clean 54, errors about 60-64, UK/CH 40-50, the webhook run
+  60); the 5-language seeded set about 92. Credits show in Agent Activity Logs.

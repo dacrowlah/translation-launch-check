@@ -424,8 +424,9 @@ The how-to is the [writing-tests skill](../../.claude/skills/writing-tests/SKILL
   tracked file, and the five built steps run end to end on the fake SDK).
 - **End-to-end runs in the instance are the integration test.** Each demo case
   (`mark/README.md` section 5) is run, and the outcome checked in the run log, not only in
-  chat text. The budget is about 10 end-to-end runs; credits per run are measured in Task 23
-  (pending).
+  chat text. The budget is about 10 end-to-end runs. Measured credits per run: about 6 for a
+  refused file, 40-65 for a 3-language file, and about 92 for the 5-language seeded set
+  (`mark/README.md` section 6).
 
 ## 6. Tooling and gates
 
