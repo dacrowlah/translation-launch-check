@@ -11,6 +11,9 @@ COLUMN = "column"
 # A reviewer finding that restates a code finding on the same line is dropped; the code's
 # stays: {review check: the code checks it restates}.
 SAME_PROBLEM = {"tone": {"formality"}}
+# A reviewer note that says it is not a problem ("... a natural paraphrase. No finding.") is
+# dropped: matched case-insensitively in its detail.
+NOT_A_PROBLEM = ("no finding", "nothing needs to change", "no change needed")
 
 
 def _rule_rows(facts, review):
@@ -37,8 +40,17 @@ def _restates(row, rule_rows):
     return any(rule["line_id"] == row["line_id"] and rule["check"] in same for rule in rule_rows)
 
 
+def _cancels_itself(row):
+    return any(phrase in row["detail"].lower() for phrase in NOT_A_PROBLEM)
+
+
+def _dropped(row, rule_rows):
+    return _restates(row, rule_rows) or _cancels_itself(row)
+
+
 def _merged(rule_rows, review_rows_):
-    return rule_rows + [row for row in review_rows_ if not _restates(row, rule_rows)]
+    """The rule rows, then the review rows that neither restate one nor cancel themselves."""
+    return rule_rows + [row for row in review_rows_ if not _dropped(row, rule_rows)]
 
 
 def _judged(facts, saved):

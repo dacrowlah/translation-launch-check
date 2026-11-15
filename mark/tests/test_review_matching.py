@@ -98,3 +98,20 @@ def test_a_tone_finding_where_the_code_found_formality_is_dropped(fake_tools, tm
         ("review", "L2", "meaning"),
     ]
     assert found["unmatched_notes"] == 0
+
+
+@pytest.mark.parametrize(
+    "detail",
+    [
+        "This is a natural paraphrase, so nothing needs to change. No finding.",
+        "Same meaning; NO CHANGE NEEDED.",
+    ],
+)
+def test_a_review_note_that_says_it_is_no_problem_is_dropped(fake_tools, tmp_path, detail):
+    def review(item):
+        notes = [a_review_finding("L2", "meaning", "warning", detail=detail)]
+        return a_review(item, [*notes, a_review_finding("L1", "meaning", "warning")])
+
+    found = score_with(fake_tools, tmp_path, review=review)
+    assert [(f["line_id"], f["check"]) for f in found["findings"]] == [("L1", "meaning")]
+    assert (found["verdict"], found["unmatched_notes"]) == ("ready_with_warnings", 0)

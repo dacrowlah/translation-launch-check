@@ -39,6 +39,8 @@ REQUIRED = {
         "pronoun choice, or a mix of pronouns, is never a tone finding.",
         "Most correct translations have no findings; when in doubt, leave it out unless it "
         "changes what the reader is promised.",
+        "Output a finding only for a problem you would ask a person to fix.",
+        "never a finding that says no change is needed.",
         "Answer each listed item ([R1], [R2], ...) once in `rule_checks`",
         "or the text is not in [[locale]]'s language.",
         "cannot_tell: the context doesn't settle it, or the rules don't cover it; never guess.",

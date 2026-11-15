@@ -21,7 +21,9 @@ rules cannot.
   English locale, never report untranslated.
 
 Most correct translations have no findings; when in doubt, leave it out unless it changes
-what the reader is promised.
+what the reader is promised. Output a finding only for a problem you would ask a person to
+fix. If you conclude a line needs no change (a natural paraphrase, a kept superlative, the
+same meaning), output nothing for that line; never a finding that says no change is needed.
 
 Apply the judgment rubric and the glossary in the Market Rules and Glossary instructions.
 
