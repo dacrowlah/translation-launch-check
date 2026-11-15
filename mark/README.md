@@ -160,9 +160,9 @@ word the report its own way: show the canvas.
      it as CSV UTF-8 and attach it again.";
    - file 5 (Windows-1252, German and French only) is accepted and checked, the umlauts and
      accents correct: Mark's conversion is the right one for it;
-   - file 6 (Shift_JIS) arrives with garbled Japanese and is refused: "...text looks
-     garbled: the file was probably saved in the wrong encoding." / "Save it as CSV UTF-8
-     and attach it again."
+   - file 6 (Shift_JIS) arrives with garbled Japanese and is refused at validation, with no
+     agent step, one problem per ja-JP row: "L1's ja-JP text looks garbled: the file was
+     probably saved in the wrong encoding." / "Save it as CSV UTF-8 and attach it again."
 
    Through the webhook sender, which reads the file's raw bytes, files 4-6 are refused:
    "The file isn't UTF-8 text."

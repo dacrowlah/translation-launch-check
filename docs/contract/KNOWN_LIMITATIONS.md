@@ -53,7 +53,9 @@ characters are written as `\uXXXX` escapes.
     visible characters, and one of them a character real copy doesn't use (such as U+0192
     or a C1 control): "...text looks garbled: the file was probably saved in the wrong
     encoding." Dense French or German copy (accents, guillemets, euro signs, dashes) has no
-    such character and passes. Pinned by tests at the thresholds.
+    such character and passes. Pinned by tests at the thresholds, and verified in chat: the
+    Shift_JIS demo file is refused at validation, one problem per ja-JP row, before any
+    agent step.
 
   The webhook sender reads the file's raw bytes and refuses one that isn't UTF-8: "The file
   isn't UTF-8 text." A UTF-8 byte-order mark is fine either way. The tool reads JSON request
