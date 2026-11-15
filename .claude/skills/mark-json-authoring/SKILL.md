@@ -183,7 +183,10 @@ only the trigger edge needs listing. Recipe:
 ## Skills as files
 Keep each skill's text + When-to-use in the repo; create it in Context -> Skills (or Import
 Skills). Export JSON fields: `title`, `skill`, `skill_semantics`, `trigger_type`,
-`trigger_tools`, `mention_handle`. Organization skills only for agents; give each a shortcut.
+`trigger_tools`, `mention_handle`. `trigger_type` is `"keyword"` (phrases in
+`skill_semantics`) or `"tool"` (names in `trigger_tools`); the import refuses the plurals
+`"keywords"`/`"tools"` as "Invalid skill JSON format" (verified). Organization skills only
+for agents; give each a shortcut.
 Write skills as unconditional rules - an injected "if this applies" skill was ignored.
 
 ## Common mistakes

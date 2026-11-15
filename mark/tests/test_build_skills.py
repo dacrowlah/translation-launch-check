@@ -152,7 +152,7 @@ def test_build_skills_gives_both_exports():
 def test_market_rules_is_keyword_triggered():
     export = _built()["market-rules-glossary"]
     assert export["title"] == "Market Rules and Glossary"
-    assert export["trigger_type"] == "keywords"
+    assert export["trigger_type"] == "keyword"  # singular: "keywords" fails import (verified)
     assert export["skill_semantics"] == (
         "localization QA, formality, German copy, French copy, Japanese copy, glossary, "
         "do-not-translate"
@@ -163,7 +163,7 @@ def test_market_rules_is_keyword_triggered():
 def test_playbook_is_attached_by_copy_fit_check():
     export = _built()["translation-fix-playbook"]
     assert export["title"] == "Fix Playbook"
-    assert export["trigger_type"] == "tools"
+    assert export["trigger_type"] == "tool"  # singular: "tools" fails import (verified)
     assert export["trigger_tools"] == ["copy_fit_check"]
     assert export["skill"].startswith("# Fix Playbook\n")
 
@@ -190,7 +190,7 @@ def test_skill_export_with_tools():
         "title": "Fix Playbook",
         "skill": "Body",
         "skill_semantics": "",
-        "trigger_type": "tools",
+        "trigger_type": "tool",
         "trigger_tools": ["copy_fit_check"],
         "mention_handle": "fix-pb",
     }
@@ -201,7 +201,7 @@ def test_skill_export_with_keywords():
         "title": "Rules",
         "skill": "Body",
         "skill_semantics": "glossary, formality",
-        "trigger_type": "keywords",
+        "trigger_type": "keyword",
         "trigger_tools": [],
         "mention_handle": "rules",
     }

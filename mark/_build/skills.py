@@ -10,13 +10,16 @@ from pathlib import Path
 from _build.market_rules import render_market_rules
 
 EXPORT_KEYS = ("title", "skill", "skill_semantics", "trigger_type", "trigger_tools")
+# Mark's skill import accepts only these singular values (the editor's radios use them too);
+# "keywords" and "tools" are refused as "Invalid skill JSON format" (verified).
+TRIGGER_TYPES = {"keywords": "keyword", "tools": "tool"}
 
 
 def skill_export(title: str, shortcut: str, body: str, trigger: dict) -> dict:
     """The skill export JSON. `trigger` is {"keywords": "<phrases>"} or {"tools": [names]}."""
     kind = _trigger_kind(trigger)
     semantics, tools = (trigger[kind], []) if kind == "keywords" else ("", list(trigger[kind]))
-    values = (title, body, semantics, kind, tools)
+    values = (title, body, semantics, TRIGGER_TYPES[kind], tools)
     return {**dict(zip(EXPORT_KEYS, values, strict=True)), "mention_handle": shortcut}
 
 
@@ -26,7 +29,7 @@ def build_skills(skills_dir: Path, rules: dict) -> dict:
 
 
 def _trigger_kind(trigger):
-    if len(trigger) != 1 or not set(trigger) <= {"keywords", "tools"}:
+    if len(trigger) != 1 or not set(trigger) <= set(TRIGGER_TYPES):
         raise ValueError("a skill needs one trigger: keywords or tools")
     return next(iter(trigger))
 
