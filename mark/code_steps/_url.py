@@ -1,9 +1,10 @@
 """The template URL rule, applied by _config at import. Nothing here raises.
 
-https, a host that passes the shared hostname rule (valid_domain), and an optional path of
-unreserved characters, %XX escapes and a few delimiters: no port, userinfo ("@"), quotes,
-braces, "|", "*" or other Markdown/HTML characters, because the URL is echoed into
-messages. It may not end in a character a Markdown autolinker drops (TRAILING).
+https, a host that passes the shared hostname rule (valid_domain, so no port and no
+userinfo), and an optional path of letters, digits, `. _ ~ ! $ & + , ; = : / ? # -` and %XX
+escapes. So no spaces, quotes, "@", "<" ">", brackets, braces, backticks, "|" or "*", but
+the path may hold "&", "_", "~", "!" and "#". The URL is echoed into messages as an explicit
+Markdown link, and may not end in a character a Markdown autolinker drops (TRAILING).
 """
 
 import re

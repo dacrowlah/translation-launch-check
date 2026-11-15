@@ -31,7 +31,13 @@ binding docs rather than repeating them.
   `_text_report.py`). Never exception text, tool messages or JSON. Untrusted text (copy,
   model output) reaches chat, email and canvas only through `md_text()` (`_markdown.py`).
 - Return only routes, the run key, checksums and small plain-JSON values; large data goes
-  to the run folder (`_run_folder.py`).
+  to the run folder (`_run_folder.py`): `check.json` and `scores.json`, each read back only
+  against the checksum the step that wrote it handed on, and `reviews/<locale>.json`, read
+  back against its locale's checksum in `check.json` (MARK.md section 1).
+- **Steps are `read_and_check.py`, `save_review.py`, `score.py`, `report.py` and
+  `needs_info.py`**; the CSV comes from the chat attachment on disk, a webhook package only
+  on a run of the configured webhook trigger with a valid checksum, and email can't carry a
+  file yet.
 
 ## Helpers and the build
 
@@ -39,7 +45,8 @@ binding docs rather than repeating them.
   MARK.md section 1) will inline every `from _x import ...` into each step, each module
   once, so a step is one file (local imports fail in Mark), and will replace `_config` with
   literal `RULES` and `PRIVATE`.
-- Because of that, a helper or step imports only the allow-listed standard library modules,
+- Because of that, a helper or step imports only the allow-listed standard library modules
+  (no network or process module; `os` only in `_config`, which the build replaces),
   `opal_tms_sdk` and other helpers, and each module-level name is bound in one helper only.
   `test_import_graph.py` and `test_inlining.py` pin both. A new standard-library module is a
   reviewed addition to the allow-list.
@@ -60,9 +67,11 @@ binding docs rather than repeating them.
 
 ## Agents and skills
 
-Authored as files under `mark/agents/` and `mark/skills/` (both planned), built and
-imported. Never typed into the Mark editor: it swallows text after `/`. A change made in the
-Mark UI is exported and committed in the same session, or reverted.
+Authored as files under `mark/agents/` and `mark/skills/`. `mark/_build/` holds the
+conversion to export-format JSON (agents, skills, and the market rules rendered from
+`tool/config/rules.json`); `build.py` (planned) will run it, and the output is imported.
+Never typed into the Mark editor: it swallows text after `/`. A change made in the Mark UI is
+exported and committed in the same session, or reverted.
 
 ## Gates
 

@@ -20,19 +20,34 @@ characters are written as `\uXXXX` escapes.
 
 ## 1. Size, encoding and markets (by design)
 
-- **Large files are not supported.** A file holds at most 50 rows, 5 target languages and
-  64 KB (`limits` in `config/rules.json`), and the workflow refuses a larger file. The tool
-  refuses a call with more than 50 lines or 5 target locales as `invalid_input`, and a request
-  body over 256 KB as `invalid_request`. Why: large files are out of scope for this release
-  (owner decision). One call checks a whole campaign package, which keeps every check and the
-  report consistent, and a seasonal campaign's string table fits easily; a bigger one can be
-  split by rows. Not pinned as a limitation; the bounds themselves are tested.
-- **UTF-8 only.** The workflow treats an attached file that is not UTF-8 (Windows-1252, for
-  example) as unreadable and asks for it to be saved as CSV UTF-8; a UTF-8 byte-order mark is
-  fine. The tool reads JSON request bodies, and a body declared in a charset that is not a UTF
-  encoding gets `invalid_request`. Why: spreadsheet and TMS exports can all write UTF-8, and
-  guessing a legacy encoding would garble exactly the characters the checks compare (currency
-  signs, accents, Japanese). Not pinned by a test.
+- **Large files are not supported.** A file holds at most 50 rows, 5 target languages,
+  1,000 characters per cell and 64 KB (`limits` in `config/rules.json`). The workflow refuses
+  a larger file ("The file is larger than 64 KB." / "Split it by rows into smaller files."),
+  more rows, and a longer cell ("... is longer than 1000 characters."). It also refuses a file
+  whose text would overflow an agent step's input ("The file is too large to check in one
+  run."). Each language's reviewer gets the master and that language's column, with room for
+  the English back-translation (counted at the master's size), and that must fit 66,000 bytes
+  as escaped JSON, where every non-ASCII character counts 6 bytes; the English master itself
+  must fit 30,000. In practice that is about 21,000 master characters (about 420 a line over
+  50 lines) with one Latin-script target, fewer for accented text, and about 7,000
+  characters of Japanese in a ja-JP column. So a 46 KB en-US + de-DE file of long email
+  bodies is refused although it is under 64 KB; the 64 KB cap binds first only with two or
+  more further columns. The tool refuses a call with more than 50 lines, 5 target locales or
+  a 1,000-character cell as `invalid_input`, and a request body over 256 KB as
+  `invalid_request`. Why: large files are
+  out of scope for this release (owner decision). One call checks a whole campaign package,
+  which keeps every check and the report consistent, and a seasonal campaign's string table
+  fits easily; a bigger one can be split by rows. Not pinned as a limitation; the bounds
+  themselves are tested.
+- **UTF-8 only.** The workflow refuses an attached file that is not UTF-8 (Windows-1252, for
+  example): "The file isn't UTF-8 text." / "Save it as CSV UTF-8 and attach it again." A
+  UTF-8 byte-order mark is fine. A file whose characters were already replaced by `?` when it
+  was saved gets the same advice, per cell that is mostly question marks (at least 3, and at
+  least half its visible characters). The tool reads JSON request bodies, and a body declared
+  in a charset that is not a UTF encoding gets `invalid_request`. Why: spreadsheet and TMS
+  exports can all write UTF-8, and guessing a legacy encoding would garble exactly the
+  characters the checks compare (currency signs, accents, Japanese). The workflow's checks
+  are tested; the tool's charset refusal is not pinned by a test.
 - **Six markets.** The master is en-US; the targets with rules are de-DE, de-CH, fr-FR,
   en-GB and ja-JP. Any other well-formed locale is returned as `unsupported_locale`, never
   checked, never clean. Adding a locale of a language the rules already cover (de-AT) is a
@@ -259,3 +274,92 @@ become limitations or unsure findings, not new parsing rules.
   before the SDK checks the bearer token, so malformed JSON or a body over 256 KB is refused
   with `invalid_request` whatever the token. Either reply carries no data, and a second token
   check before parsing would duplicate the SDK's auth. Pinned by a test.
+
+## 5. The workflow (Mark side)
+
+- **Only chat attachments and webhook packages are read; email can't carry the file yet.**
+  An email run gets "Email can't carry the file yet." / "Attach the file in Mark chat
+  instead." Why: the email source was deferred for this release.
+- **Only webhook runs send the report email, and only to the configured QA inbox.** A chat run
+  emails nobody: the chat payload carries no verified identity to send to. The recipient is
+  checked against the allow-list in code twice, before and inside `send_email`.
+- **Webhook failures are silent.** A webhook run that ends in "Ask for a corrected file", an
+  unreadable report, the report step's fallback, or a report whose email failed answers only
+  in the run's chat reply and run log, which no one reads on a webhook run: the QA inbox gets
+  no email and the sender gets nothing back (webhook calls are asynchronous). A failed send
+  adds "The report email to the QA inbox couldn't be sent." to that unread reply. Why: the
+  report email is sent only by the report step on a successful run; emailing the QA inbox on
+  every webhook failure is a possible next step. Not pinned by a test.
+- **A model-filled webhook gate.** A payload counts only on a run whose `trigger_name` equals
+  the configured `webhook_trigger_name` (without it, no run counts as a webhook), and its
+  checksum must verify. Both inputs are filled by the orchestrator model, so a chat user who
+  gets the model to fill both, with the exact name and a correctly checksummed package, still
+  gets a "webhook" run. The worst case is one extra report to the fixed, allow-listed QA inbox,
+  its copy Markdown-escaped (how the email renders it is not verified yet; see "Escaping is
+  for Markdown" below). Why: model-filled inputs can't authenticate; the webhook's auth key is
+  the real sender gate. Not pinned by a test.
+- **A fallback after a sent email.** The report step saves the canvas, builds the message,
+  sends the email and only then builds its answer. If that answer were over `run_safely`'s
+  250,000-byte cap, or building it raised, the step would return its fallback ("re-run") while
+  the QA inbox already had the report. The answer is bounded well below the cap and is built
+  from plain values, so this is theoretical; and since email goes only on webhook runs, the
+  "re-run" would land in the unread run log. Not pinned by a test.
+- **Escaping is for Markdown.** Untrusted text (copy, campaign name, the tool's and the
+  agents' text) is backslash-escaped for Markdown in the chat reply, the canvas and the email
+  body, which is the chat reply. If `send_email` delivers the body as plain text, readers see
+  the backslashes in ordinary copy (`Jacken \& M\u00e4ntel \(statt 79,99 EUR\)\!`). If it
+  inserts the body as raw HTML, an escaped tag would be live after its backslash. How the
+  platform renders the body is not verified yet; an instance test with an email decides. A
+  link in copy can also be cut short: escaping a `_` or `&` inside a URL ends a renderer's
+  autolink there (the visible text is intact).
+- **Format characters are removed from displayed copy.** The same escaping drops control
+  and format characters, to stop bidi overrides and invisible text. That also drops the
+  zero-width joiner, so an emoji sequence (woman, ZWJ, laptop) shows as two emoji, and the
+  soft hyphen German headlines sometimes carry. It changes only what the report shows,
+  including the suggested fixes a marketer may copy; the checks read the copy as sent. Not
+  pinned as a limitation.
+- **An unmatched reviewer note doesn't count.** When a Translation Review finding names a line
+  id that matches no line (even after `[L1]` and `L1, L2` are normalised), it is dropped and
+  only noted ("1 reviewer note couldn't be matched to a line" in the chat reply, a count in the
+  canvas). Its severity, even a blocker, does not affect the verdict. Why: the rest of the
+  review is kept instead of dropping the whole language; a structurally broken finding still
+  makes the language `check_incomplete`. Pinned by a test.
+- **The neutral "we couldn't check" reply depends on verbatim relay.** "Ask for a corrected
+  file" recognises a failure on our side (the tool or the platform) by the exact template text
+  of the problems it receives, which the orchestrator model passes on. If the model changes
+  that text (drops the final full stop), the marketer gets the ordinary corrected-file request
+  with the template link, worded as if the file were at fault. Not pinned by a test.
+- **The fix re-check fails open on an unknown severity.** A suggested fix is "passes the rule
+  checks" unless its re-checked line has a `blocker` or `warning` finding, so a finding with
+  any other severity would read as passing. The shipped tool returns only `blocker`,
+  `warning` and `info`, so this is unreachable today, and fixes never change verdicts. Not
+  pinned by a test.
+- **Very short copy of question marks trips the wrong-encoding advice.** A cell with at least
+  3 `?` making up at least half its visible characters, such as a `Why???` teaser, gets "...is
+  mostly question marks: the file was probably saved in the wrong encoding." Why: that is the
+  shape a file takes when an editor replaced every non-ASCII character with `?`; such teasers
+  are rare in campaign copy. Not pinned by a test.
+- **A real "or" before the translation-leak marker goes with it.** Content Translation appends
+  "or [[file]] (at least one needed)" to its last line; _Save the review_ strips that marker
+  and the one "or" before it. A back-translation that really ends in "or" right before the
+  marker loses that word too. Why: the two can't be told apart, and the back-translation is
+  only a reading aid for the reviewer. Pinned by a test.
+- **Unsure findings on the master's language are ignored.** A certain finding that the en-US
+  master isn't English makes the file a problem to fix; an unsure one (a short master the
+  detector can't place) is neither a problem nor reported. Why: the master is the marketer's
+  own English. Pinned by a test.
+- **The CSV checks are basic beyond the essentials.** A cell holding only a blank lookalike
+  (a Hangul filler, the Braille blank) counts as filled, control characters other than NUL are
+  allowed in cells, and an id need not start with a letter. Why: cut under the demo's scope
+  rule; the essential checks (UTF-8, delimiter, header, known locales, unique ids, known
+  channels, non-empty cells, size caps, the reserved route prefix) all run. Not pinned by a
+  test.
+- **Lines past the fixer's input cap get no suggestion.** The fixer's input is capped at
+  50,000 bytes; lines beyond it get no suggested fix, and the chat reply says "N more lines
+  need a fix but got no suggestion (too many for one run)." Why: one agent call per run keeps
+  the run's time and cost bounded; at 50 rows this is rare. Pinned by a test.
+- **A back-translation that isn't text leaves its language unchecked.** _Save the review_
+  expects Content Translation's answer as text; any other shape is stored as null, and that
+  language becomes `check_incomplete` ("re-run"). The answer's real shape inside a workflow
+  is not verified yet; an instance test decides. Pinned by a test (an object is stored as
+  null).

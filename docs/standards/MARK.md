@@ -47,6 +47,13 @@ mark/                                      the Agent Platform source
   code_steps/_report_view.py  _message.py  the chat reply (also the QA-inbox email)
   code_steps/_canvas.py                    the canvas markdown
   code_steps/_text.py  _text_problems.py  _text_report.py   every user-facing template
+  agents/<agent_id>/                       agent.json, prompt.md, output.schema.json
+                                           (translation_review, translation_fix_suggestions)
+  skills/market-rules-glossary.template.md the rubric; its <!-- RULES --> marker is rendered
+                                           from tool/config/rules.json at build
+  skills/translation-fix-playbook.md       skill text + When-to-use
+  _build/agents.py  skills.py              agent and skill sources -> export-format JSON
+  _build/market_rules.py                   the market rules part of the skill, from rules.json
   tests/                                   conftest.py, builders.py, step_builders.py,
                                            report_support.py, fakes/opal_tms_sdk/,
                                            test_*.py (section 5)
@@ -56,18 +63,26 @@ Planned, created as the build proceeds:
 ```
 mark/
   README.md                                setup (section 3) and the demo cases (section 5)
-  agents/<agent_id>/                       agent.json, prompt.md, output.schema.json
-  skills/market-rules-glossary.template.md rendered from tool/config/rules.json at build
-  skills/translation-fix-playbook.md       skill text + When-to-use
   workflow/workflow.json                   steps, triggers, conditions (code by file reference)
   workflow/layout.json                     canvas node positions (section 4)
-  build.py  _build/{inline,agents,skills,workflow,layout}.py
+  build.py  _build/{inline,workflow,layout}.py
   dist/                                    generated, importable, gitignored (never hand-edited)
 ```
 
-**Run folder files** (`/workspace/tlc/<run_key>/`): `check.json` (written by *Read and check
-the file*, bound by `check_checksum`), `reviews/<locale>.json` (*Save the review*, bound by
-the locale checksum) and `scores.json` (*Score each language*, bound by `verdict_checksum`).
+**Run folder files** (`/workspace/tlc/<run_key>/`), each `{data, checksum}`, one handoff
+checksum per hop:
+- `check.json`, written by *Read and check the file* and handed on as `run_key` +
+  `check_checksum`. It holds everything Score needs: campaign, source, `notify_email`,
+  `rules_version`, the master lines, and per locale its status, lines, rule findings (those
+  that need a second opinion carry an `R<n>` ref, the rest `ref: null`), checks and locale
+  checksum;
+- `reviews/<locale>.json`, written by *Save the review*: `{locale, checksum, review,
+  back_translation}`. Score binds it to that locale's checksum in the verified `check.json`
+  (the loop item carries the same value);
+- `scores.json`, written by *Score each language* and handed on as `run_key` +
+  `verdict_checksum`: campaign, source, `notify_email` and `rules_version` copied forward,
+  the outcome, each locale's score, the lines to fix and the count left unfixed. The report
+  reads only this file.
 
 **Source of truth: the repo, not the instance.**
 - Every agent, skill and code step is edited here, then built and imported. Mark exports the
@@ -153,8 +168,9 @@ Rules:
   (`_routes.py`), so no copy or model text can form a route token.
 - **The parse chain runs outside Mark.** `_csv_package`, `_webhook_package` and `_checksum`,
   and every helper they import, use the standard library only: no `opal_tms_sdk`, no
-  `_config`. `scripts/send_package.py` imports them on a laptop. `test_parse_chain.py`
-  loads them in a fresh interpreter with neither the SDK nor any config.
+  `_config`. `scripts/send_package.py` (the webhook sender) imports `_csv_package` and
+  `_checksum` on a laptop. `test_parse_chain.py` loads the three in a fresh interpreter with
+  neither the SDK nor any config.
 - **Checksums** (`_checksum.py`):
   - canonical JSON is exactly what `json.dumps(sort_keys=True, separators=(",", ":"),
     ensure_ascii=False, allow_nan=False)` writes, encoded as UTF-8. Data that is not plain
@@ -204,7 +220,9 @@ Rules:
   - the import graph (`test_import_graph.py`): a helper or step imports only allow-listed
     standard library modules (`csv`, `datetime`, `hashlib`, `io`, `json`, `pathlib`, `re`,
     `secrets`, `unicodedata`; `os` only in `_config`, which the build replaces),
-    `opal_tms_sdk` and helpers. So no network or process modules. It imports nothing dynamically
+    `opal_tms_sdk` and helpers. So no step can import a network module (`socket`, `http`,
+    `urllib`, `ssl`), nor a process module (`subprocess`; and `os` once the build replaces
+    `_config`, which is the one module allowed it). It imports nothing dynamically
     (`__import__`, `exec`, `eval`, `compile`, `importlib`, ...), and the helpers form no
     import cycle. A new standard-library module is a reviewed one-line addition to the
     allow-list;
@@ -392,7 +410,13 @@ once with `python3.12 -m venv .venv && .venv/bin/pip install -r mark/requirement
     `/` followed only by letters, digits, `. _ ~ ! $ & + , ; = : / ? # -` and `%XX` escapes
     (no spaces, quotes, `@`, `<` `>`, brackets, braces, backticks, `|` or `*`). The URL may
     not end in `.` `,` `;` `:` `!` `?` `_` `~`, which a Markdown autolinker drops. It is
-    echoed into messages and the canvas.
+    echoed into the corrected-file request as an explicit Markdown link,
+    `Template: [CSV template](https://...)`, with the configured URL in the parentheses.
+    - **Setup:** point it at a public HTTPS copy of the CSV template, such as the raw-file URL
+      of `demo/template.csv` in the published repository. Open the URL in a private browser
+      window before relying on it: the link is shown to the marketer as is, and nothing
+      checks that it resolves. A request caused by our side (the tool or the platform
+      failed) gets no template link.
 - The email recipient allow-list is enforced in code (`send_email`, section 2), never only in
   a prompt. File contents are data: an address inside a file is never a recipient.
 - Code steps hold no credentials. Tool auth is configured on the registry, not in steps.

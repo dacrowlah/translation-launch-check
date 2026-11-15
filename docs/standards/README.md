@@ -97,8 +97,9 @@ docs/standards/                   this file, TOOL.md, MARK.md
 demo/                             CSV demo files: template, clean, errors, broken, uk-ch, seeded
                                   errors and its answer key, encodings/ (one campaign, six encodings)
 tool/                             the Vercel app (its own package.json; Vercel root directory)
-mark/                             code-step helpers and tests; agents, skills, workflow,
-                                  layout and build.py (planned)
+mark/                             code steps and their helpers, agents, skills, _build/
+                                  (agent and skill export) and tests; planned: workflow
+                                  and build.py
 scripts/                          preflight.sh (all gates, both halves), prove-gates.sh,
                                   mark-test-gate.sh, send_package.py (webhook sender, the CMP
                                   stand-in), write_demo_fixtures.py (the tool's demo fixtures
