@@ -1,8 +1,7 @@
 # Standards (binding)
 
 How this repository is built. When code and a standards doc disagree, the doc wins: fix the
-code, or amend the doc in the same change. Never invent a standard. Items marked
-**(planned)** describe files the build has not created yet.
+code, or amend the doc in the same change. Never invent a standard.
 
 | Doc | Covers |
 |---|---|
@@ -85,12 +84,14 @@ documented shape.
 ## 4. Repository layout
 
 ```
-README.md            (planned)    what the solution is, how to run and deploy it
+README.md                         what the solution is, how to run and deploy it
 CLAUDE.md                         operating manual for Claude; tool/ and mark/ have their own
 docs/contract/TOOL_CONTRACT.md    the tool's binding behaviour
 docs/contract/BEHAVIOUR.md        how the value checks read copy (rules with examples)
 docs/contract/KNOWN_LIMITATIONS.md  accepted gaps, each with its reason
 docs/standards/                   this file, TOOL.md, MARK.md
+docs/security-review.md           the security review
+docs/workflow-diagram.png         the workflow diagram (shown in README.md)
 .claude/skills/                   writing-tests (both halves), mark-platform,
                                   mark-code-step-patterns, mark-json-authoring,
                                   opal-custom-tools
@@ -104,7 +105,7 @@ scripts/                          preflight.sh (all gates, both halves), prove-g
                                   mark-test-gate.sh, send_package.py (webhook sender, the CMP
                                   stand-in), write_demo_fixtures.py (the tool's demo fixtures
                                   from demo/), catch_rate.py (seeded test set: caught, missed,
-                                  extra)
+                                  extra), ruff.toml (scripts/ uses mark/'s ruff rules)
 .githooks/                        pre-commit: format and lint on staged files
 ```
 
@@ -122,8 +123,8 @@ scripts/                          preflight.sh (all gates, both halves), prove-g
 ## 6. Git and change hygiene
 
 - `main` is releasable. Work on a branch; merge when preflight is green.
-- Never push without the owner's approval. This repository becomes public at submission,
-  so no secrets, webhook URLs, auth keys, instance ids or personal data, ever.
+- Never push without the owner's approval. This repository is public, so no secrets,
+  webhook URLs, auth keys, instance ids or personal data, ever.
 - Stage files by name. Never `--no-verify`. Never rewrite pushed history.
 - Plain ASCII in code and docs. Non-ASCII test data is written with escapes where practical.
   No ticket numbers; comments and docs describe current behaviour, not history.

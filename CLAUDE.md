@@ -28,8 +28,8 @@ Hard constraints:
 - No stored user data, and no campaign copy in logs.
 - Responses carry statuses, never diagnostics.
 - A model is used only where language judgment is needed.
-- This repository becomes **public**: no secrets, instance ids, webhook URLs or personal
-  data, ever.
+- This repository is public: no secrets, instance ids, webhook URLs or personal data,
+  ever.
 
 - How we test (read before writing or reviewing any test, in either half):
   [.claude/skills/writing-tests/SKILL.md](.claude/skills/writing-tests/SKILL.md)
@@ -93,22 +93,19 @@ the same change. The contract changes only with the owner's approval.
 ## Repository layout
 
 ```
-CLAUDE.md    tool/CLAUDE.md    mark/CLAUDE.md
+README.md    CLAUDE.md    tool/CLAUDE.md    mark/CLAUDE.md
+docs/security-review.md  workflow-diagram.png
 docs/contract/TOOL_CONTRACT.md  BEHAVIOUR.md  KNOWN_LIMITATIONS.md
 docs/standards/README.md  TOOL.md  MARK.md
 .claude/skills/writing-tests/SKILL.md
 .claude/skills/mark-platform/  mark-code-step-patterns/  mark-json-authoring/  opal-custom-tools/
-scripts/     preflight.sh  prove-gates.sh  mark-test-gate.sh  send_package.py  write_demo_fixtures.py  catch_rate.py
+scripts/     preflight.sh  prove-gates.sh  mark-test-gate.sh  send_package.py  write_demo_fixtures.py  catch_rate.py  ruff.toml
 .githooks/   pre-commit
 tool/        api/  config/  scripts/  src/{domain,application,infrastructure,presentation}  test/
 mark/        code_steps/ (steps and helper modules)  agents/  skills/  workflow/  build.py  _build/  tests/  dist/ (generated)
 demo/        template.csv  black-friday-{clean,errors,broken,uk-ch}.csv  seeded-errors.csv (+ .answers.json)  encodings/
 ```
 
-Planned, created as the build proceeds:
-```
-README.md
-```
 See [standards README section 4](docs/standards/README.md#4-repository-layout), and
 [TOOL.md](docs/standards/TOOL.md) section 1 and [MARK.md](docs/standards/MARK.md) section 1
 for the full trees.
