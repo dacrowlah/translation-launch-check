@@ -241,7 +241,3 @@ Known gaps today ([KNOWN_LIMITATIONS section 5](docs/contract/KNOWN_LIMITATIONS.
 - **Webhook failures are silent.** A webhook run that fails sends no email, and the caller
   gets only the HTTP status.
 - **Chat runs send no email:** the chat payload carries no verified identity to send to.
-
-## License
-
-License: to be decided.

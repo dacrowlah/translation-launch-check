@@ -91,5 +91,6 @@ All hold unless noted.
 ## Process
 
 - Every platform behaviour the security relies on was verified in a live instance first.
-- The tool bearer token and the webhook auth key are rotated before publishing.
+- The tool bearer token and the webhook auth key were rotated before publishing; the old
+  values are refused.
 - The git history was scanned for secrets and private data before publishing.
