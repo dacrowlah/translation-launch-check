@@ -4,7 +4,7 @@ reported per line (names only, so the reviewer never reports them again), and th
 findings to double-check; the back-translation input is one labelled line per entry.
 Nothing here raises."""
 
-from _budgets import input_budget, review_allowance
+from _budgets import INPUT_KEYS, input_budget, review_allowance
 from _checksum import json_size
 from _finding_text import length_text, values_text
 from _text_problems import file_problem
@@ -14,7 +14,7 @@ MAX_AGENT_INPUT_BYTES = 66_000  # one agent step's input; verified intact to abo
 # The back-translation goes into "Save the review" next to the review: what that step's
 # budget leaves after the largest review the schema admits and its small keys (run_key,
 # locale, checksum).
-MAX_ENGLISH_BYTES = input_budget("save_review") - review_allowance() - 200
+MAX_ENGLISH_BYTES = input_budget("save_review") - review_allowance() - INPUT_KEYS
 MAX_ITEMS_BYTES = 240_000  # this step's return: 256 KB, and run_safely refuses over 250,000
 DOUBLE_CHECK_HEADING = "Rule findings to double-check:"
 REPORTED_HEADING = "Already reported by code (never report these again, in any form):"

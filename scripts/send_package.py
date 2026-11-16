@@ -20,7 +20,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "mark" / "code_steps"))
 
-from _budgets import input_budget  # noqa: E402
+from _budgets import INPUT_KEYS, input_budget  # noqa: E402
 from _checksum import json_size, sha256_hex  # noqa: E402
 from _csv_package import parse_csv  # noqa: E402
 
@@ -37,7 +37,7 @@ NO_WEBHOOK = (
 NO_ANSWER = "No answer from the webhook (network error). Check the run log before sending again."
 # "Read and check the file" gets the payload as its input, and Mark fails a run whose code
 # plus input is too large before any code runs, silently for a webhook: refuse here instead.
-MAX_PAYLOAD_BYTES = input_budget("read_and_check") - 200  # trigger_name and the input's keys
+MAX_PAYLOAD_BYTES = input_budget("read_and_check") - INPUT_KEYS  # trigger_name and the keys
 TOO_LARGE = "The package is {size} bytes as JSON; a webhook run takes at most {limit}. "
 TOO_LARGE += "Split the file by rows. Nothing was sent."
 

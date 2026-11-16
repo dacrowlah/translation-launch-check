@@ -11,7 +11,6 @@ from _shared import call_platform
 
 SEPARATORS = frozenset("\u2028\u2029")  # line and paragraph separators (Zl, Zp)
 UNSAFE_CATEGORIES = ("Cc", "Cf", "Cs")
-BOM = "\ufeff"
 
 
 def allowed_recipient(address):

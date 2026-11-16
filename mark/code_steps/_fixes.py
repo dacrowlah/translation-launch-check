@@ -1,12 +1,13 @@
 """Suggested fixes: the fixer agent's drafts (only for lines it was sent) and the code-made
 spelling fixes, re-checked together with ONE localization_check call. A fix passes when its
-line has no blocker or warning and it doesn't read as a note; if the tool fails, every fix is
-"not re-checked". Fixes never change verdicts: the verdict describes the file as submitted.
-Nothing here raises."""
+line has no blocker or warning and it is fit to apply as copy (_fix_notes); if the tool
+fails, every fix is "not re-checked". Fixes never change verdicts: the verdict describes the
+file as submitted. Nothing here raises."""
 
 from _agent_output import agent_answer
 from _config import RULES
-from _fix_notes import fix_reads_as_a_note
+from _csv_format import FIXED_COLUMNS
+from _fix_notes import fix_reads_as_a_note, fix_starts_a_formula
 from _fixable import SPELLING, fixable_at
 from _model_output import model_text
 from _shared import call_tool
@@ -74,7 +75,7 @@ def _fixed_text(fixes, locale, line):
 def _recheck_line(index, fixed, fixes):
     first = fixed[0]["lines"][index]
     texts = {s["locale"]: _fixed_text(fixes, s["locale"], s["lines"][index]) for s in fixed}
-    names = {key: first[key] for key in ("id", "channel", "field")}
+    names = {key: first[key] for key in FIXED_COLUMNS}
     return {**names, "texts": {RULES["master_locale"]: first["master"], **texts}}
 
 
@@ -112,15 +113,22 @@ def _recheck_body(scores, fixes):
     return result["body"] if usable_report(result["body"], pkg["locales"]) else None
 
 
-def _fix_status_or_note(scores, body, fix):
-    """The re-check status, unless the fix reads as a note: then it never passes."""
+def _unfit(scores, fix):
+    """Why a fix must never pass, or None: it reads as a note, or would start a formula."""
+    if fix_reads_as_a_note(scores, fix):
+        return "reads_as_a_note"
+    return "starts_a_formula" if fix_starts_a_formula(scores, fix) else None
+
+
+def _final_status(scores, body, fix):
+    """The re-check status, unless the fix is unfit as copy: then it never passes."""
     status = fix_status(body, fix)
-    noted = status["status"] != "still_has" and fix_reads_as_a_note(scores, fix)
-    return {"status": "reads_as_a_note", "checks": []} if noted else status
+    unfit = status["status"] != "still_has" and _unfit(scores, fix)
+    return {"status": unfit, "checks": []} if unfit else status
 
 
 def rechecked(scores, fixes):
-    """Each fix with its status: the re-check's, from one call for all of them, or "reads as
-    a note" (_fix_notes)."""
+    """Each fix with its status: the re-check's, from one call for all of them, or why it is
+    unfit as copy (_fix_notes)."""
     body = _recheck_body(scores, fixes) if fixes else None
-    return [{**fix, **_fix_status_or_note(scores, body, fix)} for fix in fixes]
+    return [{**fix, **_final_status(scores, body, fix)} for fix in fixes]

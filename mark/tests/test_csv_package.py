@@ -5,6 +5,10 @@ from _csv_package import parse_csv
 from step_builders import BOM, HEADER, a_csv, problems_of
 
 SUBJECT = ["L1", "email", "subject"]
+NOT_CSV = {
+    "message": "The file couldn't be read as CSV.",
+    "suggestion": "Compare it with the template.",
+}
 
 
 def parse(raw, name="bf.csv"):
@@ -126,6 +130,11 @@ def test_header_only_has_no_rows():
 def test_formula_like_cell_stays_text():
     pkg, _ = parse(a_csv(rows=[[*SUBJECT, "=HYPERLINK(1)", "=HYPERLINK(1)"]]), "x.csv")
     assert pkg["lines"][0]["texts"]["en-US"] == "=HYPERLINK(1)"
+
+
+def test_text_after_a_closing_quote_makes_the_file_unreadable():
+    raw = b'id,channel,field,en-US,de-DE\nL1,email,subject,"Sale"x,Hallo\n'
+    assert parse(raw) == (None, [{"where": "file", **NOT_CSV}])
 
 
 def test_copy_cells_keep_their_spaces_and_ids_are_trimmed():

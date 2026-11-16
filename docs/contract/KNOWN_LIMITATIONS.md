@@ -10,6 +10,10 @@ corpus group named `known_limitation_...` in `tool/test/fixtures/regression/`, o
 of that name. Changing one is a visible decision, not a silent regression. Items not pinned
 by a test say so.
 
+"By design for this release" marks work that was left out on purpose: this release fixes
+false blockers on mainstream copy, problems seen in the demo files and security problems,
+and nothing else in that area.
+
 How to read the examples: the same notation as the
 [behaviour spec](BEHAVIOUR.md) ("How to read the examples"): `locale` `master` /
 `translation` -> the findings of the value checks, `(none)` for nothing on that side, and
@@ -35,11 +39,10 @@ characters are written as `\uXXXX` escapes.
   bodies is refused although it is under 64 KB; the 64 KB cap binds first only with two or
   more further columns. The tool refuses a call with more than 50 lines, 5 target locales or
   a 1,000-character cell as `invalid_input`, and a request body over 256 KB as
-  `invalid_request`. Why: large files are
-  out of scope for this release (owner decision). One call checks a whole campaign package,
-  which keeps every check and the report consistent, and a seasonal campaign's string table
-  fits easily; a bigger one can be split by rows. Not pinned as a limitation; the bounds
-  themselves are tested.
+  `invalid_request`. Why: large files are out of scope, by design for this release. One call
+  checks a whole campaign package, which keeps every check and the report consistent, and a
+  seasonal campaign's string table fits easily; a bigger one can be split by rows. Not
+  pinned as a limitation; the bounds themselves are tested.
 - **UTF-8 only.** A file that isn't UTF-8 is refused with "Save it as CSV UTF-8 and attach it
   again." How it is caught depends on how it arrives. Mark converts a chat attachment that
   isn't UTF-8 to UTF-8 before the workflow runs, by decoding it as Windows-1252, so the
@@ -256,9 +259,9 @@ become limitations or unsure findings, not new parsing rules.
   `Sale` -> `language_column: not_applicable`. The loanwords (`accepted_loanwords`) are
   stripped before detection.
 - **Time zones are matched by simple patterns.** The time-zone check was kept to two fixes
-  (French `apr\u00e8s-midi` is no time, and `ET` is no zone in French); the rest was cut under
-  the demo's scope rule (only false blockers on mainstream copy, demo files and security get
-  fixed). What that leaves, each a warning at most and none pinned by a test:
+  (French `apr\u00e8s-midi` is no time, and `ET` is no zone in French); the rest was left out,
+  by design for this release. What that leaves, each a warning at most and none pinned by a
+  test:
   - a time written with full-width digits is not seen as a time, so a deadline without a zone
     gets no warning: `ja-JP` `\uff08\u65e5\uff09\uff19\u6642\u958b\u59cb\u3002`;
   - `aujourd'hui seulement` matches only with a straight apostrophe, so
@@ -269,8 +272,8 @@ become limitations or unsure findings, not new parsing rules.
     `\u00e0 21 h, heure de New York` get a warning;
   - the French cue word stays in `found` (`\u00e0 21 h`, not `21 h`).
 - **Formality is a word list.** `formality` looks for the pronouns and verb forms in
-  `formality_markers`; the fuller lexicon work was cut under the same scope rule, and the
-  Translation Review agent judges register. What that leaves, none pinned by a test:
+  `formality_markers`; the fuller lexicon work was left out, by design for this release, and
+  the Translation Review agent judges register. What that leaves, none pinned by a test:
   - a noun that spells like an informal verb is flagged:
     `Die Schau beginnt jetzt. Besuchen Sie uns.` -> formality `formal` -> `Schau`;
   - the plural informal `Ihr bekommt 20 % Rabatt.` is not flagged (`Ihr` is also the formal
@@ -316,6 +319,23 @@ become limitations or unsure findings, not new parsing rules.
   QA inbox, as plain text (see "The email is sent as plain text" below). Why: model-filled
   inputs can't authenticate; the webhook's auth key is the real sender gate. Not pinned by a
   test.
+- **The reused Content Translation agent can browse the web.** The prebuilt agent that
+  writes the back-translation has the platform tool `browse_web`, and it reads the copy,
+  which is untrusted. Copy written to steer it could make it open a web page, and the
+  request could carry text from the lines it was given. What reaches it is one locale's
+  lines per call; its answer is stored as text for the report only; verdicts, routing and
+  the email recipient stay in code. Our own agents have no side-effecting tools
+  (Translation Review: none; Translation Fix Suggestions: `copy_fit_check` only). Why: the
+  prebuilt agent is reused as it is installed; a copy of it without `browse_web` is a
+  possible next step. Not pinned by a test.
+- **Instructions planted in copy can hide model-judged findings.** The agents read the copy,
+  and their prompts tell them to ignore any instruction inside it, but a model can still be
+  steered: planted text could drop or soften the findings only a model makes (claims,
+  meaning, tone), or skew the back-translation. A dropped model finding can leave a language
+  with a better verdict than it deserves. Rule findings, the verdict rules and routing are
+  code and are unaffected: planted text can't remove a rule finding or call a language ready
+  over one. Why: judging meaning needs a model to read the copy; the report is a screening
+  aid, and a person still reviews every language. Not pinned by a test.
 - **A fallback after a sent email.** The report step saves the canvas, builds the message,
   sends the email and only then builds its answer. If that answer were over `run_safely`'s
   250,000-byte cap, or building it raised, the step would return its fallback ("re-run") while
@@ -369,6 +389,21 @@ become limitations or unsure findings, not new parsing rules.
   particle (the name followed by "nara"). Each miss needs a reviewer's own file; none is in
   a demo file. Why: the two shapes are what the fixer was seen to produce; a wider rule
   would refuse correct fixes. Pinned by a test (test_fix_notes.py).
+- **Formula-like fixes.** A suggested fix that starts with `=`, `+`, `-`, `@`, a tab or a
+  carriage return, also after leading whitespace or invisible characters (` =1+1`, a
+  zero-width space before `=`), gets the status "starts like a spreadsheet formula - needs a
+  person" and is not applied to the corrected file, unless the original cell starts with the
+  same character. What that leaves:
+  - a fix that keeps the cell's own leading `-` or `+` passes even if the rest is
+    formula-like: the source cell already started that way;
+  - false positives on the safe side: a fix that adds a leading "-30 %", "+49" or "@", or
+    drops the space before a cell's own "-" (` -20 %` -> `-30 %`), goes to a person;
+  - cells from the submitted file are written back unchanged, even ones starting with `=`,
+    because they are the user's own.
+
+  Why: the corrected file is opened in a spreadsheet, and a model-written fix must not
+  become a live formula (`=HYPERLINK(...)`); German copy can legitimately start with
+  "-30 %". Pinned by a test (test_formula_fixes.py), except the last point.
 - **Very short copy of question marks trips the wrong-encoding advice.** A cell with at least
   3 `?` making up at least half its visible characters, such as a `Why???` teaser, gets "...is
   mostly question marks: the file was probably saved in the wrong encoding." Why: that is the
@@ -385,8 +420,8 @@ become limitations or unsure findings, not new parsing rules.
   own English. Pinned by a test.
 - **The CSV checks are basic beyond the essentials.** A cell holding only a blank lookalike
   (a Hangul filler, the Braille blank) counts as filled, control characters other than NUL are
-  allowed in cells, and an id need not start with a letter. Why: cut under the demo's scope
-  rule; the essential checks (UTF-8, delimiter, header, known locales, unique ids, known
+  allowed in cells, and an id need not start with a letter. Why: by design for this release;
+  the essential checks (UTF-8, delimiter, header, known locales, unique ids, known
   channels, non-empty cells, size caps, the reserved route prefix) all run. Not pinned by a
   test.
 - **Lines past the fixer's caps get no suggestion.** The fixer gets the lines to fix in file
@@ -412,6 +447,6 @@ become limitations or unsure findings, not new parsing rules.
   as a file. Not pinned as a limitation (the sender's refusal is tested).
 - **A back-translation that isn't text leaves its language unchecked.** _Save the review_
   expects Content Translation's answer as text; any other shape is stored as null, and that
-  language becomes `check_incomplete` ("re-run"). The answer's real shape inside a workflow
-  is not verified yet; an instance test decides. Pinned by a test (an object is stored as
-  null).
+  language becomes `check_incomplete` ("re-run"). Seen live as text, or as the agent's
+  execution record whose response is text; both are read. Pinned by a test (an object is
+  stored as null).

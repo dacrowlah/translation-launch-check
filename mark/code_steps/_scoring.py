@@ -2,6 +2,7 @@
 one was asked for), the review's findings, its verdict, and its lines and back-translation
 as the report shows them. Nothing here raises."""
 
+from _csv_format import FIXED_COLUMNS
 from _review import counted_review, review_rows, rule_opinions, saved_data
 from _verdict import verdict_for
 
@@ -30,7 +31,7 @@ def _back_translation(saved):
 
 
 def _report_line(master, line):
-    names = {key: master[key] for key in ("id", "channel", "field")}
+    names = {key: master[key] for key in FIXED_COLUMNS}
     found = {key: line[key] for key in ("text", "length", "spelling_fix")}
     return {**names, "master": master["text"], **found}
 

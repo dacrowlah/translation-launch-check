@@ -11,7 +11,7 @@ FAILED=0
 
 mkdir "$SCRATCH/base"
 rsync -a --exclude .vitest.json --exclude .vitest-perf.json "$ROOT/tool/" "$SCRATCH/base/tool/"
-# The demo test reads demo/*.answers.json beside tool/ (Task 21).
+# The demo test reads demo/*.answers.json beside tool/.
 rsync -a "$ROOT/demo/" "$SCRATCH/base/demo/"
 
 # plant <label> <gate script> <expected output regex> <file> <content> [<file 2> <content 2>]
@@ -218,12 +218,13 @@ mkdir -p "$SCRATCH/mbase/tool"
 rsync -a --exclude __pycache__ "$ROOT/mark/" "$SCRATCH/mbase/mark/"
 rsync -a "$ROOT/tool/config/" "$SCRATCH/mbase/tool/config/"
 # The mark tests import scripts/ (send_package, catch_rate) and read demo/ and the tool's
-# demo fixtures (Task 21).
+# demo fixtures.
 rsync -a --exclude __pycache__ "$ROOT/scripts/" "$SCRATCH/mbase/scripts/"
 rsync -a "$ROOT/demo/" "$SCRATCH/mbase/demo/"
 rsync -a "$ROOT/tool/test/fixtures/demo/" "$SCRATCH/mbase/tool/test/fixtures/demo/"
 
 # mark_plant <label> <gate: lint|format|test> <expected output regex> <file under mark/> <content>
+# (a file under scripts/ is given as ../scripts/<name>)
 mark_plant() {
   local label="$1" gate="$2" pattern="$3" file="$4" content="$5"
   local dir="$SCRATCH/m-$label"
@@ -245,8 +246,8 @@ mark_plant() {
 mark_gate() {
   local dir="$1"
   case "$2" in
-    lint) (cd "$dir" && "$VENV/ruff" check mark --no-cache) ;;
-    format) (cd "$dir" && "$VENV/ruff" format --check --no-cache mark) ;;
+    lint) (cd "$dir" && "$VENV/ruff" check mark scripts --no-cache) ;;
+    format) (cd "$dir" && "$VENV/ruff" format --check --no-cache mark scripts) ;;
     test) bash "$ROOT/scripts/mark-test-gate.sh" "$dir" ;;
   esac
 }
@@ -275,6 +276,12 @@ mark_plant mark-five-params lint 'PLR0913' code_steps/wide.py \
   'def wide(a, b, c, d, e):
     return a'
 mark_plant mark-unformatted format 'would be reformatted' code_steps/ugly.py 'X   =   {"a":1}'
+# scripts/ is linted and formatted with mark/'s rules (scripts/ruff.toml extends them).
+mark_plant scripts-print lint 'T201' ../scripts/printing.py 'print("x")'
+mark_plant scripts-five-params lint 'PLR0913' ../scripts/wide.py \
+  'def wide(a, b, c, d, e):
+    return a'
+mark_plant scripts-unformatted format 'would be reformatted' ../scripts/ugly.py 'X   =   {"a":1}'
 mark_plant mark-skipped-test test 'some were skipped' tests/test_skipped.py \
   'import pytest
 

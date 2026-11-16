@@ -56,14 +56,14 @@ class Redirecting(http.server.BaseHTTPRequestHandler):
 
     seen = []
 
-    def do_POST(self):  # noqa: N802 - the handler's method naming
+    def do_POST(self):
         self.rfile.read(int(self.headers["Content-Length"]))
         self.seen.append(("POST", self.path, self.headers.get("X-Api-Key")))
         self.send_response(302)
         self.send_header("Location", "/elsewhere")
         self.end_headers()
 
-    def do_GET(self):  # noqa: N802 - the handler's method naming
+    def do_GET(self):
         self.seen.append(("GET", self.path, self.headers.get("X-Api-Key")))
         self.send_response(200)
         self.end_headers()

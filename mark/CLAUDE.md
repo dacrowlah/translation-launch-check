@@ -26,8 +26,7 @@ binding docs rather than repeating them.
   read. Steps inside the loop must never fail: one failed iteration stops the workflow.
 - **Our tool only through `call_tool(tool, /, **params)`**: any status other than `ok` is a
   failure (`unavailable` when the call itself failed). Platform tools only through the
-  helpers in `_platform.py` and `_csv_attachment.py`; email only through `send_email`, which
-  enforces the allow-list.
+  helpers in `_platform.py`; email only through `send_email`, which enforces the allow-list.
 - **User-facing text only from the templates** (`_text.py`, `_text_problems.py`,
   `_text_report.py`, `_text_needs_info.py`). Never exception text, tool messages or JSON.
   Untrusted text (copy, model output) reaches chat and canvas only through `md_text()` and the
@@ -92,8 +91,8 @@ python3.12 -m venv .venv && .venv/bin/pip install -r mark/requirements-dev.txt
 Then:
 
 ```
-.venv/bin/ruff check mark
-.venv/bin/ruff format --check mark
+.venv/bin/ruff check mark scripts
+.venv/bin/ruff format --check mark scripts
 bash scripts/mark-test-gate.sh     # pytest; zero tests or any skip fails
 ```
 

@@ -5,12 +5,13 @@ where strings belong), then the shared package rules. Nothing here raises."""
 
 from _campaign import clean_campaign
 from _checksum import sha256_hex
+from _csv_format import FIXED_COLUMNS
 from _model_output import json_object
 from _package import validate_package
 from _text_problems import file_problem
 
 PACKAGE_KEYS = frozenset({"campaign", "master_locale", "locales", "lines"})
-LINE_KEYS = frozenset({"id", "channel", "field", "texts"})
+LINE_KEYS = frozenset({*FIXED_COLUMNS, "texts"})
 CHECKSUM_KEY = "package_sha256"
 
 

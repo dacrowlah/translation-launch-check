@@ -53,10 +53,10 @@ into every code step (a code step is one file; local imports fail). Tests put a 
 `example_check`, the `example_route_` prefix and `/workspace/example` are placeholders.
 
 This is the webhook variant: the package comes in a webhook payload, which is itself a
-code-step input and so must fit the 75,776-byte cap. Senders measure the UTF-8 bytes of the
-JSON body as sent and refuse anything above 50,000 bytes (margin: the cap was related to
-payload size by one ASCII measurement with about 1.32x platform wrapping; non-ASCII
-expansion is untested). Over the cap the platform fails the run before this code starts.
+code-step input. The step's escaped code counts toward the same ~75,776-byte event, so keep
+escaped code plus escaped input to about 68,000 bytes: give each step a code ceiling and
+derive the sender cap from what is left (here 26,800 bytes, measured as escaped JSON). Over
+the cap the platform fails the run before this code starts.
 So the 60 KB / 200 KB caps below can only fire in the chat and email variants, which read
 the file from disk or a tool. The "unreadable" check matters there too; here the checksum
 fails first on unencodable text, so it is a guard for the shared helpers. The chat variant

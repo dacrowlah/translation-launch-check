@@ -2,7 +2,6 @@ import pytest
 
 from _checksum import (
     canonical_bytes,
-    canonical_json,
     facts_checksum,
     json_size,
     locale_checksum,
@@ -50,10 +49,6 @@ def test_facts_checksum_is_the_first_16_hex():
     assert facts_checksum(FIXTURE) == "0e294581c65d6bfe"
 
 
-def test_canonical_json_is_the_same_text():
-    assert canonical_json(FIXTURE) == FIXTURE_CANONICAL
-
-
 def test_facts_checksum_ignores_key_order():
     assert facts_checksum({"a": 1, "b": [1]}) == facts_checksum({"b": [1], "a": 1})
 
@@ -88,7 +83,6 @@ def test_facts_checksum_keeps_a_float_a_float():
 )
 def test_data_that_is_not_plain_json_has_no_checksum(value):
     assert canonical_bytes(value) is None
-    assert canonical_json(value) is None
     assert facts_checksum(value) is None
     assert sha256_hex(value) is None
 

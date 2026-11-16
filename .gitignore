@@ -13,3 +13,5 @@ mark/dist/
 .preflight/
 tool/.vitest.json
 tool/.vitest-perf.json
+.superpowers/
+.claude/settings.local.json

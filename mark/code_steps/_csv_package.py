@@ -8,18 +8,17 @@ import csv
 import io
 
 from _campaign import campaign_from
+from _csv_format import BOM, FIXED_COLUMNS
 from _package import validate_package
 from _text_problems import file_problem, header_problem, problem, where_row
 
 DELIMITERS = (",", ";", "\t")  # comma wins a tie
-BYTE_ORDER_MARK = "\ufeff"
-FIXED_COLUMNS = ("id", "channel", "field")
 MIN_COLUMNS = len(FIXED_COLUMNS) + 2  # the master and at least one translation
 
 
 def strip_bom(text):
     """The CSV parser's first step, for every source: one leading UTF-8 BOM removed."""
-    return text[1:] if isinstance(text, str) and text.startswith(BYTE_ORDER_MARK) else text
+    return text[1:] if isinstance(text, str) and text.startswith(BOM) else text
 
 
 def _decoded(raw):
@@ -48,7 +47,8 @@ def _blank_record(record):
 
 def _csv_rows(text):
     try:
-        return list(csv.reader(io.StringIO(text, newline=""), delimiter=_sniff(text)))
+        reader = csv.reader(io.StringIO(text, newline=""), delimiter=_sniff(text), strict=True)
+        return list(reader)
     except csv.Error:
         return None
 

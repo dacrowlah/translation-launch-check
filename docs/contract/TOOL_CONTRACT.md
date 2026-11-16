@@ -334,7 +334,7 @@ and offline. A back-translation alone cannot do it: it turns any language into c
 - **Statistics:** the `eld` library (Apache-2.0, no dependencies), "small" dataset, restricted
   to a candidate set. The candidates are the Latin-script languages of every locale in
   `config/rules.json` (`en`, `de`, `fr`), not only the file's own languages, so a file with
-  two languages can still catch a third language pasted in (builder's call).
+  two languages can still catch a third language pasted in (by design).
 - **Single line** (`language_line`, warning, certain): a Latin-script line with
   `min_letters` (20) or more letters after stripping that the detector reads as another
   language. A shorter line, or one the detector cannot place, gets no result.

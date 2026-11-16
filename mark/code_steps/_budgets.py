@@ -25,6 +25,7 @@ REVIEW_BOUNDS = {"findings": 20, "line_id": 40, "detail": 240, "evidence": 120}
 REVIEW_BOUNDS |= {"rule_checks": 20, "finding_id": 40, "reason": 200}
 FIX_BOUNDS = {"fixes": 60, "line_id": 40, "suggested_text": 1000, "note": 240}
 KEYS = 120  # an answer object's keys, quotes, enums and locale
+INPUT_KEYS = 200  # a step input's own keys and small values (run key, checksums, trigger)
 
 
 def input_budget(step):

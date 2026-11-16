@@ -95,24 +95,6 @@ def tool_body(status="ok", **fields):
     return {"status": status, **fields}
 
 
-def csv_canvas(content):
-    """create_csv_canvas's success: the fetched file's text in data.content."""
-    return ok({"data": {"content": content, "size": len(content.encode("utf-8"))}})
-
-
-def an_attachment(**overrides):
-    """One entry of email_payload.attachments, as the email trigger records it."""
-    base = {
-        "url": "gs://example-bucket/attachments/launch.csv",
-        "file_id": "file-1",
-        "filename": "launch.csv",
-        "size_bytes": 18,
-        "size_mb": 0.0,
-        "content_type": "text/csv",
-    }
-    return {**base, **overrides}
-
-
 def helper_modules():
     """The helper modules the build inlines: every code_steps/_*.py."""
     return sorted(CODE_STEPS.glob("_*.py"))

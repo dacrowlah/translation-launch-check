@@ -1,0 +1,2 @@
+# scripts/ follows the same ruff rules as mark/ (the scripts import its helpers).
+extend = "../mark/pyproject.toml"

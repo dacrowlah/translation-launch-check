@@ -9,7 +9,7 @@ the fixer when it has a blocker or warning on that line, except:
   nothing else to fix is not sent.
 Nothing here raises."""
 
-from _budgets import FIX_BOUNDS, fix_overhead, input_budget
+from _budgets import FIX_BOUNDS, INPUT_KEYS, fix_overhead, input_budget
 from _checksum import json_size
 from _finding_text import length_text, values_text
 from _fixable import FOR_A_PERSON, SPELLING, fixable_at
@@ -19,7 +19,7 @@ MAX_FIX_INPUT_BYTES = 50_000  # the fixer's input; lines past it get no suggesti
 # The fixer's answer goes into "Write and send the report": the lines' fixes must fit that
 # step's budget. The schema bounds each fix (FIX_BOUNDS); a draft is expected to run about a
 # fifth longer than its start text, never past the schema's suggested_text bound.
-FIXES_BUDGET = input_budget("report") - 200  # run_key, verdict_checksum and the keys
+FIXES_BUDGET = input_budget("report") - INPUT_KEYS  # run_key, verdict_checksum and the keys
 DRAFT_GROWTH = 1.2
 LIMITS = (MAX_FIX_INPUT_BYTES, FIXES_BUDGET, FIX_BOUNDS["fixes"])  # bytes in, bytes out, fixes
 

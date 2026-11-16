@@ -9,6 +9,7 @@ Nothing here raises."""
 from _budgets import REVIEW_BOUNDS
 from _checksum import locale_checksum
 from _config import PRIVATE
+from _csv_format import FIXED_COLUMNS
 from _text_problems import header_problem, problem, shown, where_row
 from _tool_report import flat_findings
 
@@ -40,9 +41,8 @@ def unsent_checks(findings):
 
 def master_lines(pkg):
     master = pkg["master_locale"]
-    fields = ("id", "channel", "field")
     return [
-        {**{key: line[key] for key in fields}, "text": line["texts"][master]}
+        {**{key: line[key] for key in FIXED_COLUMNS}, "text": line["texts"][master]}
         for line in pkg["lines"]
     ]
 

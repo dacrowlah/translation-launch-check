@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { corpusAreas, valueFindings } from "../support/corpus.js";
 
 /**
- * Every reproduction from the review rounds, one literal row each, through the use case on
+ * Every reproduction found in review, one literal row each, through the use case on
  * the real rules (rows in test/fixtures/regression/). A known_limitation_ group pins a ruled
  * cost as it is today. A failing row names its group, its row and its copy.
  */

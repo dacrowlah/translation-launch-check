@@ -31,7 +31,8 @@ for gate in "${TOOL_GATES[@]}"; do
   run_gate "$gate" || exit 1
 done
 
-# Mark half: Python in mark/, run from the repo venv (python3.12, see docs/standards/MARK.md).
+# Mark half: Python in mark/ and scripts/, run from the repo venv (python3.12, see
+# docs/standards/MARK.md).
 VENV="$ROOT/.venv/bin"
 
 run_mark() {
@@ -57,8 +58,8 @@ mark_build() {
   fi
 }
 
-run_mark mark-lint "$VENV/ruff" check mark || exit 1
-run_mark mark-format "$VENV/ruff" format --check mark || exit 1
+run_mark mark-lint "$VENV/ruff" check mark scripts || exit 1
+run_mark mark-format "$VENV/ruff" format --check mark scripts || exit 1
 run_mark mark-test bash "$ROOT/scripts/mark-test-gate.sh" || exit 1
 mark_build || exit 1
 echo "mark tests: $(tail -1 "$LOGS/mark-test.log")"

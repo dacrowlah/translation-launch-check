@@ -33,7 +33,10 @@ beforeEach(() => {
   capture(process.stdout, written.stdout);
   capture(process.stderr, written.stderr);
 });
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
 
 const CHECK = "/tools/localization-check";
 const check = async (body: unknown) => (await postTo(base, CHECK, body, TOKEN)).text();
@@ -81,5 +84,33 @@ describe("what the app writes", () => {
       1,
     ]);
     expect(consoleCalls).toEqual([]);
+  });
+});
+
+const CALLBACK = {
+  url: "https://callback.example.test/done",
+  tool_call_id: "c1",
+  callback_token: "t",
+};
+/** Stubs the global fetch: requests to the app go through; any other URL is recorded, not sent. */
+const recordOutbound = (): string[] => {
+  const realFetch = globalThis.fetch;
+  const outbound: string[] = [];
+  vi.stubGlobal("fetch", (url: string, init?: RequestInit) =>
+    url.startsWith(base) ? realFetch(url, init) : (outbound.push(url), new Response("{}")),
+  );
+  return outbound;
+};
+const settled = () => new Promise((resolve) => setTimeout(resolve, 50));
+
+describe("outbound requests", () => {
+  // The SDK's async mode would POST the result to the caller-supplied async_callback URL.
+  it("a_body_with_an_async_callback_gets_a_direct_reply_and_causes_no_outbound_request", async () => {
+    const outbound = recordOutbound();
+    const res = await postTo(base, CHECK, { ...aBody(), async_callback: CALLBACK }, TOKEN);
+    const status = res.status;
+    await res.text();
+    await settled();
+    expect([status, outbound]).toEqual([200, []]);
   });
 });

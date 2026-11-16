@@ -11,8 +11,8 @@ skill):
 - the observed tool failures inside a code step **come back as data, not exceptions**
   (the SDK also defines exception classes, so a raise must be handled too);
 - one failed loop iteration **stops the whole workflow**;
-- a code step's input is **capped at 75,776 bytes** as Mark wraps it, and going over fails
-  the run.
+- a code step's event is **capped at about 75,776 bytes**, and going over fails the run;
+  the step's own escaped code counts toward it, beside its escaped input.
 
 Complete runnable example: [example_step.py](example_step.py).
 
@@ -60,14 +60,14 @@ Complete runnable example: [example_step.py](example_step.py).
     `trigger_name` is a recorded non-webhook value (`"Chat"`, `"Scheduler"`, `"Email"`)
     or its payload is empty or not an object, whatever the payload's shape; only a
     non-empty payload on another run whose checksum fails gets "re-send the package".
-  - **Webhook size:** the payload is itself a code-step input, so it must fit
-    the 75,776-byte code-step input cap. Measure the **UTF-8 bytes of the JSON body as
-    sent**. The relation to the cap comes from one ASCII measurement (Mark wrapped the
-    value about 1.32x); how non-ASCII text expands in that wrapping is untested. So
-    senders refuse any body above **50,000 bytes** (margin below the ~57 KB the ASCII
-    ratio suggests). Over the cap the platform fails the run before your code starts (no
-    templated message). The 60 KB / 200 KB caps below therefore only fire in the chat and
-    email variants.
+  - **Webhook size:** the payload is itself a code-step input, and the step's escaped
+    code counts toward the same ~75,776-byte event. Keep the escaped code plus the escaped
+    input to about **68,000 bytes** (the rest is the platform's own overhead): give each
+    step a code ceiling that the build enforces, and derive the sender cap from what is
+    left (here 68,000 - 41,000 for the first step's code - 200 for its other keys =
+    **26,800 bytes**). Senders measure the payload as escaped JSON, the largest form. Over
+    the cap the platform fails the run before your code starts (no templated message).
+    The 60 KB / 200 KB caps below therefore only fire in the chat and email variants.
   - The `trigger_name` gate is hygiene, not a security boundary: the model fills it and
     the gated input alike. `email_sender` decides only whether a reply may go out (the
     allow-list); the trigger's own sender filter is the real gate on who can start a run.
@@ -392,10 +392,10 @@ into each step at build time. Tests replace `opal_tms_sdk` with an in-memory fak
 
 ## Platform limits to respect
 Python 3.12; single file (no local imports - inline shared helpers at build time); stdlib +
-`opal_tms_sdk`; no network; input <= 75,776 bytes as wrapped by Mark (about 1.32x your
-JSON in one ASCII measurement); return <= 256 KB (docs: bigger silently becomes null);
-timeout default 30 s (docs: at most 300 s, not re-verified); `summary` key stripped
-downstream. JavaScript steps exist but cannot call tools. Agent input limits: see
+`opal_tms_sdk`; no network; event <= about 75,776 bytes, the step's escaped code included
+(keep escaped code plus escaped input to about 68,000); return <= 256 KB (docs: bigger
+silently becomes null); timeout default 30 s (docs: at most 300 s, not re-verified);
+`summary` key stripped downstream. JavaScript steps exist but cannot call tools. Agent input limits: see
 `mark-platform`. Parse and dry-run every step before deploying: a step that fails to start
 is debugged in front of the user.
 

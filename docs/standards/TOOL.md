@@ -132,6 +132,9 @@ The SDK's auth, logging and failure behaviour, and the response rule: the
   zod); `infrastructure` may import Node built-ins, and the composition root (`src/main.ts`)
   may import anything (it uses `express`). Lint does not ban the global `fetch`, and no test
   pins its absence, so review checks it.
+- Never register a tool in the SDK's async mode: it POSTs results to a caller-supplied
+  `async_callback` URL. A test pins that a body with `async_callback` gets the direct reply
+  and causes no outbound request (`test/presentation/app-security.test.ts`).
 - **Input:** every parameter is zod-validated with the bounds in the contract, inside the
   tool handler (`safeHandler`), after the SDK's bearer check. The SDK does not validate at
   request time and has no status hook. A malformed call does no work and replies HTTP 200
@@ -197,7 +200,8 @@ typescript-eslint 8, TypeScript 6.0 (typescript-eslint 8 does not support TypeSc
 `eslint-plugin-metz` 1.0.0, Prettier 3, Vitest, jscpd. Express 4 and `@types/express` 4 are
 pinned to match the SDK's peer range. Known and accepted peer warnings:
 the SDK declares `typescript ^5.1.6` and `@types/node ^20`; we use TypeScript 6.0 and
-`@types/node` 24 (Node 24). The SDK's types are exercised since Task 12 (presentation imports it) and typecheck cleanly without `skipLibCheck`.
+`@types/node` 24 (Node 24). The SDK's types are exercised (presentation imports them) and
+typecheck cleanly without `skipLibCheck`.
 
 Gates, each proven by a planted violation that turns it red for its named reason:
 

@@ -38,11 +38,6 @@ def canonical_bytes(value):
     return blob if blob is not None and _round_trips(blob, value) else None
 
 
-def canonical_json(value):
-    blob = canonical_bytes(value)
-    return blob.decode("utf-8") if blob is not None else None
-
-
 def sha256_hex(value):
     """The webhook package recipe: the full 64-hex SHA-256 of the canonical JSON, or None."""
     blob = canonical_bytes(value)
@@ -65,7 +60,7 @@ def json_size(value):
     escapes, default ", " and ": " separators): never smaller than the UTF-8 canonical form.
     None for data that is not plain JSON. The one measure for return and loop-item caps.
     Indentation, a second encoding or a platform envelope would be larger: how Mark measures
-    a return is unverified; it is checked by a throwaway before the report step relies on it."""
+    a return is unverified, so returns stay far below the limit."""
     if canonical_bytes(value) is None:
         return None
     return len(json.dumps(value, sort_keys=True, ensure_ascii=True, allow_nan=False))

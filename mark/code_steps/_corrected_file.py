@@ -1,20 +1,20 @@
 """The corrected file: the checked file with every fix that passed the re-check applied, as a
 CSV the user downloads and re-uploads as is. Same columns and rows, comma-delimited, UTF-8
 with a BOM (Excel), CRLF line ends. A fix to a line with a price or currency finding is never
-applied: prices come from the customer's price list. A fix that reads as a note never
-passes (_fix_notes), so it isn't applied either. Nothing here raises."""
+applied: prices come from the customer's price list. A fix unfit as copy (it reads as a note,
+or would start a spreadsheet formula) never passes (_fix_notes), so it isn't applied either.
+Nothing here raises."""
 
 import csv
 import io
 
 from _campaign import clean_campaign
 from _config import RULES
+from _csv_format import BOM, FIXED_COLUMNS
 from _fixable import FOR_A_PERSON
-from _platform import BOM, write_file
+from _platform import write_file
 from _text_report import REPORT
 from _verdict import FAILING
-
-COLUMNS = ("id", "channel", "field")  # the CSV's fixed columns (_csv_package.FIXED_COLUMNS)
 
 
 def _price_lines(scores):
@@ -34,12 +34,12 @@ def _corrected_row(index, scores, applied):
     texts = [
         applied.get((s["locale"], line["id"]), s["lines"][index]["text"]) for s in scores["locales"]
     ]
-    return [*(line[key] for key in COLUMNS), line["master"], *texts]
+    return [*(line[key] for key in FIXED_COLUMNS), line["master"], *texts]
 
 
 def _table(scores, applied):
     """The header, then every line in order with the applied fixes."""
-    header = [*COLUMNS, RULES["master_locale"], *(s["locale"] for s in scores["locales"])]
+    header = [*FIXED_COLUMNS, RULES["master_locale"], *(s["locale"] for s in scores["locales"])]
     count = len(scores["locales"][0]["lines"])
     return [header, *(_corrected_row(index, scores, applied) for index in range(count))]
 

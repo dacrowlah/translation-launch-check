@@ -69,11 +69,12 @@ Entries: `{"<name>": {"type": "predicted" | "static", "value_type": "string"|"nu
   or "unchanged".
 - **`static` is ignored on agent steps inside a `for_loop`** (verified: a required static
   input fails the iteration) - use `predicted` with a description that pins the value.
-- **Size:** a code step's whole input is capped at 75,776 bytes as Mark wraps it (about
-  1.32x your JSON in one ASCII measurement), and going over fails the run before the code starts (verified
-  2026-11). Give code steps small inputs (keys, routes, checksums, a run key) and keep
-  large data in run-folder files (see `mark-code-step-patterns`). Agent steps took about
-  72 KB without trouble; cap their inputs in code anyway.
+- **Size:** a code step's event, its escaped code plus its whole input, is capped at about
+  75,776 bytes, and going over fails the run before the code starts (verified 2026-11):
+  keep escaped code plus escaped input to about 68,000 bytes. Give code steps small inputs
+  (keys, routes, checksums, a run key) and keep large data in run-folder files (see
+  `mark-code-step-patterns`). Agent steps took about 72 KB without trouble; cap their
+  inputs in code anyway.
 - **Never declare the whole trigger as one input.** Chat pastes the attached file into
   `text_content` and email runs carry the HTML body, so the whole trigger can exceed the
   cap (inferred from the cap and the trigger contents, not separately tested). Declare
@@ -82,9 +83,10 @@ Entries: `{"<name>": {"type": "predicted" | "static", "value_type": "string"|"nu
   - `email_sender`: "trigger_context.email_payload.sender, unchanged";
   - `email_attachments`: "trigger_context.email_payload.attachments, unchanged";
   - `webhook_payload`: "trigger_context.webhook_payload, unchanged" (it must itself fit
-    the cap: senders measure the UTF-8 bytes of the JSON body as sent and refuse above
-    50,000, because over the cap the run fails before the code starts; the ratio comes
-    from one ASCII measurement and non-ASCII expansion is untested).
+    the cap: the step's escaped code counts toward the ~75,776-byte event, so keep escaped
+    code plus escaped input to about 68,000 bytes, give each step a code ceiling, and
+    derive the sender cap from what is left, here 26,800; over the cap the run fails
+    before the code starts).
 
   These are filled by the orchestrator model, not copied from the raw trigger (and that it
   resolves the `trigger_context.<path>` wording is not verified), so the code checks each

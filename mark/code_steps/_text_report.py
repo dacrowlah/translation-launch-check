@@ -18,6 +18,7 @@ FIX_STATUS = {
     "still_has": "still has: {checks}",
     "not_rechecked": "couldn't be re-checked",
     "reads_as_a_note": "reads as a note, not copy - needs a person",
+    "starts_a_formula": "starts like a spreadsheet formula - needs a person",
 }
 NOUNS = {"blocker": ("blocker", "blockers"), "warning": ("warning", "warnings")}
 

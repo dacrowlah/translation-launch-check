@@ -25,10 +25,9 @@ mark/                                      the Agent Platform source
                                            without_controls (stdlib only)
   code_steps/_platform.py                  platform-tool helpers: send_email (allow-list),
                                            create_canvas, write_file
-  code_steps/_csv_attachment.py            read_csv_attachment (create_csv_canvas; unused)
   code_steps/_address.py                   email address and allow-list rules
   code_steps/_url.py                       the template URL rule
-  code_steps/_checksum.py                  canonical JSON, sha256_hex, facts_checksum,
+  code_steps/_checksum.py                  canonical_bytes, sha256_hex, facts_checksum,
                                            locale_checksum, json_size
   code_steps/_run_folder.py                run-folder files: write, read, bind to a checksum
   code_steps/_config.py                    RULES and PRIVATE (files in dev, literals after build)
@@ -36,6 +35,7 @@ mark/                                      the Agent Platform source
   code_steps/_package.py  _locales.py      validate_package(): rules shared by CSV and webhook
                                            (per cell: empty, NUL, "????", garbled, too long)
   code_steps/_csv_package.py               parse_csv() -> package; strip_bom
+  code_steps/_csv_format.py                BOM and FIXED_COLUMNS (parser and corrected file)
   code_steps/_webhook_package.py           from_webhook() -> package (checksum)
   code_steps/_tool_report.py               the tool's report: shape check, flat findings
   code_steps/_check_facts.py               check.json: lines, rule findings, refs, checksums
@@ -52,7 +52,7 @@ mark/                                      the Agent Platform source
   code_steps/_fixable.py                   which findings a fix addresses; prices never
   code_steps/_fix_input.py                 lines to fix and the fixer's input text
   code_steps/_fixes.py                     suggested fixes and their one re-check call
-  code_steps/_fix_notes.py                 a fix that reads as a note, not copy
+  code_steps/_fix_notes.py                 a fix unfit as copy: a note, or a formula start
   code_steps/_report_view.py  _message.py  the chat reply (Markdown) and the QA-inbox email
                                            (plain text): one assembly, two styles
   code_steps/_corrected_file.py            the corrected CSV: passing fixes applied, no prices
@@ -104,7 +104,10 @@ checksum per hop:
   UTF-8 with a BOM, CRLF, through `write_content_to_file`, and links its download. A fix
   that reads as a note, not copy (`_fix_notes`: an untranslated line's fix still quoting the
   old wording, or a do-not-translate-only line's fix that grew by more than the terms) gets
-  the status "reads as a note" and is never applied.
+  the status "reads as a note" and is never applied. A fix that would start a spreadsheet
+  formula (`= + - @`, tab or carriage return first, also after leading whitespace or
+  invisible characters) where the cell it replaces doesn't start with the same character
+  gets the status "starts like a spreadsheet formula" and is never applied either.
 
 **Source of truth: the repo, not the instance.**
 - Every agent, skill and code step is edited here, then built and imported. Mark exports the
@@ -173,8 +176,8 @@ Rules:
   - Platform tools: `call_platform(tool, /, **params)` returns the body dict, or `None` for
     the same failure shapes. The helpers in `_platform.py` then check that tool's own
     fields: `send_email` counts only `status == "sent"`, `create_canvas` needs an
-    `artifact_url`, `write_file` needs `file_metadata.download_link` (not under `data`), and
-    `read_csv_attachment` (`_csv_attachment.py`) returns a status with the text.
+    `artifact_url`, and `write_file` needs `file_metadata.download_link` (not under
+    `data`).
   - Never branch on an error's own keys: they differ between tools.
 - **Never raise for expected problems.** Return a status or a route.
   - Each step's handler calls `run_safely(impl, input_, ctx, fallback=None)` from
@@ -319,8 +322,8 @@ The authoring format, export fields and import steps: the
   too large before any code runs. Translation Review: at most 20 findings (detail 240
   characters, evidence 120) and 20 `rule_checks` (reason 200). Translation Fix Suggestions:
   at most 60 fixes (suggested text 1,000 characters, note 240). Whether Mark enforces
-  `maxItems` and `maxLength` (it enforced keys and enums) is not verified yet; an instance
-  test checks it.
+  `maxItems` and `maxLength` (it enforced keys and enums) is not verified; the code caps
+  independently.
 - **Every agent:**
   - has one job;
   - has a strict JSON output schema;
@@ -396,8 +399,7 @@ The workflow's export format, loops, conditions, triggers and canvas layout: the
   - Edges never cross nodes. No two nodes overlap, and no node is closer than 80 px to
     another.
   - Every node has the short, human name from the table above.
-  - **Verify visually** after each import: a screenshot of the canvas is checked (kept
-    with the submission materials, outside this repo).
+  - **Verify visually** after each import: a screenshot of the canvas is checked.
 - **Triggers:** Chat and Webhook (the Email source is deferred). `auth_key` is null in the
   source and the platform makes the URL on import. **The import dialog has no auth-key
   field**, so after import: open the workflow editor, click the webhook trigger node, set
@@ -442,19 +444,19 @@ The how-to is the [writing-tests skill](../../.claude/skills/writing-tests/SKILL
   tracked file, and the five built steps run end to end on the fake SDK).
 - **End-to-end runs in the instance are the integration test.** Each demo case
   (`mark/README.md` section 5) is run, and the outcome checked in the run log, not only in
-  chat text. The budget is about 10 end-to-end runs. Measured credits per run: about 6 for a
-  refused file, 40-65 for a 3-language file, and about 92 for the 5-language seeded set
-  (`mark/README.md` section 6).
+  chat text. Measured credits per run: about 6 for a refused file, 40-65 for a 3-language
+  file, and about 92 for the 5-language seeded set (`mark/README.md` section 6).
 
 ## 6. Tooling and gates
 
 All commands run from the repository root, with the root `.venv` (Python 3.12), set up
 once with `python3.12 -m venv .venv && .venv/bin/pip install -r mark/requirements-dev.txt`.
 
-- `ruff check mark` and `ruff format --check mark`. ruff is pinned in
+- `ruff check mark scripts` and `ruff format --check mark scripts`. ruff is pinned in
   `requirements-dev.txt`; `mark/pyproject.toml` selects `E`, `F`, `W`, `I`, `B`, `S`
   (bandit subset), `T10` (no debugger), `T20` (no print), `A` and `PLR0913` with
-  `max-args = 4`, line length 100, target Python 3.12.
+  `max-args = 4`, line length 100, target Python 3.12. `scripts/ruff.toml` extends it, so
+  the scripts get the same rules (without it, ruff would fall back to a user-level config).
 - `bash scripts/mark-test-gate.sh`: pytest over `mark/`, green only when at least one test
   passed and none was skipped, deselected or xfailed.
 - `python mark/build.py --example`: builds from `local.config.example.json` into a new temp
@@ -464,10 +466,11 @@ once with `python3.12 -m venv .venv && .venv/bin/pip install -r mark/requirement
   the default silently skipped `mark/_build/`. A prove-gates plant (a `print` in
   `mark/_build/`) keeps it so.
 - `scripts/preflight.sh` runs all of the above after the `tool/` gates.
-  `.githooks/pre-commit` runs `ruff check` and `ruff format --check` on staged `mark/` Python
-  files.
+  `.githooks/pre-commit` runs `ruff check` and `ruff format --check` on staged `mark/` and
+  `scripts/` Python files.
 - Each gate is proven with a planted violation in `scripts/prove-gates.sh` (a print, five
-  parameters, unformatted code, a skipped test), with a no-op control plant
+  parameters, unformatted code, in `mark/` and in `scripts/`; a skipped test), with a no-op
+  control plant
   ([README.md](README.md) section 5).
 
 ## 7. Security
@@ -505,6 +508,10 @@ once with `python3.12 -m venv .venv && .venv/bin/pip install -r mark/requirement
 - Chat and canvas output show untrusted text as text (`md_text`, section 2), and the email
   is plain text (`plain_text`), so a planted link, image or tag can't render and a cell
   can't break the report layout.
-- Agents have no side-effecting tools, and verdicts are computed in code.
+- Our agents have no side-effecting tools (Translation Review: no tools; Translation Fix
+  Suggestions: `copy_fit_check` only), and verdicts are computed in code. The reused Content
+  Translation agent has `browse_web`; untrusted copy reaches it, bounded to one locale's
+  lines, and verdicts stay in code
+  ([KNOWN_LIMITATIONS.md](../contract/KNOWN_LIMITATIONS.md) section 5).
 - A security review against this section and [TOOL.md](TOOL.md) section 3 runs before
   submission.

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Format and lint the staged tool/ and mark/ files. Enable with: git config core.hooksPath .githooks
+# Format and lint the staged tool/, mark/ and scripts/ files. Enable with: git config core.hooksPath .githooks
 set -eu
 
 ROOT="$(git rev-parse --show-toplevel)"
@@ -23,7 +23,7 @@ check_tool() {
 check_mark() {
   local py=()
   while IFS= read -r path; do py+=("$path"); done < <(
-    git diff --cached --name-only --diff-filter=ACM -- 'mark/*.py'
+    git diff --cached --name-only --diff-filter=ACM -- 'mark/*.py' 'scripts/*.py'
   )
   [ "${#py[@]}" -eq 0 ] && return 0
   cd "$ROOT"

@@ -1,7 +1,7 @@
-"""The agents' prompts (Task 19, merged) show the exact text these steps send them. These
-tests feed each prompt example's facts through the real builders and require the output to
-appear in the prompt verbatim, so the code and the prompts can't drift apart. A change to
-either goes through the controller, in both places together."""
+"""The agents' prompts show the exact text these steps send them. These tests feed each prompt
+example's facts through the real builders and require the output to appear in the prompt
+verbatim, so the code and the prompts can't drift apart. A change to either updates both
+together."""
 
 import pytest
 
@@ -19,26 +19,30 @@ def prompt(agent_dir):
     return (agent_dir / "prompt.md").read_text(encoding="utf-8")
 
 
-def a_rule_finding(ref, line_id, check, detail, *values):
+def expected_and_found(values):
+    """values: (expected, found), either left off as None."""
     expected, found = (*values, None, None)[:2]
-    return {
-        "ref": ref,
-        "line_id": line_id,
-        "check": check,
-        "detail": detail,
-        "expected": expected,
-        "found": found,
-    }
+    return {"expected": expected, "found": found}
+
+
+def a_rule_finding(where, check, detail, values=()):
+    """where: (ref, line_id); values: (expected, found)."""
+    ref, line_id = where
+    names = {"ref": ref, "line_id": line_id, "check": check, "detail": detail}
+    return {**names, **expected_and_found(values)}
 
 
 EXAMPLE_FINDINGS = [
-    a_rule_finding("R1", "L3", "currency_code", CHF, "CHF"),
-    a_rule_finding("R2", "L5", "numbers", "A number differs from the master.", "00:00", "12:00"),
-    a_rule_finding("R3", "L6", "dates", "A date or weekday differs from the master.", "Friday"),
-    a_rule_finding(None, "L7", "formality", "Formal and informal address are mixed."),
+    a_rule_finding(("R1", "L3"), "currency_code", CHF, ("CHF",)),
     a_rule_finding(
-        "R4",
-        None,
+        ("R2", "L5"), "numbers", "A number differs from the master.", ("00:00", "12:00")
+    ),
+    a_rule_finding(
+        ("R3", "L6"), "dates", "A date or weekday differs from the master.", ("Friday",)
+    ),
+    a_rule_finding((None, "L7"), "formality", "Formal and informal address are mixed."),
+    a_rule_finding(
+        ("R4", None),
         "language_column",
         "The de-CH column is short and reads as English. Is it German?",
     ),
@@ -72,15 +76,9 @@ def an_entry(head, texts, length, findings):
     }
 
 
-def a_problem(check, severity, detail, *values):
-    expected, found = (*values, None, None)[:2]
-    return {
-        "check": check,
-        "severity": severity,
-        "detail": detail,
-        "expected": expected,
-        "found": found,
-    }
+def a_problem(check, severity, detail, values=()):
+    """values: (expected, found)."""
+    return {"check": check, "severity": severity, "detail": detail, **expected_and_found(values)}
 
 
 CLAIM = "The offer was widened from members to all customers."
@@ -94,7 +92,7 @@ EXAMPLE_1 = an_entry(
     {"value": 36, "limit": 30, "unit": "ads_chars"},
     [
         a_problem("claim", "blocker", CLAIM),
-        a_problem("length_hard", "blocker", TOO_LONG, "30", "36"),
+        a_problem("length_hard", "blocker", TOO_LONG, ("30", "36")),
     ],
 )
 EXAMPLE_2 = an_entry(
@@ -106,7 +104,7 @@ EXAMPLE_2 = an_entry(
     ),
     {"value": 48, "limit": 90, "unit": "chars"},
     [
-        a_problem("numbers", "blocker", "A number differs from the master.", "30", "20"),
+        a_problem("numbers", "blocker", "A number differs from the master.", ("30", "20")),
         a_problem("locale_spelling", "warning", SPELLING),
     ],
 )
@@ -126,8 +124,7 @@ EXAMPLE_3 = an_entry(
             "currency_code",
             "warning",
             "The currency differs from the master; confirm the local price.",
-            "$",
-            "CHF",
+            ("$", "CHF"),
         ),
     ],
 )
@@ -143,7 +140,7 @@ EXAMPLE_4 = an_entry(
         TRAILPRO,
     ),
     {"value": 73, "limit": None, "unit": "chars"},
-    [a_problem("glossary_dnt", "warning", DNT, "TrailPro")],
+    [a_problem("glossary_dnt", "warning", DNT, ("TrailPro",))],
 )
 
 

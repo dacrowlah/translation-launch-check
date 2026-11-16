@@ -2,8 +2,8 @@
 CSV the user can re-upload as is, and the report's lines about it."""
 
 from _config import RULES
-from _corrected_file import COLUMNS, applied_fixes, corrected_csv, open_lines
-from _csv_package import FIXED_COLUMNS, parse_csv
+from _corrected_file import applied_fixes, corrected_csv, open_lines
+from _csv_package import parse_csv
 from builders import FILE_LINK, a_written_file, error
 from report_support import delivered_with, write
 from step_builders import (
@@ -56,10 +56,6 @@ FIXES = [
     a_passed_fix("fr-FR", "L2", "Bonjour, l'ami", "still_has"),
     a_passed_fix("fr-FR", "L1", "Jusqu'a -30 % !", "not_rechecked"),
 ]
-
-
-def test_the_fixed_columns_are_the_parsers():
-    assert COLUMNS == FIXED_COLUMNS
 
 
 def test_only_fixes_that_passed_the_recheck_are_applied():
