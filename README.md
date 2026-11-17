@@ -1,106 +1,59 @@
 # Translation Launch Check
 
-A localization QA check built on Optimizely's Agent Platform ("Mark"). A marketer attaches a
-localization file (a CSV string table: the en-US master copy plus each translation) in Mark
-chat, or a CMP posts it to a webhook. The workflow returns a verdict per language, the findings
-behind it, suggested fixes that were re-checked, and a corrected CSV with those fixes
-applied. The verdicts read "Fix first", "Check incomplete - re-run", "No blocking issues
-found by automated checks" or "No issues found by automated checks". Screening aid, not
-sign-off: a person still reviews every language, and a language the system couldn't fully
-check is never reported as passing.
+Translation Launch Check reviews localized campaign copy before launch. Built on
+Optimizely's Agent Platform ("Mark"), it compares translations with an en-US master and
+returns findings, suggested fixes, and a corrected CSV containing fixes that passed
+automated checks.
+
+Submit a CSV in Mark chat or send campaign data through a webhook. Each target locale
+receives a verdict based on rule checks and language review. The report supports human
+review; it does not approve a campaign for launch.
 
 Author: Ryan Crowley.
 
 ## Why it matters
 
-Seasonal campaigns launch on the same date in every market, localized from one master. A
-local reviewer then compares each translated line with the master by eye. The costly
-mistakes are mechanical, and easy to miss in a table of 50 lines and 5 languages:
-- a discount that changed (30% in the master, 20% in German);
-- a date or weekday that moved;
-- a merge tag renamed (`{{first_name}}` became `{{vorname}}`), which the customer then sees;
-- a tracking parameter dropped from a link, which breaks attribution;
-- a forbidden claim ("garanti") or a promise the master doesn't make (free shipping instead
-  of free returns);
-- copy too long for its channel, or in the wrong language.
+Bringing translation work in-house with AI can help a marketing team reduce its reliance
+on outside agencies. The review work remains: someone still has to check that each
+translation preserves the offer.
 
-Each one found after launch means a correction email, a price honoured by mistake, or lost
-reporting. The check does the line-by-line comparison in a few minutes and points the
-reviewer at what still needs a person.
+In a campaign launching across several markets, small changes can have costly
+consequences: a 30% discount becomes 20%, a customer-name placeholder breaks, or "members
+only" becomes "everyone." Reused copy and changes to the master after translation can
+introduce these inconsistencies under an already tight deadline.
+
+Translation Launch Check automates repeatable comparisons and uses agents to flag changes
+in meaning. It brings findings and suggested fixes together so reviewers can focus on the
+lines that need attention.
 
 ## How it works
 
 ![The Translation Launch Check workflow](docs/workflow-diagram.png)
 
-The rule: **code checks values, agents judge language, code decides every verdict.**
+**Code checks values, agents assess language, and code applies the scoring policy.**
 
-- Code reads the file, refuses it with every problem listed if it can't be checked, and runs
-  every rule check through one call to the custom tool.
-- Per language, Content Translation back-translates to English. Translation Review judges
-  what rules can't check (changed claims, meaning drift, tone, literal idioms) and gives a
-  second opinion on the rule findings flagged for it. It returns findings, never a verdict.
-- Code scores each language. A model never sets a verdict.
-- If anything needs fixing, Translation Fix Suggestions drafts a fix per flagged line and
-  checks each draft's length with `copy_fit_check`. The report step's code then re-checks
-  every draft with `localization_check`; only drafts that pass go into the corrected file.
+1. Code validates the file, lists input problems, and rejects files it cannot check. For
+   valid input, it calls the custom tool once to run the rule checks across target locales.
+2. For each target locale, Content Translation back-translates the copy into English.
+   Translation Review assesses meaning, claims and tone, and gives a second opinion on
+   selected rule findings. It returns structured findings.
+3. Code applies a consistent scoring policy to rule and model findings. Model findings
+   can still be wrong and require human review.
+4. Translation Fix Suggestions drafts fixes and checks their length with `copy_fit_check`.
+   The report step rechecks drafts with `localization_check` and applies additional output
+   guards before including accepted fixes in the corrected CSV.
 
-## Where each component lives
+## Components
 
-| Component | Name in Mark | Repo path |
+| Component | Name in Mark | Source |
 |---|---|---|
 | Skill (keyword trigger) | Market Rules and Glossary | `mark/skills/market-rules-glossary.template.md` |
 | Skill (tool trigger on `copy_fit_check`) | Fix Playbook | `mark/skills/translation-fix-playbook.md` |
 | Agent | Translation Review | `mark/agents/translation_review/` |
 | Agent | Translation Fix Suggestions | `mark/agents/translation_fix_suggestions/` |
-| Agent (reused, Optimizely's) | Content Translation | referenced by the workflow, not in the repo |
+| Agent (reused, Optimizely's) | Content Translation | Provided by Optimizely; referenced by the workflow |
 | Workflow | Translation Launch Check | `mark/workflow/workflow.json`, code in `mark/code_steps/` |
 | Custom tool | `localization_check`, `copy_fit_check` | `tool/`; contract in [docs/contract/TOOL_CONTRACT.md](docs/contract/TOOL_CONTRACT.md) |
-
-**The workflow.** Two triggers: Chat and a Webhook ("Translation Launch Check webhook").
-8 top-level steps, with a loop over the languages that holds 3 more:
-
-| Step | Kind | Code |
-|---|---|---|
-| Read and check the file | code | `read_and_check.py` |
-| Is the file usable? | condition | |
-| Ask for a corrected file | code | `needs_info.py` |
-| For each language: Back-translate to English, Review the translation, Save the review | loop: 2 agents, 1 code step | `save_review.py` |
-| Score each language | code | `score.py` |
-| Anything to fix? | condition | |
-| Suggest fixes | agent | |
-| Write and send the report | code | `report.py` |
-
-Each step file imports helper modules (`mark/code_steps/_*.py`); `mark/build.py` inlines them
-into the importable workflow JSON.
-
-**Platform tools,** all called by "Write and send the report" through
-`mark/code_steps/_platform.py`:
-
-| Tool | Used for |
-|---|---|
-| `create_canvas` | the report canvas: findings, back-translations, suggested fixes |
-| `write_content_to_file` | the corrected CSV, linked from the chat reply |
-| `send_email` | the report to the QA inbox, on webhook runs only |
-
-**The custom tool** (`tool/`, TypeScript on Vercel) does all deterministic work from one
-rules file, `tool/config/rules.json`:
-- `localization_check`: every rule check of each translation against the master (numbers,
-  prices, dates, merge tags, links, promo codes, formality, glossary, market spelling,
-  forbidden terms) and the language check;
-- `copy_fit_check`: channel length counting (characters, double-width characters, SMS
-  segments). The fix agent calls it on each draft.
-
-## Repository layout
-
-| Path | What it holds |
-|---|---|
-| `tool/` | the Vercel service: `src/` (domain, application, infrastructure, presentation), `config/rules.json`, `test/` |
-| `mark/` | code steps, agents, skills, the workflow, `build.py` and its `_build/`, tests |
-| `demo/` | demo CSV files, the seeded test set and its answer key, `encodings/` |
-| `scripts/` | `preflight.sh` (all gates), `prove-gates.sh`, `send_package.py` (webhook sender), `catch_rate.py`, fixture and test helpers; `ruff.toml` (scripts/ uses mark/'s ruff rules) |
-| `docs/` | the tool contract, behaviour spec and known limitations; the engineering standards; the security review |
-| `.githooks/` | pre-commit: format and lint on staged files |
-| `.claude/skills/` | project skills for building and testing with Claude |
 
 ## Quick start
 
@@ -121,7 +74,7 @@ git config core.hooksPath .githooks
 ## Deploy and import
 
 1. Deploy `tool/` to Vercel with `tool/` as the project's root directory, and set the
-   environment variable `TOOL_BEARER_TOKEN` (at least 32 characters). The service refuses to
+   environment variable `TOOL_BEARER_TOKEN` (at least 32 characters). The service will not
    start without it.
 2. Register the tool, write the private config, build and import, following
    [mark/README.md](mark/README.md):
@@ -134,88 +87,150 @@ git config core.hooksPath .githooks
 
 - **Chat:** attach one localization CSV in Mark chat and send
   `@translation_launch_check check this`.
-- **Webhook** (the call a CMP step would make):
+- **Webhook:** submit campaign data from a content marketing platform (CMP) or another
+  system. This script demonstrates the request; a complete CMP integration is not included:
   ```
   .venv/bin/python scripts/send_package.py demo/black-friday-launch.csv --dry-run   # prints the payload
   .venv/bin/python scripts/send_package.py demo/black-friday-launch.csv             # prints "HTTP <status>"
   ```
 
-What comes back:
+The report uses four verdicts:
+
+- **Fix first:** blocking findings need attention.
+- **Check incomplete - re-run:** the workflow could not complete the required checks.
+- **No blocking issues found by automated checks:** warnings remain.
+- **No issues found by automated checks:** the completed checks found no issues.
+
+Blocking findings take precedence over an incomplete check. A locale that could not be
+fully checked is never reported as passing. Model findings can affect the verdict, so a
+person still reviews each locale.
+
+Outputs:
 
 | Output | Chat run | Webhook run |
 |---|---|---|
-| Chat reply: overall verdict, per-language summary, links | yes | in the run log only |
+| Chat reply: overall verdict, per-locale summary, links | yes | in the run log only |
 | Canvas: every finding, back-translations, suggested fixes | yes | yes |
-| Corrected CSV (fixes that passed the re-check applied) | when a fix passed | when a fix passed |
+| Corrected CSV with accepted fixes applied | when a fix passed | when a fix passed |
 | Email to the QA inbox (plain text) | no | yes |
 
-The webhook caller gets only the HTTP status, never the report.
+The webhook caller receives an HTTP status, not the report.
 
-## Demo files and expected verdicts
+## Demo files and expected results
 
-The walkthrough, with the exact findings of each file, is
-[mark/README.md section 5](mark/README.md#5-demo-walkthrough). In short:
+These files exercise the main paths. Model findings can vary between runs; the table
+summarizes expected outcomes rather than guaranteed finding counts. For recorded findings
+and a walkthrough, see [mark/README.md section 5](mark/README.md#5-demo-walkthrough).
 
 | File (`demo/`) | Expected result |
 |---|---|
-| `black-friday-clean.csv` (de-DE, fr-FR, ja-JP) | No issues found by automated checks, in every language |
-| `black-friday-launch.csv` | Fix first: de-DE and fr-FR, 4 blockers and 1 warning each (one blocker in each is a meaning change only Translation Review can see); ja-JP 1 warning |
-| `black-friday-vendor-export.csv` | refused, all three problems in one message, no agent runs |
-| `black-friday-uk-ch.csv` (en-GB, de-CH) | No blocking issues found by automated checks; market spelling fixed |
-| `encodings/` (six encodings of one file) | in chat, UTF-8 and Western Windows-1252 accepted; lost or garbled Japanese refused |
-| `seeded-errors.csv` (5 languages) | 20 of 20 planted errors caught: 17 by code, 3 by Translation Review |
+| `black-friday-clean.csv` (de-DE, fr-FR, ja-JP) | No issues found by automated checks in each target locale |
+| `black-friday-launch.csv` | Fix first for de-DE and fr-FR; a warning for ja-JP. Includes changed values, broken placeholders and links, and changes in meaning |
+| `black-friday-vendor-export.csv` | Rejected with all three input problems listed; the translation agents do not run |
+| `black-friday-uk-ch.csv` (en-GB, de-CH) | No blocking issues found by automated checks; market spelling corrections suggested |
+| `encodings/` (six encodings of one file) | UTF-8 works in chat; Western Windows-1252 text can survive Mark's conversion. Detected missing or garbled Japanese is rejected |
 
-A 3-language file takes about 1.5-3 minutes and, from the run logs, about 40-65 credits
-(clean 54, errors about 60-64). A refused file costs about 6; the 5-language seeded set
-about 92.
+In one recorded evaluation, `seeded-errors.csv` covered five target locales and 20 planted
+errors. The workflow caught all 20: 17 through code and three through Translation Review.
+It also raised seven additional flags, about two judged defensible. This is a result from
+one test set, not a general accuracy estimate.
 
-## Limits and costs
+Recorded runs with three target locales took about 1.5-3 minutes and used 40-65 credits
+(clean: 54; errors: about 60-64). A rejected-file run used about six credits, and the seeded
+evaluation used about 92. Timing and model output can vary.
 
-| Limit | Value | Where |
+## Limits
+
+| Limit | Value | Source |
 |---|---|---|
-| Rows per file | 50 | `tool/config/rules.json` `limits` |
-| Target languages per file | 5 | same |
-| Characters per cell | 1,000 | same |
-| File size | 64 KB | same |
-| Encoding | UTF-8 only | the workflow refuses other encodings |
-| Webhook package | about 26.8 KB (26,800 bytes as escaped JSON) | `scripts/send_package.py` refuses larger |
-| Markets with rules | en-US master; de-DE, de-CH, fr-FR, en-GB, ja-JP | `tool/config/rules.json` |
-| Second opinions | 20 findings per language | Translation Review's output schema |
+| Rows per file | 50 | `tool/config/rules.json` |
+| Target locales per file | 5 | Same |
+| Characters per cell | 1,000 | Same |
+| File size | 64 KB | Same |
+| Encoding | Use CSV UTF-8; see the chat conversion caveat below | Input validation |
+| Webhook package | About 26.8 KB (26,800 bytes as escaped JSON) | `scripts/send_package.py` |
+| Supported locales | en-US master; de-DE, de-CH, fr-FR, en-GB, ja-JP targets | `tool/config/rules.json` |
+| Second opinions | 20 findings per target locale | Translation Review's output schema |
 | Suggested fixes | 60 lines per run | Translation Fix Suggestions' output schema |
 
-Every accepted gap, with its reason: [docs/contract/KNOWN_LIMITATIONS.md](docs/contract/KNOWN_LIMITATIONS.md).
+The webhook sender reads the original file bytes and rejects non-UTF-8 files. Mark may
+convert chat attachments before the workflow sees them, so Western Windows-1252 text can
+be accepted after conversion. The workflow checks for missing or garbled characters, but
+cannot verify the original encoding. Export CSV UTF-8 to avoid this ambiguity.
+
+Agent input budgets can also reject a file below the 64 KB limit. See
+[known limitations](docs/contract/KNOWN_LIMITATIONS.md) for the full constraints and accepted
+gaps.
+
+## Implementation details
+
+The workflow has chat and webhook triggers and a loop over target locales.
+`mark/build.py` bundles the Python steps and their helpers into importable workflow JSON.
+See the [Mark setup guide](mark/README.md) for import instructions and the
+[workflow standards](docs/standards/MARK.md) for implementation details.
+
+**Platform tools** are called by "Write and send the report" through
+`mark/code_steps/_platform.py`:
+
+| Tool | Used for |
+|---|---|
+| `create_canvas` | the report canvas: findings, back-translations, suggested fixes |
+| `write_content_to_file` | the corrected CSV, linked from the chat reply |
+| `send_email` | the report to the QA inbox, on webhook runs only |
+
+**The custom tool** (`tool/`, TypeScript on Vercel) uses `tool/config/rules.json` for rule
+checks and channel length limits:
+
+- `localization_check`: every rule check of each translation against the master (numbers,
+  prices, dates, merge tags, links, promo codes, formality, glossary, market spelling,
+  forbidden terms) and the language check;
+- `copy_fit_check`: channel length checks (characters, double-width characters, SMS
+  segments). The fix agent calls it on each draft.
+
+## Repository layout
+
+| Path | What it holds |
+|---|---|
+| `tool/` | TypeScript service, shared market rules and tests |
+| `mark/` | Workflow, agents, skills, Python code steps, build helpers and tests |
+| `demo/` | Demo CSVs, seeded evaluation with an answer key, and encoding samples |
+| `scripts/` | Validation gates, webhook sender, evaluation and fixture helpers, and lint configuration |
+| `docs/` | Behavior contract, known limitations, engineering standards and security review |
+| `.githooks/` | Pre-commit formatting and linting |
+| `.claude/skills/` | Project skills for building and testing with Claude |
 
 ## Security and privacy
 
-Full review: [docs/security-review.md](docs/security-review.md). In short:
-- **The tool makes no outbound requests** and stores nothing.
-- **No campaign copy in logs.** Responses carry status tokens, never diagnostics.
-- **Bearer auth** on every tool call, compared in constant time; `/discovery` is public by
-  design, and any other route is a 404.
-- **Email goes only to an allow-listed address**, checked in code twice. The recipient comes
-  from the private config, never from the file.
-- **Untrusted text stays text.** Copy and model output are escaped for Markdown in the chat
-  reply and the canvas, and sent as plain text in the email.
-- **No formulas in the corrected file.** A suggested fix that would start a spreadsheet
-  formula (`=`, `+`, `-`, `@`, a tab or a carriage return first, also after leading
-  whitespace or invisible characters) is not applied unless the original cell starts the
-  same way.
-- **Content Translation can browse the web.** The reused agent has `browse_web`, and
-  untrusted copy reaches it. Its answer feeds only the review of one language's lines, and
-  every verdict is computed in code.
-- **Secrets live only** in the gitignored `mark/local.config.json` and the Vercel
-  environment.
+See the [security review](docs/security-review.md) for details.
+
+- **The custom tool makes no outbound requests** and does not persist campaign data.
+  The workflow calls platform tools to create reports, write files and send email.
+- **No campaign copy in custom-tool logs.** Log events contain statuses and timings.
+  The workflow processes campaign content in Mark; this is not a platform-wide logging claim.
+- **Bearer authentication** protects tool calls, with constant-time token comparison.
+  `/discovery` is public; routes outside the allow-list return 404.
+- **Email recipients are restricted.** Code checks the configured recipient against an
+  allow-list. The input file cannot choose the recipient.
+- **Report text is escaped.** Copy and model output are escaped for Markdown in chat and
+  canvases, and sent as plain text in email.
+- **Checks for formula-like fixes.** A suggested fix is withheld if it introduces a
+  formula-start character (`=`, `+`, `-`, `@`, tab or carriage return) that the original cell
+  did not have. Checks also account for leading whitespace and invisible characters. This
+  does not guarantee that every cell in the output is formula-free.
+- **Content Translation can browse the web.** Untrusted copy reaches the reused agent's
+  `browse_web` capability. Its response feeds the language review; computing verdicts in
+  code does not eliminate this exposure.
+- **Credentials stay out of source control.** Use gitignored local configuration and
+  deployment environment variables for secrets.
 
 ## Engineering standards and tests
 
-Both halves follow binding standards ([docs/standards/](docs/standards/README.md)): Clean
-Architecture, SOLID, DRY, the Law of Demeter and Sandi Metz's limits (5-line functions,
-100-line files, 4 parameters). In `tool/` they are gated by lint, an architecture test and a
-duplicate-code check; in `mark/`, ruff gates parameters and review counts lines.
-`scripts/preflight.sh` runs every gate, and each gate is proven red by a planted violation
-(`scripts/prove-gates.sh`).
+The [engineering standards](docs/standards/README.md) define the architecture, code limits
+and validation gates for both halves. `scripts/preflight.sh` runs formatting, linting,
+type checks, architecture checks and tests. `scripts/prove-gates.sh` verifies that the
+gates reject deliberately introduced violations.
 
-Tests at the time of writing:
+Last recorded test counts:
 
 | Suite | Tests |
 |---|---|
@@ -223,21 +238,21 @@ Tests at the time of writing:
 | `tool/` scaling (time grows at most linearly) | 21 |
 | `mark/` (pytest) | 1,076 |
 
-## How we'd extend it
+## Potential extensions
 
-Most of these are one more tool call or a rules edit:
-- **A customer price list:** check each market's prices against the customer's own list, not
-  only against the master.
-- **CMP or CMS write-back:** the webhook already takes the JSON package a CMP step would
-  post; the corrected lines could be written back the same way.
-- **Re-check only changed lines** on a second run.
-- **More markets as rules data:** a new locale of a covered language (de-AT) is a
-  `rules.json` edit; a new Latin-script language adds its calendar, time and number data
-  there, plus one display name in code.
+- **Customer price-list checks:** compare market prices with the customer's system of
+  record as well as the master copy.
+- **CMP or content management system (CMS) write-back:** send approved fixes to the source
+  system. This requires its API, permissions, an approval policy and failure handling.
+- **Incremental review:** recheck only changed lines on subsequent runs.
+- **Broader market coverage:** add locale rules and evaluate them with representative
+  copy. Some additions fit the existing rules schema; new scripts or spelling behavior
+  require code changes.
 
-Known gaps today ([KNOWN_LIMITATIONS section 5](docs/contract/KNOWN_LIMITATIONS.md#5-the-workflow-mark-side)):
-- **Email intake isn't shipped.** Email can't carry the file yet; an email run is asked to
-  attach the file in chat.
-- **Webhook failures are silent.** A webhook run that fails sends no email, and the caller
-  gets only the HTTP status.
-- **Chat runs send no email:** the chat payload carries no verified identity to send to.
+Current gaps are documented in
+[known limitations, section 5](docs/contract/KNOWN_LIMITATIONS.md#5-the-workflow-mark-side):
+
+- **Email intake is not supported.** Users are asked to attach the file in chat.
+- **Failed webhook runs send no report email.** The caller receives only an HTTP status
+  and must inspect the run log to investigate workflow failures.
+- **Chat runs send no email.** The chat payload does not provide a verified recipient.
