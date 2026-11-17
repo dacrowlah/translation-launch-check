@@ -1,7 +1,7 @@
 """Sends a localization CSV to the workflow's webhook trigger, as CMP's step would.
 
-    python scripts/send_package.py demo/black-friday-errors.csv            # prints "HTTP <status>"
-    python scripts/send_package.py demo/black-friday-errors.csv --dry-run  # prints the payload
+    python scripts/send_package.py demo/black-friday-launch.csv            # prints "HTTP <status>"
+    python scripts/send_package.py demo/black-friday-launch.csv --dry-run  # prints the payload
 
 The file is read by the workflow's own parse_csv: a file with problems lists them and sends
 nothing. The payload is the package plus package_sha256, the full SHA-256 of the package's

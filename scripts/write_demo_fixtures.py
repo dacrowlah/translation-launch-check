@@ -15,7 +15,7 @@ from send_package import DEMO, REPO, RULES, read_package
 FIXTURES = REPO / "tool" / "test" / "fixtures" / "demo"
 FIXTURE_SOURCES = (
     "black-friday-clean.csv",
-    "black-friday-errors.csv",
+    "black-friday-launch.csv",
     "black-friday-uk-ch.csv",
     "seeded-errors.csv",
     "encodings/1-campaign-utf8.csv",

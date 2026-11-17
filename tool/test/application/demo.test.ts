@@ -161,11 +161,11 @@ describe("demo files through the real tool", () => {
   });
 
   it("the_errors_file_gives_exactly_the_planted_rule_errors", () => {
-    expect(outcome("black-friday-errors")).toEqual([CHECKED, ERRORS_FILE_FINDINGS]);
+    expect(outcome("black-friday-launch")).toEqual([CHECKED, ERRORS_FILE_FINDINGS]);
   });
 
   it("the_japanese_headline_fits_at_28_of_30_double_width_characters", () => {
-    expect(lineOf(run("black-friday-errors"), "ja-JP", "L3")).toEqual({
+    expect(lineOf(run("black-friday-launch"), "ja-JP", "L3")).toEqual({
       id: "L3",
       length: { value: 28, limit: 30, unit: "ads_chars" },
       findings: [],

@@ -43,13 +43,13 @@ def demo_cells(name, column):
 
 def test_every_demo_japanese_cell_garbled_by_shift_jis_is_caught():
     cells = demo_cells("black-friday-clean.csv", "ja-JP") + demo_cells(
-        "black-friday-errors.csv", "ja-JP"
+        "black-friday-launch.csv", "ja-JP"
     )
     assert all(_garbled(as_mark_delivers(cell)) for cell in cells)
 
 
 @pytest.mark.parametrize(
-    "name", ["black-friday-clean.csv", "black-friday-errors.csv", "black-friday-uk-ch.csv"]
+    "name", ["black-friday-clean.csv", "black-friday-launch.csv", "black-friday-uk-ch.csv"]
 )
 def test_the_demo_files_have_no_garbled_cell(name):
     assert parse_csv((DEMO / name).read_bytes(), name, RULES)[1] == []

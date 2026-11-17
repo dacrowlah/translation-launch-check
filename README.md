@@ -136,8 +136,8 @@ git config core.hooksPath .githooks
   `@translation_launch_check check this`.
 - **Webhook** (the call a CMP step would make):
   ```
-  .venv/bin/python scripts/send_package.py demo/black-friday-errors.csv --dry-run   # prints the payload
-  .venv/bin/python scripts/send_package.py demo/black-friday-errors.csv             # prints "HTTP <status>"
+  .venv/bin/python scripts/send_package.py demo/black-friday-launch.csv --dry-run   # prints the payload
+  .venv/bin/python scripts/send_package.py demo/black-friday-launch.csv             # prints "HTTP <status>"
   ```
 
 What comes back:
@@ -159,8 +159,8 @@ The walkthrough, with the exact findings of each file, is
 | File (`demo/`) | Expected result |
 |---|---|
 | `black-friday-clean.csv` (de-DE, fr-FR, ja-JP) | No issues found by automated checks, in every language |
-| `black-friday-errors.csv` | Fix first: de-DE and fr-FR, 4 blockers and 1 warning each (one blocker in each is a meaning change only Translation Review can see); ja-JP 1 warning |
-| `black-friday-broken.csv` | refused, all three problems in one message, no agent runs |
+| `black-friday-launch.csv` | Fix first: de-DE and fr-FR, 4 blockers and 1 warning each (one blocker in each is a meaning change only Translation Review can see); ja-JP 1 warning |
+| `black-friday-vendor-export.csv` | refused, all three problems in one message, no agent runs |
 | `black-friday-uk-ch.csv` (en-GB, de-CH) | No blocking issues found by automated checks; market spelling fixed |
 | `encodings/` (six encodings of one file) | in chat, UTF-8 and Western Windows-1252 accepted; lost or garbled Japanese refused |
 | `seeded-errors.csv` (5 languages) | 20 of 20 planted errors caught: 17 by code, 3 by Translation Review |

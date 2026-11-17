@@ -54,7 +54,7 @@ def cells(package):
     [
         "template.csv",
         "black-friday-clean.csv",
-        "black-friday-errors.csv",
+        "black-friday-launch.csv",
         "black-friday-uk-ch.csv",
         "seeded-errors.csv",
     ],
@@ -65,12 +65,12 @@ def test_the_demo_files_parse_without_problems(name):
 
 
 def test_the_broken_file_lists_exactly_its_three_problems():
-    assert parse("black-friday-broken.csv") == (None, BROKEN_FILE_PROBLEMS)
+    assert parse("black-friday-vendor-export.csv") == (None, BROKEN_FILE_PROBLEMS)
 
 
 def test_the_errors_file_differs_from_the_clean_one_only_in_the_planted_cells():
     clean = cells(parse("black-friday-clean.csv")[0])
-    errors = cells(parse("black-friday-errors.csv")[0])
+    errors = cells(parse("black-friday-launch.csv")[0])
     changed = {key for key in clean if clean[key] != errors[key]}
     assert (set(errors) == set(clean), changed) == (
         True,

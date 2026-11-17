@@ -23,7 +23,7 @@ from send_package import (
 from _config import RULES
 from _webhook_package import from_webhook
 
-ERRORS_CSV = str(DEMO / "black-friday-errors.csv")
+ERRORS_CSV = str(DEMO / "black-friday-launch.csv")
 HOOK = {"url": "https://hooks.example.com/tlc", "auth_header": "X-Api-Key", "auth_key": "k-123456"}
 
 
@@ -171,7 +171,7 @@ def test_without_a_usable_webhook_config_nothing_is_sent(tmp_path, capsys, conte
 
 def test_a_file_with_problems_lists_them_and_sends_nothing(tmp_path, capsys):
     opener = RecordingOpener()
-    code = send(tmp_path, opener, [str(DEMO / "black-friday-broken.csv")])
+    code = send(tmp_path, opener, [str(DEMO / "black-friday-vendor-export.csv")])
     assert (code, capsys.readouterr().out.splitlines(), opener.requests) == (
         1,
         [

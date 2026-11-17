@@ -103,7 +103,7 @@ scripts/     preflight.sh  prove-gates.sh  mark-test-gate.sh  send_package.py  w
 .githooks/   pre-commit
 tool/        api/  config/  scripts/  src/{domain,application,infrastructure,presentation}  test/
 mark/        code_steps/ (steps and helper modules)  agents/  skills/  workflow/  build.py  _build/  tests/  dist/ (generated)
-demo/        template.csv  black-friday-{clean,errors,broken,uk-ch}.csv  seeded-errors.csv (+ .answers.json)  encodings/
+demo/        template.csv  black-friday-{clean,launch,vendor-export,uk-ch}.csv  seeded-errors.csv (+ .answers.json)  encodings/
 ```
 
 See [standards README section 4](docs/standards/README.md#4-repository-layout), and
